@@ -1,7 +1,14 @@
 # serializers.py
+from django.conf import settings
 from rest_framework import serializers
 from .models import CustomUser
 from .exceptions import InvalidDataException, DuplicateFieldException
+from django.contrib.auth import get_user_model
+
+
+
+User = get_user_model()
+
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,3 +36,9 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             raise InvalidDataException()
         except CustomUser.MultipleObjectsReturned:
             raise DuplicateFieldException()
+
+
+class CustomUserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'username', 'email', 'user.phone_number')  # Убедитесь, что здесь есть поле phone_number

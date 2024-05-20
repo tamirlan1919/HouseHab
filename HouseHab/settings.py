@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -52,6 +51,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+
 
 ROOT_URLCONF = 'HouseHab.urls'
 
@@ -131,19 +133,17 @@ EMAIL_HOST_USER = 'tamirlan.chinchaev@gmail.com'
 EMAIL_HOST_PASSWORD = 'F00dz!#0'
 EMAIL_PORT = 587
 
-
 DJOSER = {
 
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': False,
-    'LOGIN_FIELD': "email",
+    "LOGIN_FIELD":'email',
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'TOKEN_MODEL': None,  # We use only JWT
-    'ACTIVATION_URL': 'auth/verify/{uid}/{token}/',
     'SERIALIZERS': {
         'user_create': 'estatemaster.serializers.CustomUserCreateSerializer',
+        'current_user': 'estatemaster.serializers.CustomUserProfileSerializer',
 
     },
 
