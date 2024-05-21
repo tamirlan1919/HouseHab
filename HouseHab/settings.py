@@ -26,6 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Application definition
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'rest_framework.authtoken',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 
-
+AUTH_USER_MODEL = 'estatemaster.CustomUser'
 
 ROOT_URLCONF = 'HouseHab.urls'
 
@@ -127,20 +129,32 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'tamirlan.chinchaev@gmail.com'
-EMAIL_HOST_PASSWORD = 'F00dz!#0'
-EMAIL_PORT = 587
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False  # Use either TLS or SSL, not both
+EMAIL_USE_SSL = True  # Use SSL if the port is 465
+EMAIL_HOST_USER = 'tchinchaev@bk.ru'
+EMAIL_HOST_PASSWORD = 'FB4jx0hP4BLnXTrw2wuY'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+
+
 
 DJOSER = {
 
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': False,
+    'ACTIVATION_URL': '/users/activation/{uid}/{token}',
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_ACTIVATION_EMAIL': True,
     "LOGIN_FIELD":'email',
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
+
     'SERIALIZERS': {
         'user_create': 'estatemaster.serializers.CustomUserCreateSerializer',
         'current_user': 'estatemaster.serializers.CustomUserProfileSerializer',
@@ -160,6 +174,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'EXCEPTION_HANDLER': 'estatemaster.utils.custom_exception_handler',
 
 }

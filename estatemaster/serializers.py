@@ -27,7 +27,9 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
                 email=validated_data['email'],
                 phone_number=validated_data['phone_number'],
                 account_type=validated_data['account_type'],
-                password=validated_data['password']
+                password=validated_data['password'],
+                is_active = False  # Set the user as inactive
+
             )
             return user
         except KeyError:
@@ -41,4 +43,4 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 class CustomUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'email', 'user.phone_number')  # Убедитесь, что здесь есть поле phone_number
+        fields = ('id','email','phone_number','first_name','last_name','username','photo','date_of_birth','account_type')  # Убедитесь, что здесь есть поле phone_number

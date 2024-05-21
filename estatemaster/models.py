@@ -8,6 +8,10 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15)
     account_type = models.CharField(max_length=20, choices=[('individual', 'Individual'), ('professional', 'Professional')],
                                     default='individual')
+    photo = models.ImageField(upload_to='photos/', blank=True, null=True)
+    first_name = models.CharField(max_length=30, blank=True, null=True)
+    last_name = models.CharField(max_length=30, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number', 'account_type']
@@ -32,19 +36,3 @@ class CustomUser(AbstractUser):
         help_text='Specific permissions for this user.'
     )
 
-    def save(self, *args, **kwargs):
-        # Добавляем вашу логику перед сохранением пользователя
-        # Например, проверяем или обновляем что-то
-        # Здесь просто вызываем метод save родительского класса, чтобы сохранить объект
-        super().save(*args, **kwargs)
-
-        # Создаем или обновляем соответствующего пользователя в стандартной модели User
-        User = get_user_model()
-        user, created = User.objects.update_or_create(
-            email=self.email,
-            defaults={
-                'username': self.email,
-                'email': self.email,
-                'password': self.password,  # Если нужно, убедитесь, что пароль установлен правильно
-            }
-        )
