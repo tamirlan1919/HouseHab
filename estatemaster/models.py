@@ -377,36 +377,128 @@ class RentCommercialAdvertisement(BaseSaleComerc):
         ('usd', 'Доллар'),
         ('eur', 'Евро'),
     ]
-    currency_month_kv_m = models.CharField(max_length=3, name='Валюта в месяц  за м^2',choices=CURRENCY_CHOICES, default='mzn')
-    rent_month_kv_m  = models.PositiveIntegerField(name='Аренда в месяц  за м^2')
-    currency_kv_m_year = models.CharField(max_length=3, name='Валюта в год за м^2' ,choices=CURRENCY_CHOICES, default='mzn')
-    price_kv_m_year = models.PositiveIntegerField(name='Аренда в год за м^2')
-    currency_rent_month = models.CharField(max_length=3, name='Валюта аренда за месяц', choices=CURRENCY_CHOICES, default='mzn')
-    rent_month = models.PositiveIntegerField(name='Аренда за месяц ')
-    is_nalog = models.CharField(max_length=70, name='Налог',
-                                choices=[('nds_on', 'Ндс включен'), ('nds_off', 'Ндс не облегается'),
-                                         ('just_nalog', 'Упрощенная налогобложения')])
-    is_communal = models.BooleanField(default=False,name='Комунальный платежи')
-    is_exploitation = models.BooleanField(default=False,name='Экспаутационные  расходы')
 
-    type_rent = models.CharField(name='Тип аренды',max_length=30,choices=[('direct_rental','Прямая аренда',('subrent','Субаренда'))])
-    min_rent_period = models.PositiveIntegerField('Минимальный срок аренды')
-    rent_holidays = models.BooleanField(default=False,name='Арендные каникулы')
-    security_deposit = models.PositiveIntegerField(name='Обеспечительный платеж')
-    security_deposit_currency = models.CharField(max_length=3, name='Валюта за обеспечительный платеж'  ,choices=CURRENCY_CHOICES, default='mzn')
-    prepayment = models.CharField(name='Предоплата',max_length=30, choices=[
-        ('4','4 мес'),
-        ('5','5 мес')
-        ('6','6 мес')
-        ('7','7 мес')
-        ('8','8 мес')
-        ('9','9 мес')
-        ('10','10 мес')
-        ('11','11 мес')
-        ('year','Год')
-    ])
-    bonus_agent = models.CharField(max_length=70, name='Бонус агенту', choices=[('no','Нет'),('fix_sum','Фиксированная сумма'),
-                                                                      ('procent','Процент от сделки')])
-    phone = models.CharField(max_length=30,name='Телефон')
-    dop_phone = models.CharField(max_length=30,name='Доп телефон')
-    promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
+    currency_month_kv_m = models.CharField(
+        max_length=3,
+        name='Валюта в месяц за м^2',
+        choices=CURRENCY_CHOICES,
+        default='mzn'
+    )
+
+    rent_month_kv_m = models.PositiveIntegerField(
+        name='Аренда в месяц за м^2'
+    )
+
+    currency_kv_m_year = models.CharField(
+        max_length=3,
+        name='Валюта в год за м^2',
+        choices=CURRENCY_CHOICES,
+        default='mzn'
+    )
+
+    price_kv_m_year = models.PositiveIntegerField(
+        name='Аренда в год за м^2'
+    )
+
+    currency_rent_month = models.CharField(
+        max_length=3,
+        name='Валюта аренда за месяц',
+        choices=CURRENCY_CHOICES,
+        default='mzn'
+    )
+
+    rent_month = models.PositiveIntegerField(
+        name='Аренда за месяц'
+    )
+
+    is_nalog = models.CharField(
+        max_length=70,
+        name='Налог',
+        choices=[
+            ('nds_on', 'Ндс включен'),
+            ('nds_off', 'Ндс не облегается'),
+            ('just_nalog', 'Упрощенная налогобложения')
+        ]
+    )
+
+    is_communal = models.BooleanField(
+        default=False,
+        name='Комунальный платежи'
+    )
+
+    is_exploitation = models.BooleanField(
+        default=False,
+        name='Экспаутационные расходы'
+    )
+
+    type_rent = models.CharField(
+        name='Тип аренды',
+        max_length=30,
+        choices=[
+            ('direct_rental', 'Прямая аренда'),
+            ('subrent', 'Субаренда')
+        ]
+    )
+
+    min_rent_period = models.PositiveIntegerField(
+        name='Минимальный срок аренды'
+    )
+
+    rent_holidays = models.BooleanField(
+        default=False,
+        name='Арендные каникулы'
+    )
+
+    security_deposit = models.PositiveIntegerField(
+        name='Обеспечительный платеж'
+    )
+
+    security_deposit_currency = models.CharField(
+        max_length=3,
+        name='Валюта за обеспечительный платеж',
+        choices=CURRENCY_CHOICES,
+        default='mzn'
+    )
+
+    prepayment = models.CharField(
+        name='Предоплата',
+        max_length=30,
+        choices=[
+            ('4', '4 мес'),
+            ('5', '5 мес'),
+            ('6', '6 мес'),
+            ('7', '7 мес'),
+            ('8', '8 мес'),
+            ('9', '9 мес'),
+            ('10', '10 мес'),
+            ('11', '11 мес'),
+            ('year', 'Год')
+        ]
+    )
+
+    bonus_agent = models.CharField(
+        max_length=70,
+        name='Бонус агенту',
+        choices=[
+            ('no', 'Нет'),
+            ('fix_sum', 'Фиксированная сумма'),
+            ('procent', 'Процент от сделки')
+        ]
+    )
+
+    phone = models.CharField(
+        max_length=30,
+        name='Телефон'
+    )
+
+    dop_phone = models.CharField(
+        max_length=30,
+        name='Доп телефон'
+    )
+
+    promotion = models.ForeignKey(
+        Promotion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
