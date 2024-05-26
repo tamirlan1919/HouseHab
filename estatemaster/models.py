@@ -54,19 +54,34 @@ class PromotionConfig(models.Model):
     def __str__(self):
         return self.get_promotion_type_display()
 
+class Builder(models.Model):
+    name = models.CharField(max_length=100)
 
 
-class BaseModel(models.Model):
+class FlatModel(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
                                     default='owner')
-    type_of_deal = models.CharField(name='Тип сделки' ,max_length=40, default='Продажа')
-    type_of_property = models.CharField(name = 'Тип недвижимости',max_length=50, default='Жилая')
+    type_of_deal = models.BooleanField(name='Продажа' )
+    type_of_property = models.BooleanField(name = 'Жилая',max_length=50, default='')
     obj = models.CharField(name = 'Объект', max_length=100,
                            choices=[('flat', 'Квартира'), ('new_flat', 'Квартира в новостройке'),
                                     ('room','Комната'), ('part_flat','Доля в квартире'), ('house', 'Дом'),
                                     ('cottege','Коттедж'), ('tanhouse', 'Танхаус'), ('part_house', 'Часть дома'), ('spot','Участок')],
                           default='owner' )
+    address = models.CharField(name='Адресс',max_length=400)
+    nearest_stop = models.CharField(name='Ближайшая остановка',max_length=400)
+    minute_stop = models.CharField(name='Минут до остановки',max_length=400)
+class BaseModel(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
+    deal_type = models.CharField(name='deal_type', max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
+    type_of_property = models.CharField(name = 'Жилая',max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Комерческая')])
+    obj = models.CharField(name = 'Объект', max_length=100,
+                           choices=[('flat', 'Квартира'), ('new_flat', 'Квартира в новостройке'),
+                                    ('room','Комната'), ('part_flat','Доля в квартире'), ('house', 'Дом'),
+                                    ('cottege','Коттедж'), ('tanhouse', 'Танхаус'), ('part_house', 'Часть дома'), ('spot','Участок')]
+                          )
     address = models.CharField(name='Адресс',max_length=400)
     nearest_stop = models.CharField(name='Ближайшая остановка',max_length=400)
     minute_stop = models.CharField(name='Минут до остановки',max_length=400)
@@ -77,26 +92,138 @@ class BaseModel(models.Model):
                                                            ('5', '5'), ('6+', '6'),
                                                            ('free_layout', 'Свободная планировка')])
     total_area = models.PositiveIntegerField(name='Общая площадь')
-    living_area = models.PositiveIntegerField(name='Жилая площадь')
-    kitchen_area = models.PositiveIntegerField(name='Кухня')
+    living_area = models.PositiveIntegerField(name='Жилая площадь',blank=True,null=True)
+    kitchen_area = models.PositiveIntegerField(name='Кухня',blank=True,null=True)
     property_type = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')])
     photo = models.ImageField(upload_to='images/')
-    video = models.CharField(max_length=300, name='Видео')
+    video = models.CharField(max_length=300, name='Видео',blank=True,null=True)
+    headings = models.CharField(max_length=100, name='Загаловок')
+    description = models.TextField(name='Описание')
     balconies = models.PositiveIntegerField(name='Балконы',default=0)
     loggia = models.PositiveIntegerField(name='Лоджия',default=0)
-    view_from_window = models.CharField(max_length=30, choices=[('outside', 'На улицу'), ('into_the_courtyard', 'Во двор')])
+    view_from_window = models.CharField(max_length=30, choices=[('outside', 'На улицу'), ('into_the_courtyard', 'Во двор')],blank=True,null=True)
     bathroom = models.PositiveIntegerField(name='Раздельный',default=0)
     bathroom_joint = models.PositiveIntegerField(name='Совмещенный',default=0)
     repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Космитический'),
-                                                      ('euro',"Евро"),('disigner', 'Дизайнерский')])
+                                                      ('euro',"Евро"),('disigner', 'Дизайнерский')],blank=True,null=True)
     elevators_passengers = models.PositiveIntegerField(name='Пассажирский',default=0)
     elevators_cargo = models.PositiveIntegerField(name='Грузовой',default=0)
-    entrance = models.CharField(max_length=30, choices=[('ramp', 'Пандус'), ('garbage_chute', 'Мусоропровод')])
+    entrance = models.CharField(max_length=30, choices=[('ramp', 'Пандус'), ('garbage_chute', 'Мусоропровод')],blank=True,null=True)
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'),
-                                                       ('underground','Подземная'), ('in_roof','На крыше')])
+                                                       ('underground','Подземная'), ('in_roof','На крыше')],blank=True,null=True)
+
+    phone = models.CharField(max_length=30,name='Номер телефона')
+
+class BaseSaleComerc(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    obj = models.CharField(name = 'Объект', max_length=100,
+                           choices=[('ofice', 'Офис'), ('building', 'Здание'),
+                                    ('retail_space','Торговая площадь'), ('free_place','Помещение свободного назначения'), ('production', 'Производство'),
+                                    ('warehouse','Склад'), ('garage', 'Гараж'), ('business', 'Бизнес'), ('commer_land','Коммерческая земля')])
+
+    address = models.CharField(name='Адресс',max_length=400)
+    nearest_stop = models.CharField(name='Ближайшая остановка',max_length=400)
+    minute_stop = models.CharField(name='Минут до остановки',max_length=400)
+    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')],
+                                    default='afoot')
+
+    number_nalog = models.CharField(max_length=100,name='Номер налоговой')
+    total_area = models.PositiveIntegerField(name='Общая площадь')
+    ceiling_height = models.PositiveIntegerField(name='Высота потолков',blank=True,null=True)
+    floor = models.PositiveIntegerField(name='Этаж')
+    floors_house = models.PositiveIntegerField('Всего этажей')
+    ur_adress = models.CharField(max_length=200,name='',choices=[('provided ','Предоставляется'),('no_provided ','Не предоставляется')])
+    room_busy = models.BooleanField(name = 'Занято')
+    layout = models.CharField(max_length=30, name='Планировка',choices=[('open','Открытая'),('coridor','Коридор'),('cabinet','Кабинетная')])
+    count_raint_touch = models.CharField(max_length=50,name='Кол-во мокрых точек',choices=[('no','Нет'),('1','1'),('2','2'),('3','3'),('4','4'),('5','5 и больше')])
+    electric = models.PositiveIntegerField(name='Электрическая мощность')
+    condition = models.CharField(name='Состояние',max_length=100, choices=[('office','Офисная отделка'), ('clean_ot','Под чистовую отделку'), ('cap_repair', 'Требутеся капитальный ремонт'),('cosmetic_repair','Требутеся косметический ремонт')])
+    mebel = models.BooleanField(name='Мебель')
+    access = models.CharField(max_length=30, name='Доступ',choices=[('free','Свободный'),('propusk','Пропуская система')])
+    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'),
+                                                       ('underground','Подземная'), ('in_roof','На крыше')],blank=True,null=True)
+    numner_seats = models.PositiveIntegerField(name='Кол-во мест')
+    price_park = models.CharField(max_length=30, name='Планировка парковки',choices=[('paid','Платная'),('free','Бесплатная')])
+    price_month = models.PositiveIntegerField(name='Стоимость парковки',blank=True,null=True)
+    name_building = models.CharField(max_length=200, name='Название')
+    age_build = models.PositiveIntegerField(name='Год постройки')
+    type_building = models.CharField(max_length=100,name='Тип здания')
+    klass_zd = models.CharField(max_length=3, name='Класс здания', choices=[('A', 'A'), ('A+', 'A+'),
+                                                                            ('B', 'B'), ('B+', 'B+'),
+                                                                            ('B-', 'B-'), ('C', 'C')])
+    area_zd = models.PositiveIntegerField(name='Площадь здания')
+    region = models.PositiveIntegerField(name='Участок')
+    in_sobstven = models.BooleanField(name='В собсвтенноем')
+    in_rent = models.BooleanField(name='В аренде')
+    category = models.CharField(max_length=30,
+                                choices=[('doing', 'Действующее'), ('project', 'Проект'), ('building', 'Строящееся')])
+    developer = models.CharField(max_length=200, name='Девелопер')
+    upr_company = models.CharField(max_length=200, name='Управляющая компания')
+    ventilation = models.CharField(max_length=30,
+                                   choices=[('natural', 'Естественная'), ('supply', 'Приточная'), ('no', 'Нет')])
+    conditioning = models.CharField(max_length=30, name='Кондиционирование',
+                                    choices=[('local', 'Местное'), ('center', 'Центральное'), ('no', 'Нет')])
+    heating = models.CharField(max_length=30, name = 'Отопление',choices=[('auto', 'Автономное'), ('center', 'Центральное'), ('no', 'Нет')])
+    fire_stop = models.CharField(max_length=30, name='Система пожаротушения' ,choices=[('gidro', 'Гидратная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'),('gas', 'Газовая'),('signal', 'Сигнализация'),
+                                                         ('no', 'Нет')])
+    auto_wish = models.BooleanField(name='Автомойка')
+    auto_service = models.BooleanField(name='Автосервис')
+    pharmacy = models.BooleanField(name='Аптека')
+    atelier = models.BooleanField(name='Ателье одежды')
+    bank = models.BooleanField(name='Бассейн')
+    bufet = models.BooleanField(name = 'Буфет')
+    sclad = models.BooleanField(name='Выставочно-складский комплекс')
+    hotel = models.BooleanField(name='Гостиница')
+    cafe = models.BooleanField(name='Кафе')
+    tv_vinema = models.BooleanField(name='Кинотеатр')
+    conference = models.BooleanField(name='Коференц-зал')
+    med_center = models.BooleanField(name='Медецинский центр')
+    mini_market = models.BooleanField(name='Минимаркет')
+    notarial_contore = models.BooleanField(name='Нотариальная контора')
+    otdel_bank = models.BooleanField(name='Отделение банка')
+    park = models.BooleanField(name='Парк')
+    restoran = models.BooleanField(name='Ресторан')
+    beaty_salon = models.BooleanField(name='Салон красоты')
+    sclad_place = models.BooleanField(name='Складское помещение')
+    stolov = models.BooleanField(name='Столовая')
+    supermarket = models.BooleanField(name='Супермаркет')
+    torg_zona = models.BooleanField(name='Торговая зона')
+    fitness = models.BooleanField(name='Фитнес-центр')
+    central_recep = models.BooleanField(name='Центральная рецепция')
+    photo = models.ImageField(upload_to='images/')
+    video = models.CharField(max_length=300, name='Видео',blank=True,null=True)
+    headings = models.CharField(max_length=100, name='Загаловок')
+    description = models.TextField(name='Описание')
+
+class BaseRent:
+    user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
+                                    default='owner')
+    type_of_deal = models.CharField(name = 'Объект', max_length=100,
+                           choices=[('sale','Продажа'),('rent','Аренда')] )
+    type_of_property = models.CharField(name = 'Жилая',max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Комерческая')])
+    obj = models.CharField(name = 'Объект', max_length=100,
+                           choices=[('flat', 'Квартира'),('room','Комната'), ('house', 'Дом'), ('place','Койко-место')]
+                          )
+    address = models.CharField(name='Адресс',max_length=400)
+    nearest_stop = models.CharField(name='Ближайшая остановка',max_length=400)
+    minute_stop = models.CharField(name='Минут до остановки',max_length=400)
+    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')],
+                                    default='afoot')
+    count_rooms = models.CharField(max_length=20, choices=[('Atelier', 'Студия'), ('1', '1'),
+                                                           ('2', '2'), ('3', '3'), ('4', '4'),
+                                                           ('5', '5'), ('6+', '6'),
+                                                           ('free_layout', 'Свободная планировка')])
+    total_area = models.PositiveIntegerField(name='Общая площадь')
+    kitchen_area = models.PositiveIntegerField(name='Кухня',blank=True,null=True)
+    property_type = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')])
+    photo = models.ImageField(upload_to='images/')
+    video = models.CharField(max_length=300, name='Видео',blank=True,null=True)
     headings = models.CharField(max_length=100,name='Загаловок')
     description = models.TextField(name='Описание')
     phone = models.CharField(max_length=30,name='Номер телефона')
+
+
 
 class Promotion(models.Model):
     PROMOTION_TYPE_CHOICES = [
@@ -136,7 +263,7 @@ class Promotion(models.Model):
         return f"{self.get_promotion_type_display()} - {self.duration} days"
 
 
-class ResidentialSaleListing(BaseModel):
+class Flat(BaseModel):
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),
         ('usd', 'Доллар'),
@@ -145,16 +272,16 @@ class ResidentialSaleListing(BaseModel):
 
     floor = models.PositiveIntegerField()
     floors_house = models.PositiveIntegerField()
-    number_flat = models.CharField(max_length=30,name='Номер квартиры')
-    age_build = models.PositiveIntegerField()
-    ceiling_height = models.PositiveIntegerField(name='Высота потолков')
+    number_flat = models.CharField(max_length=30,name='Номер квартиры',blank=True,null=True)
+    age_build = models.PositiveIntegerField(blank=True,null=True)
+    ceiling_height = models.PositiveIntegerField(name='Высота потолков',blank=True,null=True)
     type_house = models.CharField(max_length=20, choices=[('brick', 'Кирпичный'), ('monolithic', 'Монолитный'),
                                                           ('panel', 'Панельный'), ('block', 'Блочный'), ('wooden', 'Деревянный')])
     price = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
 
     ipoteka = models.CharField(max_length=30, choices=[('perhaps', 'Возможно'), ('no', 'Нет')])
-    how_sell = models.CharField(max_length=30, choices=[('only_sell', 'Только продаю'), ('barter', 'Одновременно покупаю другую')])
+    how_sell = models.CharField(max_length=30, choices=[('only_sell', 'Только продаю'), ('barter', 'Одновременно покупаю другую')],blank=True,null=True)
     whatsapp = models.CharField(max_length=30,name='Whatsapp')
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -166,12 +293,16 @@ class ResidentialSaleListing(BaseModel):
     def __str__(self):
         return self.headings
 
+
+
+
 class RentLongAdvertisement(BaseModel):
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),
         ('usd', 'Доллар'),
         ('eur', 'Евро'),
     ]
+    type_rent_long =  models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')])
     floor = models.PositiveIntegerField()
     floors_house = models.PositiveIntegerField()
     number_flat = models.CharField(max_length=30, name='Номер квартиры', blank=True, null=True)
@@ -208,5 +339,34 @@ class RentLongAdvertisement(BaseModel):
     def __str__(self):
         return self.headings
 
-class RentDayAdvertisement(models.Model):
+class RentDayAdvertisement(BaseRent):
+    CURRENCY_CHOICES = [
+        ('mzn', 'MZN'),
+        ('usd', 'Доллар'),
+        ('eur', 'Евро'),
+    ]
+    type_rent_long =  models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')])
+    price_day = models.PositiveIntegerField()
+    deposit = models.PositiveIntegerField(blank=True,null=True)
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
+    promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
+    without_mebel = models.BooleanField(blank=True, null=True)
+    mebel_kitchen = models.BooleanField(blank=True, null=True)
+    mebel_rooms = models.BooleanField(blank=True, null=True)
+    living_baby =  models.BooleanField()
+    living_animal = models.BooleanField()
+    bathroom_vanna = models.BooleanField(blank=True, null=True)
+    bathroom_doosh = models.BooleanField(blank=True, null=True)
+    split = models.BooleanField(blank=True, null=True)
+    holodilnik = models.BooleanField(blank=True, null=True)
+    tv = models.BooleanField(blank=True, null=True)
+    posud_car = models.BooleanField(blank=True, null=True)
+    stiral_car = models.BooleanField(blank=True, null=True)
+    dop_phone = models.CharField(max_length=50,name='Доп телефон',blank=True,null=True)
+    internet = models.BooleanField(blank=True, null=True)
+    phone_house = models.BooleanField(blank=True, null=True)
+
+
+
+class SaleCommercialAdvertisement(BaseSaleComerc):
     pass
