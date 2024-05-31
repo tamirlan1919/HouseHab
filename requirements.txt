@@ -1,0 +1,8 @@
+django==4.2
+djoser
+djangorestframework
+djangorestframework-simplejwt
+django-rest-auth
+psycopg2
+drf-spectacular
+dj-database-url
