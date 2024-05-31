@@ -94,7 +94,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = dj_database_url.parse('postgres://my_base_user:NmpKHRPLl9v0wk3rnYIOGxKw0XXzAoS3@dpg-cpcv2mdds78s738u4n00-a.oregon-postgres.render.com/my_base')
+#DATABASES['default'] = dj_database_url.parse('postgres://my_base_user:NmpKHRPLl9v0wk3rnYIOGxKw0XXzAoS3@dpg-cpcv2mdds78s738u4n00-a.oregon-postgres.render.com/my_base')
 
 
 
@@ -133,7 +133,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Дополнительные настройки, если требуются
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
