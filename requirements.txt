@@ -7,3 +7,4 @@ psycopg2-binary
 drf-spectacular
 dj-database-url
 gunicorn
+pillow
