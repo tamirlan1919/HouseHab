@@ -21,15 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
+SECRET_KEY = 'django-insecure-x)+7&9gxrj67f-^fstfm)cqa0sa2%k@+%a4_gc!w-*pj__s87e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(' ')
-
+ALLOWED_HOSTS = ['*']
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -96,8 +93,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-database_url = os.environ.get("DATABASE_URL")
-DATABASES['default'] = dj_database_url.parse(database_url)
+
+DATABASES['default'] = dj_database_url.parse('postgres://my_base_user:NmpKHRPLl9v0wk3rnYIOGxKw0XXzAoS3@dpg-cpcv2mdds78s738u4n00-a.oregon-postgres.render.com/my_base')
 
 
 
@@ -218,3 +215,4 @@ SIMPLE_JWT = {
 }
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
