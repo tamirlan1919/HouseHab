@@ -227,15 +227,44 @@ class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 class CheckEmail(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    def get(self, request, format=None):
-        email = request.GET.get('email')
-        user = CustomUser.objects.filter(email=email)
-        if user:
-            return Response('Email exists')
-        else:
-            return Response('Welcome aboard!')
 
+    @extend_schema(
+        summary='Check if an email is already registered',
+        description='Checks if the given email address is already in use and returns corresponding message.',
+        request=None,  # This can be omitted if using default request description
+        responses={
+            200: OpenApiResponse(description='Email exists', examples=[
+                OpenApiExample(
+                    name='Email Exists',
+                    summary='Existing email',
+                    description='The response indicates that the email is already in use.',
+                    value='Email exists'
+                ),
+            ]),
+            404: OpenApiResponse(response=ErrorResponseSerializer, description='Email not found'),
+            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request')
+        },
+        examples=[
+            OpenApiExample(
+                name='Request Example',
+                summary='Example POST request with email data',
+                description='An example POST request showing how to check an email.',
+                value={"email": "example@example.com"}
+            )
+        ]
+    )
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        user = CustomUser.objects.filter(email=email)
+
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_exists = CustomUser.objects.filter(email=email).exists()
+        if user:
+            return Response('Email exists', status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Email does not exist"}, status=status.HTTP_404_NOT_FOUND)
 class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
     serializer_class = SaleCommercialAdvertisementSerializer
