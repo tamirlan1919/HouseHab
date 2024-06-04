@@ -68,7 +68,6 @@ MIDDLEWARE = [
 
 
 AUTH_USER_MODEL = 'estatemaster.CustomUser'
-CORS_ALLOW_ALL_ORIGINS = True  # Открытый доступ или используйте CORS_ALLOWED_ORIGINS для ограничения списка.
 
 ROOT_URLCONF = 'HouseHab.urls'
 
@@ -162,7 +161,18 @@ EMAIL_HOST_USER = 'tchinchaev@bk.ru'
 EMAIL_HOST_PASSWORD = 'FB4jx0hP4BLnXTrw2wuY'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
+                      'content-type', 'accept', 'origin', 'Authorization',
+                      'access-control-allow-methods')
+CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
 
 
 
