@@ -26,9 +26,9 @@ SECRET_KEY = 'django-insecure-x)+7&9gxrj67f-^fstfm)cqa0sa2%k@+%a4_gc!w-*pj__s87e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['89.223.64.210','91.186.196.201', 'tamirlan1919-househab-8a3f.twc1.net']
-CSRF_TRUSTED_ORIGINS = ['https://tamirlan1919-househab-8a3f.twc1.net']
-
+# ALLOWED_HOSTS = ['89.223.64.210','91.186.196.201', 'tamirlan1919-househab-8a3f.twc1.net']
+# CSRF_TRUSTED_ORIGINS = ['https://tamirlan1919-househab-8a3f.twc1.net']
+ALLOWED_HOSTS = ['*']
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 

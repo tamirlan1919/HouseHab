@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
     path('auth/users/create/', views.CustomUserCreateView.as_view(), name='user-create'),
+    path('auth/check_email/',views.CheckEmail.as_view(), name = 'check_email'),
     path('api/', include(router.urls)),  # Include the router's URLs
 
 

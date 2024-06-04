@@ -69,6 +69,7 @@ class LocationSerializer(serializers.ModelSerializer):
         model = Location
         fields = '__all__'
 
+
 class SaleResidentialSerializer(serializers.ModelSerializer):
 
     class Meta:

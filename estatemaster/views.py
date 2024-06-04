@@ -1,6 +1,7 @@
 from djoser.views import UserViewSet
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -225,7 +226,15 @@ class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
     )
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
-
+class CheckEmail(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    def get(self, request, format=None):
+        email = request.GET.get('email')
+        user = CustomUser.objects.filter(email=email)
+        if user:
+            return Response('Email exists')
+        else:
+            return Response('Welcome aboard!')
 
 class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
