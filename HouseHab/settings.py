@@ -29,9 +29,11 @@ DEBUG = True
 ALLOWED_HOSTS = ['89.223.64.210','91.186.196.201', 'tamirlan1919-househab-8a3f.twc1.net']
 # CSRF_TRUSTED_ORIGINS = ['https://tamirlan1919-househab-8a3f.twc1.net']
 CSRF_TRUSTED_ORIGINS = ['https://tamirlan1919-househab-8a3f.twc1.net']
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5173',
+# ]
+CORS_ORIGIN_ALLOW_ALL = True
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Application definition
