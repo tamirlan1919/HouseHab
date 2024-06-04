@@ -38,7 +38,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Application definition
 
 INSTALLED_APPS = [
-
+    'corsheaders,'
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,12 +52,14 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
 
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -66,6 +68,7 @@ MIDDLEWARE = [
 
 
 AUTH_USER_MODEL = 'estatemaster.CustomUser'
+CORS_ALLOW_ALL_ORIGINS = True  # Открытый доступ или используйте CORS_ALLOWED_ORIGINS для ограничения списка.
 
 ROOT_URLCONF = 'HouseHab.urls'
 
