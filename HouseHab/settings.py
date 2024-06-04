@@ -167,11 +167,11 @@ CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    ['http://localhost:5173','http://localhost:3000']
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
+    ['http://localhost:5173','http://localhost:3000']
 ]
 
 

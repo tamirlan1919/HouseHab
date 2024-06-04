@@ -8,3 +8,4 @@ drf-spectacular
 dj-database-url
 gunicorn
 pillow
+django-cors-headers
