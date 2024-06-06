@@ -9,3 +9,4 @@ dj-database-url
 gunicorn
 pillow
 django-cors-headers
+tzdata
