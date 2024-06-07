@@ -187,13 +187,14 @@ DJOSER = {
     'ACTIVATION_URL': '/users/activation/{uid}/{token}',
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'USER_ID_FIELD': 'id',
-    # 'SEND_ACTIVATION_EMAIL': True,
+    'SEND_ACTIVATION_EMAIL': True,
     "LOGIN_FIELD":'email',
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
 
     'SERIALIZERS': {
         'user_create': 'estatemaster.serializers.CustomUserCreateSerializer',
         'current_user': 'estatemaster.serializers.CustomUserProfileSerializer',
+        'activation': 'estatemaster.serializers.CustomActivationSerializer',
 
     },
 

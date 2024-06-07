@@ -26,7 +26,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=30, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
-
+    is_confirm = models.BooleanField(default=False,blank=True,null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number', 'account_type']
     objects = CustomUserManager()

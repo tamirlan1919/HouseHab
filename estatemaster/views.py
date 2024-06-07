@@ -1,6 +1,7 @@
 from djoser.views import UserViewSet
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -361,3 +362,21 @@ class LocationViewSet(viewsets.ModelViewSet):
     )
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+
+
+class CustomActivateUser(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request, *args, **kwargs):
+
+        print("Request User:", request.user)  # Добавлено логирование
+        user = request.user
+        if not user or not user.is_authenticated:
+            return Response({"error": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user.is_confirm = True
+        user.save()
+
+        return Response({"message": "User confirmed successfully."}, status=status.HTTP_200_OK)

@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
 from estatemaster import views
-
+from estatemaster.views import CustomActivateUser
 
 router = DefaultRouter()
 router.register(r'promotion-configs', views.PromotionConfigViewSet)
@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
     path('auth/users/create/', views.CustomUserCreateView.as_view(), name='user-create'),
     path('auth/check_email/',views.CheckEmail.as_view(), name = 'check_email'),
+    path('auth/users/custom-activate/', CustomActivateUser.as_view(), name='custom-activate'),
+
     path('api/', include(router.urls)),  # Include the router's URLs
 
 

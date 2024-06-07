@@ -10,9 +10,9 @@ class ImageInline(admin.TabularInline):
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'phone_number', 'account_type', 'is_staff', 'is_active']
-    list_filter = ['account_type', 'is_staff', 'is_active']
-    search_fields = ('email', 'phone_number', 'first_name', 'last_name')
+    list_display = ['email', 'phone_number', 'account_type', 'is_confirm' , 'is_staff', 'is_active']
+    list_filter = ['account_type', 'is_confirm' ,'is_staff', 'is_active']
+    search_fields = ('email', 'phone_number', 'is_confirm' ,'first_name', 'last_name')
     ordering = ('email',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),

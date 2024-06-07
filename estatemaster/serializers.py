@@ -1,5 +1,5 @@
-# serializers.py
 from django.conf import settings
+from djoser.utils import decode_uid
 from rest_framework import serializers
 
 from .mixins import  UserFromTokenMixin
@@ -7,16 +7,15 @@ from .models import *
 from .exceptions import InvalidDataException, DuplicateFieldException
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
-
-
-
 User = get_user_model()
+from djoser.serializers import ActivationSerializer
+
 
 
 class CustomUserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'phone_number', 'account_type')
+        fields = ('email', 'password', 'phone_number' ,'account_type')
 
     def create(self, validated_data):
         try:
@@ -33,6 +32,7 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
                 password=validated_data['password'],
                 is_active = True  # Set the user as inactive
 
+
             )
             return user
         except KeyError:
@@ -46,7 +46,7 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
 class CustomUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id','email','phone_number','first_name','last_name','username','photo','date_of_birth','account_type')  # Убедитесь, что здесь есть поле phone_number
+        fields = ('id','email','phone_number','first_name','last_name','username','photo','date_of_birth','account_type', 'is_confirm')  # Убедитесь, что здесь есть поле phone_number
 
 class AdvertisementImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -110,3 +110,13 @@ class ErrorResponseSerializer(serializers.Serializer):
     error = serializers.CharField()
     status_code = serializers.IntegerField()
     message = serializers.JSONField()
+
+
+class CustomActivationSerializer(ActivationSerializer):
+    def validate(self, attrs):
+        uid = decode_uid(attrs['uid'])
+        user = User.objects.get(id=uid)
+
+        user.is_confirm = True
+        user.save()
+        return super().validate(attrs)
