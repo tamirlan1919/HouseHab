@@ -31,7 +31,7 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
                 phone_number=validated_data['phone_number'],
                 account_type=validated_data['account_type'],
                 password=validated_data['password'],
-                is_active = False  # Set the user as inactive
+                is_active = True  # Set the user as inactive
 
             )
             return user
