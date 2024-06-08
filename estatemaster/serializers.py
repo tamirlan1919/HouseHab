@@ -43,11 +43,39 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             raise DuplicateFieldException()
 
 
+
+class ProfessionalProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProfessionalProfile
+        fields = '__all__'
+
+    def update(self, instance, validated_data):
+        # Обновление или создание профиля
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
 class CustomUserProfileSerializer(serializers.ModelSerializer):
+    professional_profile = ProfessionalProfileSerializer(required=False)
+
     class Meta:
         model = CustomUser
-        fields = ('id','email','phone_number','first_name','last_name','username','photo','date_of_birth','account_type', 'is_confirm')  # Убедитесь, что здесь есть поле phone_number
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'username', 'photo', 'date_of_birth', 'account_type', 'is_confirm', 'professional_profile')
 
+    def update(self, instance, validated_data):
+        professional_profile_data = validated_data.pop('professional_profile', None)
+
+        instance = super(CustomUserProfileSerializer, self).update(instance, validated_data)
+
+        # Обновление или создание профессионального профиля, если он существует
+        if professional_profile_data:
+            prof_profile_instance, created = ProfessionalProfile.objects.get_or_create(user=instance)
+            prof_serializer = ProfessionalProfileSerializer(prof_profile_instance, data=professional_profile_data, partial=True)
+            if prof_serializer.is_valid(raise_exception=True):
+                prof_serializer.save()
+
+        return instance
 class AdvertisementImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image

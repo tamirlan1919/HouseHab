@@ -104,6 +104,7 @@ DATABASES = {
 #DATABASES['default'] = dj_database_url.parse('postgres://my_base_user:NmpKHRPLl9v0wk3rnYIOGxKw0XXzAoS3@dpg-cpcv2mdds78s738u4n00-a.oregon-postgres.render.com/my_base')
 
 
+default_app_config = 'estatemaster.apps.UsersAppConfig'
 
 
 # Password validation

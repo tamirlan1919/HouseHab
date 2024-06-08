@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import (CustomUser, PromotionConfig, Builder, SaleResidential, Promotion, RentLongAdvertisement, RentDayAdvertisement, SaleCommercialAdvertisement,
-                     Image,RentCommercialAdvertisement,Location)
+from .models import (CustomUser, PromotionConfig, Builder, SaleResidential, Promotion, RentLongAdvertisement,
+                     RentDayAdvertisement, SaleCommercialAdvertisement,
+                     Image, RentCommercialAdvertisement, Location, ProfessionalProfile)
 
 
 class ImageInline(admin.TabularInline):
@@ -90,3 +91,4 @@ admin.site.register(RentDayAdvertisement, RentDayAdvertisementAdmin)
 admin.site.register(SaleCommercialAdvertisement, SaleCommercialAdvertisementAdmin)
 admin.site.register(RentCommercialAdvertisement, RentCommercialAdvertisementAdmin)
 admin.site.register(Image)
+admin.site.register(ProfessionalProfile)

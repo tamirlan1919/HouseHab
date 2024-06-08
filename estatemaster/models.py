@@ -51,6 +51,52 @@ class CustomUser(AbstractUser):
         verbose_name = 'Пользователи'
         verbose_name_plural = 'Пользователь'
 
+
+class ProfessionalProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='professional_profile')
+    ROLE_CHOICES = (
+        ('realtor', 'Риелтор'),
+        ('agency', 'Агентство'),
+        ('developer', 'Застройщик'),
+    )
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='realtor')
+    place_of_work = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')], blank=True, null=True)
+    working_hours_start = models.TimeField(blank=True, null=True)
+    working_hours_end = models.TimeField(blank=True, null=True)
+    experience = models.PositiveIntegerField( blank=True, null=True)
+    is_macler = models.BooleanField(blank=True,null=True)
+    about_me = models.TextField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    facebook = models.URLField(blank=True, null=True)
+    name_company = models.CharField(max_length=100, null=True,blank=True)
+    # Добавляем специализации как булевы поля
+    specialization_residential_rental = models.BooleanField(default=False)
+    specialization_commercial_rental = models.BooleanField(default=False)
+    specialization_suburban_rental = models.BooleanField(default=False)
+    specialization_foreign_rental = models.BooleanField(default=False)
+
+    specialization_mortgage = models.BooleanField(default=False)
+    specialization_refinancing = models.BooleanField(default=False)
+
+    specialization_insurance = models.BooleanField(default=False)
+    specialization_notary = models.BooleanField(default=False)
+    specialization_property_management = models.BooleanField(default=False)
+    specialization_construction = models.BooleanField(default=False)
+    specialization_consulting = models.BooleanField(default=False)
+    specialization_interior_design = models.BooleanField(default=False)
+    specialization_repair = models.BooleanField(default=False)
+    specialization_architecture = models.BooleanField(default=False)
+
+    specialization_residential_sale = models.BooleanField(default=False)
+    specialization_commercial_sale = models.BooleanField(default=False)
+    specialization_suburban_sale = models.BooleanField(default=False)
+    specialization_foreign_sale = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+
+
 class PromotionConfig(models.Model):
     promotion_type = models.CharField(
         max_length=20,
