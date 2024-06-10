@@ -118,11 +118,11 @@ class ProfessionalProfile(models.Model):
     facebook = models.URLField(blank=True, null=True)
     # Добавляем специализации как булевы поля
 
-
-    rental_specializations = models.ManyToManyField(RentalSpecialization, blank=True)
-    mortgage_specializations = models.ManyToManyField(MortgageSpecialization, blank=True)
-    other_service_specializations = models.ManyToManyField(OtherServiceSpecialization, blank=True)
-    sale_specializations = models.ManyToManyField(SaleSpecialization, blank=True)
+    #
+    # rental_specializations = models.ManyToManyField(RentalSpecialization, blank=True)
+    # mortgage_specializations = models.ManyToManyField(MortgageSpecialization, blank=True)
+    # other_service_specializations = models.ManyToManyField(OtherServiceSpecialization, blank=True)
+    # sale_specializations = models.ManyToManyField(SaleSpecialization, blank=True)
 
     def __str__(self):
         return self.user.username

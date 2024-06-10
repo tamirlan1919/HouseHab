@@ -1,6 +1,7 @@
 from django.conf import settings
 from djoser.utils import decode_uid
 from rest_framework import serializers
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .mixins import  UserFromTokenMixin
 from .models import *
@@ -72,10 +73,7 @@ class SaleSpecializationSerializer(serializers.ModelSerializer):
 from rest_framework import serializers
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
-    rental_specializations = RentalSpecializationSerializer(many=True, read_only=False)
-    mortgage_specializations = MortgageSpecializationSerializer(many=True, read_only=False)
-    other_service_specializations = OtherServiceSpecializationSerializer(many=True, read_only=False)
-    sale_specializations = SaleSpecializationSerializer(many=True, read_only=False)
+
 
     class Meta:
         model = ProfessionalProfile
@@ -84,7 +82,6 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         role = instance.role
-
         if role == 'developer':
             fields_to_remove = [
                 'is_macler', 'place_of_work', 'gender', 'working_hours_start',
@@ -117,6 +114,7 @@ class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
 class CustomUserProfileSerializer(serializers.ModelSerializer):
     professional_profile = ProfessionalProfileSerializer(required=False)
+    parser_classes = (MultiPartParser, FormParser)  # Правильное место для parser_classes
 
     class Meta:
         model = CustomUser
@@ -124,7 +122,7 @@ class CustomUserProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         professional_profile_data = validated_data.pop('professional_profile', None)
-
+        print(professional_profile_data)
         instance = super(CustomUserProfileSerializer, self).update(instance, validated_data)
 
         # Обновление или создание профессионального профиля, если он существует
