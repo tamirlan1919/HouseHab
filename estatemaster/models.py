@@ -59,7 +59,7 @@ class ProfessionalProfile(models.Model):
         ('agency', 'Агентство'),
         ('developer', 'Застройщик'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='realtor')
     place_of_work = models.CharField(max_length=100, blank=True, null=True)
     bd = models.DateField(blank=True,null=True)
     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')], blank=True, null=True)
