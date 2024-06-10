@@ -43,60 +43,78 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             raise DuplicateFieldException()
 
 
+class RentalSpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RentalSpecialization
+        fields = ['id', 'name']
+
+        def validate_name(self, value):
+            if RentalSpecialization.objects.filter(name=value).exists():
+                raise serializers.ValidationError("Аренда недвижимости with this name already exists.")
+            return value
+
+class MortgageSpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MortgageSpecialization
+        fields = ['id', 'name']
+
+class OtherServiceSpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OtherServiceSpecialization
+        fields = ['id', 'name']
+
+class SaleSpecializationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SaleSpecialization
+        fields = ['id', 'name']
+
+
+from rest_framework import serializers
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
+    rental_specializations = RentalSpecializationSerializer(many=True, read_only=False)
+    mortgage_specializations = MortgageSpecializationSerializer(many=True, read_only=False)
+    other_service_specializations = OtherServiceSpecializationSerializer(many=True, read_only=False)
+    sale_specializations = SaleSpecializationSerializer(many=True, read_only=False)
+
     class Meta:
         model = ProfessionalProfile
         fields = '__all__'
 
     def to_representation(self, instance):
-        data = super(ProfessionalProfileSerializer, self).to_representation(instance)
+        data = super().to_representation(instance)
         role = instance.role
 
-        # Скрываем или показываем поля в зависимости от роли
         if role == 'developer':
-            fields_to_remove = ['is_macler', 'place_of_work', 'gender', 'working_hours_start'
-                                'working_hours_end', 'experience', 'about_me', 'facebook', 'bd', 'first_name']
+            fields_to_remove = [
+                'is_macler', 'place_of_work', 'gender', 'working_hours_start',
+                'working_hours_end', 'experience', 'about_me', 'facebook', 'bd', 'first_name'
+            ]
         elif role == 'agency':
-            fields_to_remove = ['is_macler',  'about_me', 'facebook' , 'about_me', 'gender',
-                               'place_of_work', 'date_company','how_houses', 'how_houses_building',
-                                'count_zhk', 'bd', 'first_name']
+            fields_to_remove = [
+                'is_macler', 'about_me', 'facebook', 'gender',
+                'place_of_work', 'date_company', 'how_houses', 'how_houses_building',
+                'count_zhk', 'bd', 'first_name'
+            ]
         else:  # realtor
             fields_to_remove = [
-                'company_name' , 'about_company', 'email', 'date_company',
-                'how_houses', 'how_houses_building',
-                'count_zhk'
+                'company_name', 'about_company', 'email', 'date_company',
+                'how_houses', 'how_houses_building', 'count_zhk'
             ]
 
-        # Удаляем ненужные поля
         for field in fields_to_remove:
             data.pop(field, None)
 
         return data
 
     def update(self, instance, validated_data):
-        role = instance.role
-
-        # Определяем, какие поля запрещены для обновления в зависимости от роли
-        if role == 'developer':
-            forbidden_fields = ['place_of_work', 'gender', 'working_hours_start', 'working_hours_end', 'experience',
-                                'about_me']
-        elif role == 'agency':
-            forbidden_fields = ['place_of_work', 'date_company', 'how_houses', 'how_houses_building', 'count_zhk']
-        else:  # realtor
-            forbidden_fields = ['company_name', 'about_company', 'email', 'date_company', 'how_houses',
-                                'how_houses_building', 'count_zhk']
-
-        # Фильтруем данные, удаляя запрещенные поля
-        for field in forbidden_fields:
-            validated_data.pop(field, None)
-
         # Обновление или создание профиля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
         instance.save()
         return instance
+
+
 class CustomUserProfileSerializer(serializers.ModelSerializer):
     professional_profile = ProfessionalProfileSerializer(required=False)
 

@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (CustomUser, PromotionConfig, Builder, SaleResidential, Promotion, RentLongAdvertisement,
                      RentDayAdvertisement, SaleCommercialAdvertisement,
-                     Image, RentCommercialAdvertisement, Location, ProfessionalProfile)
+                     Image, RentCommercialAdvertisement, Location, ProfessionalProfile, RentalSpecialization,
+                     MortgageSpecialization, OtherServiceSpecialization, SaleSpecialization)
 
 
 class ImageInline(admin.TabularInline):
@@ -79,16 +80,12 @@ class LocationAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}  # Автоматическое заполнение поля slug на основе поля name
     list_filter = ('name',)  # Добавление фильтра по имени
     ordering = ('name',)  # Добавление сортировки по имени
-admin.site.register(Location, LocationAdmin)
 
+admin.site.register(Location, LocationAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(PromotionConfig, PromotionConfigAdmin)
-admin.site.register(Builder, BuilderAdmin)
-admin.site.register(SaleResidential, SaleResidentialAdmin)
-admin.site.register(Promotion, PromotionAdmin)
-admin.site.register(RentLongAdvertisement, RentLongAdvertisementAdmin)
-admin.site.register(RentDayAdvertisement, RentDayAdvertisementAdmin)
-admin.site.register(SaleCommercialAdvertisement, SaleCommercialAdvertisementAdmin)
-admin.site.register(RentCommercialAdvertisement, RentCommercialAdvertisementAdmin)
 admin.site.register(Image)
+admin.site.register(RentalSpecialization)
+admin.site.register(MortgageSpecialization)
+admin.site.register(OtherServiceSpecialization)
+admin.site.register(SaleSpecialization)
 admin.site.register(ProfessionalProfile)

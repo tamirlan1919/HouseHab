@@ -51,6 +51,45 @@ class CustomUser(AbstractUser):
         verbose_name = 'Пользователи'
         verbose_name_plural = 'Пользователь'
 
+class RentalSpecialization(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Аренда недвижимости'
+        verbose_name_plural = 'Аренда недвижимости'
+
+
+class MortgageSpecialization(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        verbose_name = 'Ипотечное кредитование'
+        verbose_name_plural = 'Ипотечное кредитование'
+class OtherServiceSpecialization(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Другие услуги'
+        verbose_name_plural = 'Другие услуги'
+
+class SaleSpecialization(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Продажа недвижимости'
+        verbose_name_plural = 'Продажа недвижимости'
+
 
 class ProfessionalProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='professional_profile')
@@ -78,32 +117,19 @@ class ProfessionalProfile(models.Model):
     website = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     # Добавляем специализации как булевы поля
-    specialization_residential_rental = models.BooleanField(default=False)
-    specialization_commercial_rental = models.BooleanField(default=False)
-    specialization_suburban_rental = models.BooleanField(default=False)
-    specialization_foreign_rental = models.BooleanField(default=False)
 
-    specialization_mortgage = models.BooleanField(default=False)
-    specialization_refinancing = models.BooleanField(default=False)
 
-    specialization_insurance = models.BooleanField(default=False)
-    specialization_notary = models.BooleanField(default=False)
-    specialization_property_management = models.BooleanField(default=False)
-    specialization_construction = models.BooleanField(default=False)
-    specialization_consulting = models.BooleanField(default=False)
-    specialization_interior_design = models.BooleanField(default=False)
-    specialization_repair = models.BooleanField(default=False)
-    specialization_architecture = models.BooleanField(default=False)
-
-    specialization_residential_sale = models.BooleanField(default=False)
-    specialization_commercial_sale = models.BooleanField(default=False)
-    specialization_suburban_sale = models.BooleanField(default=False)
-    specialization_foreign_sale = models.BooleanField(default=False)
+    rental_specializations = models.ManyToManyField(RentalSpecialization, blank=True)
+    mortgage_specializations = models.ManyToManyField(MortgageSpecialization, blank=True)
+    other_service_specializations = models.ManyToManyField(OtherServiceSpecialization, blank=True)
+    sale_specializations = models.ManyToManyField(SaleSpecialization, blank=True)
 
     def __str__(self):
         return self.user.username
 
-
+    class Meta:
+        verbose_name = 'Проф пользователь'
+        verbose_name_plural = 'Проф пользователи'
 class PromotionConfig(models.Model):
     promotion_type = models.CharField(
         max_length=20,
