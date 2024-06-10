@@ -75,10 +75,16 @@ from rest_framework import serializers
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        excluded_fields = {'user', 'id'}  # Set of fields to exclude
+        # Dynamically adjust fields to include by removing excluded ones
+        for field_name in excluded_fields:
+            self.fields.pop(field_name, None)
+
     class Meta:
         model = ProfessionalProfile
-        fields = '__all__'
-
+        fields = '__all__'  # Initially set to include all, but will exclude dynamically in __init__
     def to_representation(self, instance):
         data = super().to_representation(instance)
         role = instance.role
