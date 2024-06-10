@@ -20,6 +20,8 @@ class CustomUserCreateView(APIView):
 
 
 class CustomMeViewSet(UserViewSet):
+    serializer_class = CustomUserProfileSerializer
+
     def get(self, request, *args, **kwargs):
         user = request.user
         serializer = self.get_serializer(user)
