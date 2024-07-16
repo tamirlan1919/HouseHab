@@ -93,6 +93,32 @@ class SaleSpecialization(models.Model):
 
 class ProfessionalProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='professional_profile')
+    RENTAL_CHOICES = (
+        ('жилая', 'Жилая'),
+        ('загородная', 'Загородная'),
+        ('зарубежная', 'Зарубежная'),
+        ('коммерческая', 'Коммерческая'),
+    )
+    MORTGAGE_CHOICES = (
+        ('ипотека', 'Ипотека'),
+        ('рефинансирование', 'Рефинансирование'),
+    )
+    OTHER_SERVICES_CHOICES = (
+        ('страхование', 'Страхование'),
+        ('нотариат', 'Нотариат'),
+        ('управление_объектами', 'Управление объектами'),
+        ('строительство', 'Строительство'),
+        ('консультация', 'Консультация'),
+        ('дизайн_интерьера', 'Дизайн интерьера'),
+        ('ремонт', 'Ремонт'),
+        ('архитектура', 'Архитектура'),
+    )
+    SALE_CHOICES = (
+        ('жилая', 'Жилая'),
+        ('коммерческая', 'Коммерческая'),
+        ('загородная', 'Загородная'),
+        ('зарубежная', 'Зарубежная'),
+    )
     ROLE_CHOICES = (
         ('realtor', 'Риелтор'),
         ('agency', 'Агентство'),
@@ -118,11 +144,12 @@ class ProfessionalProfile(models.Model):
     facebook = models.URLField(blank=True, null=True)
     # Добавляем специализации как булевы поля
 
-    #
-    # rental_specializations = models.ManyToManyField(RentalSpecialization, blank=True)
-    # mortgage_specializations = models.ManyToManyField(MortgageSpecialization, blank=True)
-    # other_service_specializations = models.ManyToManyField(OtherServiceSpecialization, blank=True)
-    # sale_specializations = models.ManyToManyField(SaleSpecialization, blank=True)
+
+    rental_types = models.CharField(max_length=255, blank=True,null=True,  choices=RENTAL_CHOICES)
+    mortgage_types = models.CharField(max_length=255, blank=True,null=True,  choices=MORTGAGE_CHOICES)
+    other_services = models.CharField(max_length=255, blank=True, null=True, choices=OTHER_SERVICES_CHOICES)
+    sale_types = models.CharField(max_length=255, blank=True, null=True, choices=SALE_CHOICES)
+
 
     def __str__(self):
         return self.user.username
@@ -130,6 +157,8 @@ class ProfessionalProfile(models.Model):
     class Meta:
         verbose_name = 'Проф пользователь'
         verbose_name_plural = 'Проф пользователи'
+
+
 class PromotionConfig(models.Model):
     promotion_type = models.CharField(
         max_length=20,
@@ -149,7 +178,9 @@ class PromotionConfig(models.Model):
         return self.get_promotion_type_display()
 
 class Builder(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,blank=True)
+    zone = models.CharField(max_length=100,blank=True)
+    address = models.CharField(max_length=500,blank=True)
 
     class Meta:
         verbose_name = 'Застройщики'
@@ -158,11 +189,62 @@ class Builder(models.Model):
     def __str__(self):
         return self.name
 
+
+class Promotion(models.Model):
+    PROMOTION_TYPE_CHOICES = [
+        ('standard', 'Стандарт'),
+        ('premium', 'Премиум'),
+        ('top', 'Топ'),
+    ]
+
+    DURATION_CHOICES = [
+        (1, 'Посуточно'),
+        (7, '7 дней'),
+        (14, '14 дней'),
+        (30, '30 дней'),
+    ]
+
+    promotion_type = models.CharField(max_length=20, choices=PROMOTION_TYPE_CHOICES, default='standard')
+    duration = models.PositiveIntegerField(choices=DURATION_CHOICES)
+    config = models.ForeignKey(PromotionConfig, on_delete=models.CASCADE, null=True, blank=True)
+
+
+
+
+    def calculate_total_cost(self):
+        if not self.config:
+            return 0
+
+        base_cost = self.duration * self.config.cost_per_day
+        discount = 0
+
+        if self.duration == 7:
+            discount = base_cost * self.config.discount_7_days
+        elif self.duration == 14:
+            discount = base_cost * self.config.discount_14_days
+        elif self.duration == 30:
+            discount = base_cost * self.config.discount_30_days
+
+        return base_cost - discount
+
+    def __str__(self):
+        return f"{self.get_promotion_type_display()} - {self.duration} days"
+class Location(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
 class SaleResidential(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Комерческая')])
+    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа')])
+    region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
+
+    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая')])
+    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True)
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
         ('new_flat', 'Квартира в новостройке'),
@@ -228,7 +310,7 @@ class SaleResidential(models.Model):
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
     how_sale = models.CharField(max_length=50, choices=[('only_sale', 'Только продаю'), ('sale_another', 'Одновременно покупаю другую')])
     whatsapp = models.CharField(max_length=300)
-    promotion = models.ForeignKey('Promotion', on_delete=models.SET_NULL, null=True, blank=True)
+    promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Жилые прожажи'
@@ -237,54 +319,8 @@ class SaleResidential(models.Model):
     def __str__(self):
         return self.headings
 
-class Promotion(models.Model):
-    PROMOTION_TYPE_CHOICES = [
-        ('standard', 'Стандарт'),
-        ('premium', 'Премиум'),
-        ('top', 'Топ'),
-    ]
-
-    DURATION_CHOICES = [
-        (1, 'Посуточно'),
-        (7, '7 дней'),
-        (14, '14 дней'),
-        (30, '30 дней'),
-    ]
-
-    promotion_type = models.CharField(max_length=20, choices=PROMOTION_TYPE_CHOICES, default='standard')
-    duration = models.PositiveIntegerField(choices=DURATION_CHOICES)
-    config = models.ForeignKey(PromotionConfig, on_delete=models.CASCADE, null=True, blank=True)
 
 
-
-
-    def calculate_total_cost(self):
-        if not self.config:
-            return 0
-
-        base_cost = self.duration * self.config.cost_per_day
-        discount = 0
-
-        if self.duration == 7:
-            discount = base_cost * self.config.discount_7_days
-        elif self.duration == 14:
-            discount = base_cost * self.config.discount_14_days
-        elif self.duration == 30:
-            discount = base_cost * self.config.discount_30_days
-
-        return base_cost - discount
-
-    def __str__(self):
-        return f"{self.get_promotion_type_display()} - {self.duration} days"
-
-
-class Location(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, null=True)
-    slug = models.SlugField(max_length=100, unique=True, blank=True)
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name = 'Location'
@@ -296,11 +332,13 @@ class Location(models.Model):
             self.slug = slugify(self.name)
         super(Location, self).save(*args, **kwargs)
 
+
 class RentLongAdvertisement(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Коммерческая')])
+    deal_type = models.CharField(max_length=100, choices=[('rent', 'Аренда')])
+    region = models.OneToOneField(Location, on_delete=models.CASCADE, blank=True, null=True)
+    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая')])
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
         ('new_flat', 'Квартира в новостройке'),
@@ -382,7 +420,8 @@ class RentLongAdvertisement(models.Model):
 class RentDayAdvertisement(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    type_of_deal = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
+    type_of_deal = models.CharField(max_length=100, choices=[('rent', 'Аренда')])
+    region = models.OneToOneField(Location, on_delete=models.CASCADE, blank=True, null=True)
     type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая')])
     obj = models.CharField(max_length=100, choices=[('flat', 'Квартира'), ('room', 'Комната'), ('house', 'Дом'), ('place', 'Койко-место')])
     address = models.CharField(max_length=400)
@@ -446,8 +485,9 @@ class SaleCommercialAdvertisement(models.Model):
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Коммерческая')])
+    region = models.OneToOneField(Location, on_delete=models.CASCADE, blank=True, null=True)
+    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа')])
+    type_of_property = models.CharField(max_length=50, choices=[('commercial', 'Коммерческая')])
     obj = models.CharField(max_length=100, choices=[
         ('office', 'Офис'),
         ('building', 'Здание'),
@@ -471,7 +511,7 @@ class SaleCommercialAdvertisement(models.Model):
     ur_address = models.CharField(max_length=200, choices=[('provided', 'Предоставляется'), ('not_provided', 'Не предоставляется')])
     room_busy = models.BooleanField(default=False)
     layout = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')])
-    count_raint_touch = models.CharField(max_length=50, blank=True, null=True, choices=[('no', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5 и больше')])
+    count_rooms = models.CharField(max_length=50, blank=True, null=True, choices=[('no', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5 и больше')])
     electric = models.PositiveIntegerField(blank=True, null=True)
     condition = models.CharField(max_length=100, blank=True, null=True, choices=[('office', 'Офисная отделка'), ('clean_ot', 'Под чистовую отделку'), ('cap_repair', 'Требуется капитальный ремонт'), ('cosmetic_repair', 'Требуется косметический ремонт')])
     mebel = models.BooleanField(default=False)
@@ -485,7 +525,7 @@ class SaleCommercialAdvertisement(models.Model):
     type_building = models.CharField(max_length=100, blank=True, null=True)
     klass_zd = models.CharField(max_length=3, blank=True, null=True, choices=[('A', 'A'), ('A+', 'A+'), ('B', 'B'), ('B+', 'B+'), ('B-', 'B-'), ('C', 'C')])
     area_zd = models.PositiveIntegerField(blank=True, null=True)
-    region = models.PositiveIntegerField(blank=True, null=True)
+    uchastok = models.PositiveIntegerField(blank=True, null=True)
     in_sobstven = models.BooleanField(default=False)
     in_rent = models.BooleanField(default=False)
     category = models.CharField(max_length=30, choices=[('doing', 'Действующее'), ('project', 'Проект'), ('building', 'Строящееся')])
@@ -527,8 +567,10 @@ class SaleCommercialAdvertisement(models.Model):
     price_all = models.PositiveIntegerField()
     currency_kv_m = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
     price_kv_m = models.PositiveIntegerField()
-    is_nalog = models.CharField(max_length=70, choices=[('nds_on', 'НДС включен'), ('nds_off', 'НДС не облагается'), ('just_nalog', 'Упрощенная налогобложение')])
-    bonus_agent = models.CharField(max_length=70, choices=[('no', 'Нет'), ('fix_sum', 'Фиксированная сумма'), ('procent', 'Процент от сделки')])
+    is_nalog = models.CharField(max_length=70, choices=[('nds_on', 'НДС включен'), ('nds_off', 'НДС не облагается')
+        , ('just_nalog', 'Упрощенная налогобложение')])
+    bonus_agent = models.CharField(max_length=70, choices=[('no', 'Нет'), ('fix_sum', 'Фиксированная сумма'),
+                                                           ('procent', 'Процент от сделки')])
     phone = models.CharField(max_length=30)
     dop_phone = models.CharField(max_length=30)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
@@ -548,8 +590,10 @@ class RentCommercialAdvertisement(models.Model):
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')])
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Коммерческая')])
+    deal_type = models.CharField(max_length=100, choices=[('rent', 'Аренда')])
+    region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
+
+    type_of_property = models.CharField(max_length=50, choices=[('commercial', 'Коммерческая')])
     obj = models.CharField(max_length=100, choices=[
         ('office', 'Офис'),
         ('building', 'Здание'),
@@ -573,7 +617,7 @@ class RentCommercialAdvertisement(models.Model):
     ur_address = models.CharField(max_length=200, choices=[('provided', 'Предоставляется'), ('not_provided', 'Не предоставляется')])
     room_busy = models.BooleanField(default=False)
     layout = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')])
-    count_raint_touch = models.CharField(max_length=50, blank=True, null=True, choices=[('no', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5 и больше')])
+    count_rooms = models.CharField(max_length=50, blank=True, null=True, choices=[('no', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5 и больше')])
     electric = models.PositiveIntegerField(blank=True, null=True)
     condition = models.CharField(max_length=100, blank=True, null=True, choices=[('office', 'Офисная отделка'), ('clean_ot', 'Под чистовую отделку'), ('cap_repair', 'Требуется капитальный ремонт'), ('cosmetic_repair', 'Требуется косметический ремонт')])
     mebel = models.BooleanField(default=False)
@@ -587,7 +631,7 @@ class RentCommercialAdvertisement(models.Model):
     type_building = models.CharField(max_length=100, blank=True, null=True)
     klass_zd = models.CharField(max_length=3, blank=True, null=True, choices=[('A', 'A'), ('A+', 'A+'), ('B', 'B'), ('B+', 'B+'), ('B-', 'B-'), ('C', 'C')])
     area_zd = models.PositiveIntegerField(blank=True, null=True)
-    region = models.PositiveIntegerField(blank=True, null=True)
+    uchastok = models.PositiveIntegerField(blank=True, null=True)
     in_sobstven = models.BooleanField(default=False)
     in_rent = models.BooleanField(default=False)
     category = models.CharField(max_length=30, choices=[('doing', 'Действующее'), ('project', 'Проект'), ('building', 'Строящееся')])
@@ -661,3 +705,4 @@ class RentCommercialAdvertisement(models.Model):
 
     def __str__(self):
         return self.headings
+

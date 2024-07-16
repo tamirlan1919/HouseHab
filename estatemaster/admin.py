@@ -1,9 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import (CustomUser, PromotionConfig, Builder, SaleResidential, Promotion, RentLongAdvertisement,
-                     RentDayAdvertisement, SaleCommercialAdvertisement,
-                     Image, RentCommercialAdvertisement, Location, ProfessionalProfile, RentalSpecialization,
-                     MortgageSpecialization, OtherServiceSpecialization, SaleSpecialization)
+from .models import *
 
 
 class ImageInline(admin.TabularInline):
@@ -74,6 +71,15 @@ class RentCommercialAdvertisementAdmin(admin.ModelAdmin):
     search_fields = ['address', 'email', 'phone_number']
     ordering = ['address']
 
+class PromotionAdmin(admin.ModelAdmin):
+    list_display = ['promotion_type', 'duration', 'config', 'calculate_total_cost']
+    list_filter = ['promotion_type', 'duration']
+    search_fields = ['promotion_type']
+    ordering = ['promotion_type']
+
+
+
+
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'description')  # Поля, которые будут отображаться в списке объектов
     search_fields = ('name',)  # Поля, по которым можно выполнить поиск в админ-панели
@@ -89,3 +95,10 @@ admin.site.register(MortgageSpecialization)
 admin.site.register(OtherServiceSpecialization)
 admin.site.register(SaleSpecialization)
 admin.site.register(ProfessionalProfile)
+admin.site.register(Builder, BuilderAdmin)
+admin.site.register(Promotion, PromotionAdmin)
+admin.site.register(RentLongAdvertisement, RentLongAdvertisementAdmin)
+admin.site.register(RentDayAdvertisement, RentDayAdvertisementAdmin)
+admin.site.register(SaleCommercialAdvertisement, SaleCommercialAdvertisementAdmin)
+admin.site.register(RentCommercialAdvertisement, RentCommercialAdvertisementAdmin)
+

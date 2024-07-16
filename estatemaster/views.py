@@ -76,69 +76,7 @@ class PromotionConfigViewSet(viewsets.ModelViewSet):
 
 # Repeat similarly for other viewsets
 
-class BuilderViewSet(viewsets.ModelViewSet):
-    queryset = Builder.objects.all()
-    serializer_class = BuilderSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
-# Similarly for other viewsets
-class SaleResidentialViewSet(viewsets.ModelViewSet):
-    queryset = SaleResidential.objects.all()
-    serializer_class = SaleResidentialSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
 
 class PromotionViewSet(viewsets.ModelViewSet):
@@ -166,68 +104,9 @@ class PromotionViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
 
-class RentLongAdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = RentLongAdvertisement.objects.all()
-    serializer_class = RentLongAdvertisementSerializer
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
 
-class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = RentDayAdvertisement.objects.all()
-    serializer_class = RentDayAdvertisementSerializer
 
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 class CheckEmail(APIView):
 
     @extend_schema(
@@ -267,70 +146,6 @@ class CheckEmail(APIView):
             return Response('Email exists', status=status.HTTP_200_OK)
         else:
             return Response({"error": "Email does not exist"}, status=status.HTTP_404_NOT_FOUND)
-class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = SaleCommercialAdvertisement.objects.all()
-    serializer_class = SaleCommercialAdvertisementSerializer
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-
-
-class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
-    queryset = RentCommercialAdvertisement.objects.all()
-    serializer_class = RentCommercialAdvertisementSerializer
-
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return SaleResidential.objects.filter(user=self.request.user)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @extend_schema(
-        responses={
-            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
-            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
-            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
 
 class LocationViewSet(viewsets.ModelViewSet):
@@ -381,3 +196,55 @@ class CustomActivateUser(APIView):
         user.save()
 
         return Response({"message": "User confirmed successfully."}, status=status.HTTP_200_OK)
+
+class BaseAdvertisementViewSet(viewsets.ModelViewSet):
+    """
+    Базовый viewset, который реализует общую логику для всех рекламных объявлений.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    @extend_schema(
+        responses={
+            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
+            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
+            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        responses={
+            400: OpenApiResponse(response=ErrorResponseSerializer, description='Bad Request'),
+            403: OpenApiResponse(response=ErrorResponseSerializer, description='Forbidden'),
+            404: OpenApiResponse(response=ErrorResponseSerializer, description='Not Found'),
+        }
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+class SaleResidentialViewSet(BaseAdvertisementViewSet):
+    queryset = SaleResidential.objects.all()
+    serializer_class = SaleResidentialSerializer
+
+class RentLongAdvertisementViewSet(BaseAdvertisementViewSet):
+    queryset = RentLongAdvertisement.objects.all()
+    serializer_class = RentLongAdvertisementSerializer
+
+class RentDayAdvertisementViewSet(BaseAdvertisementViewSet):
+    queryset = RentDayAdvertisement.objects.all()
+    serializer_class = RentDayAdvertisementSerializer
+
+class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
+    queryset = SaleCommercialAdvertisement.objects.all()
+    serializer_class = SaleCommercialAdvertisementSerializer
+
+class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
+    queryset = RentCommercialAdvertisement.objects.all()
+    serializer_class = RentCommercialAdvertisementSerializer
