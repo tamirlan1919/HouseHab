@@ -139,7 +139,7 @@ class CustomUserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'phone_number', 'first_name', 'last_name', 'username', 'photo', 'date_of_birth', 'account_type', 'is_confirm', 'professional_profile')
+        fields = ('id', 'email' ,'phone_number', 'first_name', 'last_name', 'username', 'photo', 'date_of_birth', 'account_type', 'is_confirm', 'professional_profile')
 
     def update(self, instance, validated_data):
         professional_profile_data = validated_data.pop('professional_profile', None)
