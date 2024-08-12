@@ -171,25 +171,151 @@ class BuilderSerializer(serializers.ModelSerializer):
 
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
+    price_info = serializers.SerializerMethodField()
+    sellerContacts = serializers.SerializerMethodField()
 
     class Meta:
         model = SaleResidential
-        fields = '__all__'
+        fields = [
+            'id',
+            'accountType',
+            'dealType',
+            'estateType',
+            'obj',
+            'new_or_no',
+            'region',
+            'address',
+            'nearest_stop',
+            'minute_stop',
+            'transport',
+            'roomsNumber',
+            'floor',
+            'floors_house',
+            'number_flat',
+            'age_build',
+            'ceiling_height',
+            'houseType',
+            'total_area',
+            'living_area',
+            'kitchen_area',
+            'propertyType',
+            'photo',
+            'video',
+            'balconies',
+            'loggia',
+            'bathroom',
+            'bathroom_joint',
+            'repair',
+            'elevators_passengers',
+            'elevators_cargo',
+            'viewFromWindow',
+            'apartmentEntrance',
+            'parking',
+            'headings',
+            'description',
+            'price_info',
+            'saleType',
+            'sellerContacts',
+            'user',
+            'promotion'
+        ]
         read_only_fields = ('user',)
 
+    def get_price_info(self, obj):
+        return {
+            'price': obj.price,
+            'currency': obj.currency
+        }
+
+    def get_sellerContacts(self, obj):
+        return {
+            "phone": obj.phone,
+            "whatsapp": obj.whatsapp
+        }
 
 class RentLongAdvertisementSerializer(serializers.ModelSerializer):
+    price_info = serializers.SerializerMethodField()
+    deposit_info = serializers.SerializerMethodField()
+    sellerContacts = serializers.SerializerMethodField()
+
     class Meta:
         model = RentLongAdvertisement
-        fields = '__all__'
+        fields = [
+            'id',
+            'accountType',
+            'dealType',
+            'estateType',
+            'type_rent_long',
+            'obj',
+            'new_or_no',
+            'region',
+            'address',
+            'nearest_stop',
+            'minute_stop',
+            'transport',
+            'roomsNumber',
+            'floor',
+            'floors_house',
+            'number_flat',
+            'total_area',
+            'living_area',
+            'kitchen_area',
+            'propertyType',
+            'photo',
+            'video',
+            'viewFromWindow',
+            'balconies',
+            'loggia',
+            'bathroom_count',
+            'bathroom_joint_count',
+            'repair',
+            'elevators_passengers',
+            'elevators_cargo',
+            'apartmentEntrance',
+            'parking',
+            'price_info',
+            'utility_payer',
+            'prepayment',
+            'currency',
+            'deposit_info',
+            'rental_period',
+            'living_conditions',
+            'furniture',
+            'bathroom_choice',
+            'tech',
+            'communication',
+            'sellerContacts',
+            'communication_method',
+            'promotion',
+            'headings',
+            'description',
+            'user'
+        ]
         read_only_fields = ('user',)
 
+    def get_price_info(self, obj):
+        return {
+            'rent_per_month': obj.rent_per_month,
+            'currency': obj.currency
+        }
+
+    def get_deposit_info(self, obj):
+        return {
+            'deposit': obj.deposit,
+            'currency': obj.currency
+        }
+
+    def get_sellerContacts(self, obj):
+        return {
+            "phone": obj.phone,
+            "additional_phone": obj.additional_phone
+        }
 
 class RentDayAdvertisementSerializer(serializers.ModelSerializer):
     # Добавление вложенных полей для цены и депозита
     price = serializers.SerializerMethodField()
     deposit_info = serializers.SerializerMethodField()
-
+    sellerContacts = serializers.SerializerMethodField()
     class Meta:
         model = RentDayAdvertisement
         fields = [
@@ -223,14 +349,19 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'tech',
             'communication',
             'living_conditions',
-            'phone',
-            'additional_phone',
+            'sellerContacts',
             'user',
             'region',
             'promotion'
         ]
         read_only_fields = ('user',)
 
+
+    def get_sellerContacts(self, obj):
+        return {
+            "phone": obj.phone,
+            "additional_phone": obj.additional_phone
+        }
     def get_price(self, obj):
         return {
             'daily_price': obj.daily_price,
