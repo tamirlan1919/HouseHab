@@ -229,7 +229,8 @@ class BaseAdvertisementViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-class SaleResidentialViewSet(BaseAdvertisementViewSet):
+@extend_schema(tags=['Подача объявления (Жилая продажа)'])
+class SaleResidentialViewSet(viewsets.ModelViewSet):
     queryset = SaleResidential.objects.all()
     serializer_class = SaleResidentialSerializer
 

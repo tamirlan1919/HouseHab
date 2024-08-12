@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.text import slugify
-
+from multiselectfield import MultiSelectField
 from .managers import CustomUserManager
 
 
@@ -234,17 +234,33 @@ class Location(models.Model):
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Location'
+        verbose_name_plural = 'Locations'
+
     def __str__(self):
         return self.name
 
-class SaleResidential(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    deal_type = models.CharField(max_length=100, choices=[('sale', 'Продажа')])
-    region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
+    def save(self, *args, **kwargs):
+        # Если слаг пустой, то генерируем его из name
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Location, self).save(*args, **kwargs)
 
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая')])
-    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True)
+class SaleResidential(models.Model):
+    VIEW_CHOICES = [
+        ('outside', 'На улицу'),
+        ('into_the_courtyard', 'Во двор'),
+        ('to_sea', 'На море')
+    ]
+    APARTMENT_ENTRANCE_CHOICES = [
+        ('ramp', 'Пандус'),
+        ('garbage_chute', 'Мусоропровод')
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner',blank=True)
+    dealType = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')],default='sale',blank=True)
+    estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial','Коммерческая')],blank=True)
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
         ('new_flat', 'Квартира в новостройке'),
@@ -256,11 +272,25 @@ class SaleResidential(models.Model):
         ('part_house', 'Часть дома'),
         ('spot', 'Участок')
     ])
+    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True)
+    region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
     address = models.CharField(max_length=400)
     nearest_stop = models.CharField(max_length=400)
     minute_stop = models.CharField(max_length=400)
     transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
-    count_rooms = models.CharField(max_length=20, choices=[
+    floor = models.PositiveIntegerField()
+    floors_house = models.PositiveIntegerField()
+    number_flat = models.CharField(max_length=30, blank=True, null=True)
+    age_build = models.PositiveIntegerField(blank=True, null=True)
+    ceiling_height = models.FloatField(blank=True, null=True)
+    houseType = models.CharField(max_length=100, choices=[
+        ('brick', 'Кирпичный'),
+        ('monolit', 'Монолитный'),
+        ('panel', 'Панельный'),
+        ('block', 'Блочный'),
+        ('wood', 'Деревянный'),
+    ])
+    roomsNumber = models.CharField(max_length=20, choices=[
         ('Atelier', 'Студия'),
         ('1', '1'),
         ('2', '2'),
@@ -273,42 +303,32 @@ class SaleResidential(models.Model):
     total_area = models.PositiveIntegerField()
     living_area = models.PositiveIntegerField(blank=True, null=True)
     kitchen_area = models.PositiveIntegerField(blank=True, null=True)
-    property_type = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')])
+    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')],blank=True)
     photo = models.ImageField(upload_to='images/',blank=True)
     video = models.CharField(max_length=300, blank=True, null=True)
-    headings = models.CharField(max_length=100)
-    description = models.TextField()
+
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
-    view_from_window = models.CharField(max_length=30, choices=[('outside', 'На улицу'), ('into_the_courtyard', 'Во двор')], blank=True, null=True)
+
+    viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     bathroom = models.PositiveIntegerField(default=0)
     bathroom_joint = models.PositiveIntegerField(default=0)
     repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
     elevators_passengers = models.PositiveIntegerField(default=0)
     elevators_cargo = models.PositiveIntegerField(default=0)
-    entrance = models.CharField(max_length=30, choices=[('ramp', 'Пандус'), ('garbage_chute', 'Мусоропровод')], blank=True, null=True)
+    apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')], blank=True, null=True)
-    phone = models.CharField(max_length=30)
+    headings = models.CharField(max_length=100)
+    description = models.TextField()
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),
         ('usd', 'Доллар'),
         ('eur', 'Евро'),
     ]
-    floor = models.PositiveIntegerField()
-    floors_house = models.PositiveIntegerField()
-    number_flat = models.CharField(max_length=30, blank=True, null=True)
-    age_build = models.PositiveIntegerField(blank=True, null=True)
-    ceiling_height = models.PositiveIntegerField(blank=True, null=True)
-    type_house = models.CharField(max_length=100, choices=[
-        ('brick', 'Кирпичный'),
-        ('monolit', 'Монолитный'),
-        ('panel', 'Панельный'),
-        ('block', 'Блочный'),
-        ('wood', 'Деревянный'),
-    ])
     price = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
-    how_sale = models.CharField(max_length=50, choices=[('only_sale', 'Только продаю'), ('sale_another', 'Одновременно покупаю другую')])
+    saleType = models.CharField(max_length=50, choices=[('only_sale', 'Только продаю'), ('sale_another', 'Одновременно покупаю другую')],blank=True)
+    phone = models.CharField(max_length=30)
     whatsapp = models.CharField(max_length=300)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -321,16 +341,6 @@ class SaleResidential(models.Model):
 
 
 
-
-    class Meta:
-        verbose_name = 'Location'
-        verbose_name_plural = 'Locations'
-
-    def save(self, *args, **kwargs):
-        # Если слаг пустой, то генерируем его из name
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super(Location, self).save(*args, **kwargs)
 
 
 class RentLongAdvertisement(models.Model):
