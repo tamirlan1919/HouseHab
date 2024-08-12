@@ -185,11 +185,65 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         read_only_fields = ('user',)
 
 
-class RentDayAdvertisementSerializer( serializers.ModelSerializer):
+class RentDayAdvertisementSerializer(serializers.ModelSerializer):
+    # Добавление вложенных полей для цены и депозита
+    price = serializers.SerializerMethodField()
+    deposit_info = serializers.SerializerMethodField()
+
     class Meta:
         model = RentDayAdvertisement
-        fields = '__all__'
+        fields = [
+            'id',
+            'accountType',
+            'dealType',
+            'estateType',
+            'type_rent_long',
+            'obj',
+            'new_or_no',
+            'address',
+            'nearest_stop',
+            'minute_stop',
+            'transport',
+            'roomsNumber',
+            'floor',
+            'floors_house',
+            'number_flat',
+            'total_area',
+            'kitchen_area',
+            'propertyType',
+            'guest_count',
+            'photo',
+            'video',
+            'headings',
+            'description',
+            'price',
+            'deposit_info',
+            'furniture',
+            'bathroom_choice',
+            'tech',
+            'communication',
+            'living_conditions',
+            'phone',
+            'additional_phone',
+            'user',
+            'region',
+            'promotion'
+        ]
         read_only_fields = ('user',)
+
+    def get_price(self, obj):
+        return {
+            'daily_price': obj.daily_price,
+            'currency': obj.daily_price_currency
+        }
+
+    def get_deposit_info(self, obj):
+        return {
+            'deposit': obj.deposit,
+            'currency': obj.deposit_currency
+        }
+
+
 
 
 class SaleCommercialAdvertisementSerializer( serializers.ModelSerializer):

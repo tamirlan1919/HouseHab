@@ -2,7 +2,8 @@ from djoser.views import UserViewSet
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import NotAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -235,14 +236,18 @@ class SaleResidentialViewSet(viewsets.ModelViewSet):
     serializer_class = SaleResidentialSerializer
 
 @extend_schema(tags=['Аренда длительная (Жилая)'])
-class RentLongAdvertisementViewSet(BaseAdvertisementViewSet):
+class RentLongAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentLongAdvertisement.objects.all()
     serializer_class = RentLongAdvertisementSerializer
 
+
+
+
 @extend_schema(tags=['Аренда посуточная (Жилая)'])
-class RentDayAdvertisementViewSet(BaseAdvertisementViewSet):
+class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentDayAdvertisement.objects.all()
     serializer_class = RentDayAdvertisementSerializer
+    permission_classes = [AllowAny]
 
 class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
