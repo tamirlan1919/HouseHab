@@ -10,3 +10,4 @@ gunicorn
 pillow
 django-cors-headers
 tzdata
+django-multiselectfield
