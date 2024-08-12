@@ -234,6 +234,7 @@ class SaleResidentialViewSet(viewsets.ModelViewSet):
     queryset = SaleResidential.objects.all()
     serializer_class = SaleResidentialSerializer
 
+@extend_schema(tags=['Аренда длительная (Жилая)'])
 class RentLongAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentLongAdvertisement.objects.all()
     serializer_class = RentLongAdvertisementSerializer
