@@ -48,11 +48,7 @@ class PromotionAdmin(admin.ModelAdmin):
     ordering = ['promotion_type']
 
 
-class RentDayAdvertisementAdmin(admin.ModelAdmin):
-    list_display = ['user', 'account_type', 'type_of_deal', 'type_of_property', 'obj', 'address', 'price_day']
-    list_filter = ['account_type', 'type_of_deal', 'type_of_property', 'obj']
-    search_fields = ['address', 'user__email', 'user__phone_number']
-    ordering = ['address']
+
 
 class SaleCommercialAdvertisementAdmin(admin.ModelAdmin):
     list_display = ['user', 'account_type', 'deal_type', 'type_of_property', 'obj', 'address', 'price_all']
@@ -93,7 +89,7 @@ admin.site.register(ProfessionalProfile)
 admin.site.register(Builder, BuilderAdmin)
 admin.site.register(Promotion, PromotionAdmin)
 admin.site.register(RentLongAdvertisement)
-admin.site.register(RentDayAdvertisement, RentDayAdvertisementAdmin)
+admin.site.register(RentDayAdvertisement)
 admin.site.register(SaleCommercialAdvertisement, SaleCommercialAdvertisementAdmin)
 admin.site.register(RentCommercialAdvertisement, RentCommercialAdvertisementAdmin)
 

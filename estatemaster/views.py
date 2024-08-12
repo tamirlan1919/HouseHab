@@ -239,6 +239,7 @@ class RentLongAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentLongAdvertisement.objects.all()
     serializer_class = RentLongAdvertisementSerializer
 
+@extend_schema(tags=['Аренда посуточная (Жилая)'])
 class RentDayAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentDayAdvertisement.objects.all()
     serializer_class = RentDayAdvertisementSerializer

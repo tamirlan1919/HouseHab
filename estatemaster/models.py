@@ -477,17 +477,69 @@ class RentLongAdvertisement(models.Model):
             raise ValidationError("Вы не можете выбрать 'Без мебели' с другими вариантами.")
 
 class RentDayAdvertisement(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    account_type = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner')
-    type_of_deal = models.CharField(max_length=100, choices=[('rent', 'Аренда')])
-    region = models.OneToOneField(Location, on_delete=models.CASCADE, blank=True, null=True)
-    type_of_property = models.CharField(max_length=50, choices=[('residential', 'Жилая')])
-    obj = models.CharField(max_length=100, choices=[('flat', 'Квартира'), ('room', 'Комната'), ('house', 'Дом'), ('place', 'Койко-место')])
-    address = models.CharField(max_length=400)
-    nearest_stop = models.CharField(max_length=400)
-    minute_stop = models.CharField(max_length=400)
-    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
-    count_rooms = models.CharField(max_length=20, choices=[
+    VIEW_CHOICES = [
+        ('outside', 'На улицу'),
+        ('into_the_courtyard', 'Во двор'),
+        ('to_sea', 'На море')
+    ]
+    APARTMENT_ENTRANCE_CHOICES = [
+        ('ramp', 'Пандус'),
+        ('garbage_chute', 'Мусоропровод')
+    ]
+    BATHROOM_CHOICES = [
+        ('bath', 'Ванна'),
+        ('shower', 'Душевая кабина')
+    ]
+
+    TECH_CHOICES = [
+        ('ac', 'Кондиционер'),
+        ('fridge', 'Холодильник'),
+        ('tv', 'Телевизор'),
+        ('dishwasher', 'Посудомоечная машина'),
+        ('washing_machine', 'Стиральная машина')
+    ]
+
+    COMMUNICATION_CHOICES = [
+        ('internet', 'Интернет'),
+        ('phone', 'Телефон')
+    ]
+    FURNITURE_CHOICES = [
+        ('no_furniture', 'Без мебели'),
+        ('kitchen', 'На кухне'),
+        ('rooms', 'В комнатах')
+    ]
+    PREPAYMENT_CHOICES = [
+        ('1_month', 'За 1 месяц'),
+        ('2_months', '2 месяца'),
+        ('3_months', '3 месяца'),
+        ('4_plus', '4+')
+    ]
+    CURRENCY_CHOICES = [
+        ('mzn', 'MZN'),
+        ('usd', 'USD'),
+        ('eur', 'EUR'),
+    ]
+    LIVING_CONDITIONS_CHOICES = [
+        ('children_allowed', 'Можно с детьми'),
+        ('pets_allowed', 'Можно с животными')
+    ]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  blank=True)
+    accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
+                                   default='owner', blank=True)
+    dealType = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')], default='sale',
+                                blank=True)
+    estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая')],
+                                  blank=True, default='residential')
+    type_rent_long = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')], blank=True, default='day')
+
+    obj = models.CharField(max_length=100, choices=[('flat', 'Квартира'), ('room', 'Комната'), ('house', 'Дом'), ('place', 'Койко-место')], blank=True)
+    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True, null=True)
+    region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
+    address = models.CharField(max_length=400, blank=True)
+    nearest_stop = models.CharField(max_length=400, blank=True)
+    minute_stop = models.CharField(max_length=400, blank=True)
+    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot', blank=True)
+    roomsNumber = models.CharField(max_length=20, choices=[
         ('Atelier', 'Студия'),
         ('1', '1'),
         ('2', '2'),
@@ -496,38 +548,32 @@ class RentDayAdvertisement(models.Model):
         ('5', '5'),
         ('6+', '6'),
         ('free_layout', 'Свободная планировка')
-    ])
-    total_area = models.PositiveIntegerField()
-    kitchen_area = models.PositiveIntegerField(blank=True, null=True)
-    property_type = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')])
-    photo = models.ImageField(upload_to='images/')
+    ], blank=True)
+    floor = models.PositiveIntegerField(blank=True, default=0)
+    floors_house = models.PositiveIntegerField(blank=True, default=0)
+    number_flat = models.CharField(max_length=30, blank=True)
+    total_area = models.PositiveIntegerField(blank=True, default=0)
+    kitchen_area = models.PositiveIntegerField(blank=True, default=0)
+    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')],blank=True)
+    guest_count = models.PositiveIntegerField(blank=True, default=0)
+    photo = models.ImageField(upload_to='images/', blank=True)
     video = models.CharField(max_length=300, blank=True, null=True)
-    headings = models.CharField(max_length=100)
-    description = models.TextField()
-    phone = models.CharField(max_length=30)
-    CURRENCY_CHOICES = [
-        ('mzn', 'MZN'),
-        ('usd', 'Доллар'),
-        ('eur', 'Евро'),
-    ]
-    type_rent_long = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')])
-    price_day = models.PositiveIntegerField()
-    deposit = models.PositiveIntegerField(blank=True, null=True)
-    currency_month = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
-    currency_deposit = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
+    headings = models.CharField(max_length=100, blank=True)
+    description = models.TextField(blank=True)
+    daily_price = models.PositiveIntegerField(verbose_name='Цена за сутки', blank=True, default=0)
+    daily_price_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn', blank=True)
+
+    deposit = models.PositiveIntegerField(verbose_name='Залог', blank=True, default=0)
+    deposit_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn', blank=True)
+
+    furniture = MultiSelectField(choices=FURNITURE_CHOICES, blank=True, null=True)
+    bathroom_choice = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
+    tech = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
+    communication = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
+    living_conditions = MultiSelectField(choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
+    phone = models.CharField(max_length=30, blank=True)
+    additional_phone = models.CharField(max_length=30, blank=True, null=True)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
-    without_mebel = models.BooleanField(default=False, blank=True, null=True)
-    mebel_kitchen = models.BooleanField(default=False, blank=True, null=True)
-    mebel_rooms = models.BooleanField(default=False, blank=True, null=True)
-    bathroom_vanna = models.BooleanField(default=False, blank=True, null=True)
-    bathroom_doosh = models.BooleanField(default=False, blank=True, null=True)
-    split = models.BooleanField(default=False, blank=True, null=True)
-    holodilnik = models.BooleanField(default=False, blank=True, null=True)
-    tv = models.BooleanField(default=False, blank=True, null=True)
-    posud_car = models.BooleanField(default=False, blank=True, null=True)
-    stiral_car = models.BooleanField(default=False, blank=True, null=True)
-    internet = models.BooleanField(default=False, blank=True, null=True)
-    phone_house = models.BooleanField(default=False, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Аренда посуточная продажи'
@@ -535,6 +581,12 @@ class RentDayAdvertisement(models.Model):
 
     def __str__(self):
         return self.headings
+
+    def clean(self):
+        super().clean()
+        # Валидация выбора мебели
+        if 'no_furniture' in self.furniture and (len(self.furniture) > 1):
+            raise ValidationError("Вы не можете выбрать 'Без мебели' с другими вариантами.")
 
 class SaleCommercialAdvertisement(models.Model):
     CURRENCY_CHOICES = [
