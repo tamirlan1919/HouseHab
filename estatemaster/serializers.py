@@ -377,11 +377,88 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
 
 
 
-class SaleCommercialAdvertisementSerializer( serializers.ModelSerializer):
+class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
+    # Вложенные поля для цены и контактов
+    total_price_info = serializers.SerializerMethodField()
+    price_per_m2_info = serializers.SerializerMethodField()
+    sellerContact = serializers.SerializerMethodField()
+
     class Meta:
         model = SaleCommercialAdvertisement
-        fields = '__all__'
+        fields = [
+            'id',
+            'accountType',
+            'dealType',
+            'estateType',
+            'obj',
+            'region',
+            'address',
+            'nearest_stop',
+            'minute_stop',
+            'transport',
+            'taxNumber',
+            'total_area',
+            'ceiling_height',
+            'floor',
+            'floors_house',
+            'legalAddress',
+            'isRoomOccupied',
+            'planning',
+            'numberWetSpots',
+            'electricPower',
+            'status',
+            'furniture_c',
+            'access',
+            'parking',
+            'numberParkingPlaces',
+            'parkingFees',
+            'parkingPrice',
+            'parkingCurreny',
+            'name_building',
+            'ageBuild',
+            'typeBuilding',
+            'klassBuild',
+            'areaBuild',
+            'plotBuild',
+            'buildInfo',
+            'buildCategory',
+            'buildDeveloper',
+            'buildManagmentCompany',
+            'buildVentilation',
+            'buildConditioning',
+            'buildHeating',
+            'buildFireStop',
+            'infrastructure',
+            'photo',
+            'video',
+            'headings',
+            'description',
+            'total_price_info',
+            'price_per_m2_info',
+            'tax',
+            'agent_bonus',
+            'sellerContact',
+            'promotion',
+        ]
         read_only_fields = ('user',)
+
+    def get_total_price_info(self, obj):
+        return {
+            'price': obj.total_price,
+            'currency': obj.currency_total
+        }
+
+    def get_price_per_m2_info(self, obj):
+        return {
+            'price': obj.price_per_m2,
+            'currency': obj.currency_per
+        }
+
+    def get_sellerContact(self, obj):
+        return {
+            'phone': obj.phone,
+            'additional_phone': obj.additional_phone
+        }
 
 
 class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
