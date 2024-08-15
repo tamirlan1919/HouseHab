@@ -255,6 +255,9 @@ class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
     serializer_class = SaleCommercialAdvertisementSerializer
 
+
+@extend_schema(tags=['Аренда  Недвижимости (Коммерция)'])
+
 class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer

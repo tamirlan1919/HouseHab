@@ -462,10 +462,106 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
 
 
 class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
+    rent_per_month_info = serializers.SerializerMethodField()
+    rent_per_year_per_m2_info = serializers.SerializerMethodField()
+    rent_per_month_per_m2_info = serializers.SerializerMethodField()
+    deposit_info = serializers.SerializerMethodField()
+    sellerContacts = serializers.SerializerMethodField()
+
     class Meta:
         model = RentCommercialAdvertisement
-        fields = '__all__'
-        read_only_fields = ('user',)
+        fields = [
+            'id',
+            'accountType',
+            'dealType',
+            'estateType',
+            'obj',
+            'region',
+            'address',
+            'nearest_stop',
+            'minute_stop',
+            'transport',
+            'taxNumber',
+            'total_area',
+            'ceiling_height',
+            'floor',
+            'floors_house',
+            'legalAddress',
+            'isRoomOccupied',
+            'planning',
+            'numberWetSpots',
+            'electricPower',
+            'status',
+            'furniture_c',
+            'access',
+            'parking',
+            'numberParkingPlaces',
+            'parkingFees',
+            'parkingPrice',
+            'parkingCurreny',
+            'name_building',
+            'ageBuild',
+            'typeBuilding',
+            'klassBuild',
+            'areaBuild',
+            'plotBuild',
+            'buildInfo',
+            'buildCategory',
+            'buildDeveloper',
+            'buildManagmentCompany',
+            'buildVentilation',
+            'buildConditioning',
+            'buildHeating',
+            'buildFireStop',
+            'infrastructure',
+            'photo',
+            'video',
+            'headings',
+            'rent_per_month_info',
+            'rent_per_year_per_m2_info',
+            'rent_per_month_per_m2_info',
+            'tax',
+            'communal_payments',
+            'operating_costs',
+            'rent_type',
+            'min_rent_period',
+            'rent_holidays',
+            'deposit_info',
+            'prepayment',
+            'agent_bonus',
+            'sellerContacts',
+            'promotion'
+        ]
+
+    def get_rent_per_month_info(self, obj):
+        return {
+            'rent_per_month': obj.rent_per_month,
+            'currency': obj.currency_rent_month
+        }
+
+    def get_rent_per_year_per_m2_info(self, obj):
+        return {
+            'rent_per_year_per_m2': obj.rent_per_year_per_m2,
+            'currency': obj.currency_rent_year_per_m2
+        }
+
+    def get_rent_per_month_per_m2_info(self, obj):
+        return {
+            'rent_per_month_per_m2': obj.rent_per_month_per_m2,
+            'currency': obj.currency_rent_month_per_m2
+        }
+
+    def get_deposit_info(self, obj):
+        return {
+            'security_deposit': obj.security_deposit,
+            'currency': obj.currency_deposit
+        }
+
+    def get_sellerContacts(self, obj):
+        return {
+            "phone": obj.phone,
+            "additional_phone": obj.additional_phone
+        }
 
 
 class LocationSerializer(serializers.ModelSerializer):

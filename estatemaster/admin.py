@@ -52,11 +52,7 @@ class PromotionAdmin(admin.ModelAdmin):
 
 
 
-class RentCommercialAdvertisementAdmin(admin.ModelAdmin):
-    list_display = ['user', 'account_type', 'deal_type', 'type_of_property', 'obj', 'address', 'rent_month']
-    list_filter = ['account_type', 'deal_type', 'type_of_property', 'obj']
-    search_fields = ['address', 'email', 'phone_number']
-    ordering = ['address']
+
 
 class PromotionAdmin(admin.ModelAdmin):
     list_display = ['promotion_type', 'duration', 'config', 'calculate_total_cost']
@@ -87,5 +83,5 @@ admin.site.register(Promotion, PromotionAdmin)
 admin.site.register(RentLongAdvertisement)
 admin.site.register(RentDayAdvertisement)
 admin.site.register(SaleCommercialAdvertisement)
-admin.site.register(RentCommercialAdvertisement, RentCommercialAdvertisementAdmin)
+admin.site.register(RentCommercialAdvertisement)
 
