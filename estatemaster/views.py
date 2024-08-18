@@ -80,6 +80,7 @@ class PromotionConfigViewSet(viewsets.ModelViewSet):
 
 
 
+
 class PromotionViewSet(viewsets.ModelViewSet):
     queryset = Promotion.objects.all()
     serializer_class = PromotionConfigSerializer
@@ -149,6 +150,7 @@ class CheckEmail(APIView):
             return Response({"error": "Email does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(tags=['Локация'])
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
@@ -257,7 +259,6 @@ class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
 
 
 @extend_schema(tags=['Аренда  Недвижимости (Коммерция)'])
-
 class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer

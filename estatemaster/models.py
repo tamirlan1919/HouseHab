@@ -276,14 +276,14 @@ class SaleResidential(models.Model):
     new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True, null=True)
     region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
     address = models.CharField(max_length=400)
-    nearest_stop = models.CharField(max_length=400)
-    minute_stop = models.CharField(max_length=400)
-    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
+    nearestStop = models.CharField(max_length=400)
+    minutesBusStop = models.CharField(max_length=400)
+    pathType = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
     floor = models.PositiveIntegerField()
-    floors_house = models.PositiveIntegerField()
-    number_flat = models.CharField(max_length=30, blank=True, null=True)
-    age_build = models.PositiveIntegerField(blank=True, null=True)
-    ceiling_height = models.FloatField(blank=True, null=True)
+    floorsHouse = models.PositiveIntegerField()
+    flatNumber = models.CharField(max_length=30, blank=True, null=True)
+    yaerBuilt = models.PositiveIntegerField(blank=True, null=True)
+    ceilingHeight = models.FloatField(blank=True, null=True)
     houseType = models.CharField(max_length=100, choices=[
         ('brick', 'Кирпичный'),
         ('monolit', 'Монолитный'),
@@ -301,25 +301,24 @@ class SaleResidential(models.Model):
         ('6+', '6'),
         ('free_layout', 'Свободная планировка')
     ])
-    total_area = models.PositiveIntegerField()
-    living_area = models.PositiveIntegerField(blank=True, null=True)
-    kitchen_area = models.PositiveIntegerField(blank=True, null=True)
+    totalArea = models.PositiveIntegerField()
+    livingArea = models.PositiveIntegerField(blank=True, null=True)
+    kitchenArea = models.PositiveIntegerField(blank=True, null=True)
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')],blank=True)
     photo = models.ImageField(upload_to='images/',blank=True)
-    video = models.CharField(max_length=300, blank=True, null=True)
+    youtubeLink = models.CharField(max_length=300, blank=True, null=True)
 
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
-
-    bathroom = models.PositiveIntegerField(default=0)
-    bathroom_joint = models.PositiveIntegerField(default=0)
-    repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
-    elevators_passengers = models.PositiveIntegerField(default=0)
-    elevators_cargo = models.PositiveIntegerField(default=0)
     viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
+    separateBathroom = models.PositiveIntegerField(default=0)
+    repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
+    freightElevator = models.PositiveIntegerField(default=0)
+    passengerElevator = models.PositiveIntegerField(default=0)
+    combinedBathroom = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')], blank=True, null=True)
-    headings = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     description = models.TextField()
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),
@@ -338,7 +337,7 @@ class SaleResidential(models.Model):
         verbose_name_plural = 'Жилая продажа'
 
     def __str__(self):
-        return self.headings
+        return self.title
 
 
 
