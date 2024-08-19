@@ -297,7 +297,7 @@ class SaleResidential(models.Model):
     combinedBathroom = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, null=True)
     description = models.TextField()
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),

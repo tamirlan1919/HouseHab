@@ -145,7 +145,7 @@ class BuilderSerializer(serializers.ModelSerializer):
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
     price = serializers.JSONField()
-    sellerContacts = serializers.SerializerMethodField()
+    sellerContacts = serializers.JSONField()
 
     class Meta:
         model = SaleResidential
