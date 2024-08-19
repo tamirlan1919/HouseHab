@@ -306,8 +306,8 @@ class SaleResidential(models.Model):
     price = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
     saleType = models.CharField(max_length=50, choices=[('onlySale', 'Только продаю'), ('buyingAnother', 'Одновременно покупаю другую')],blank=True)
-    phone = models.CharField(max_length=30)
-    whatsapp = models.CharField(max_length=300)
+    phone = models.CharField(max_length=30, null=True)
+    whatsapp = models.CharField(max_length=300,null=True)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
@@ -347,7 +347,7 @@ class RentLongAdvertisement(models.Model):
         ('phone', 'Телефон')
     ]
     FURNITURE_CHOICES = [
-        ('no_furniture', 'Без мебели'),
+        ('noFurniture', 'Без мебели'),
         ('kitchen', 'На кухне'),
         ('rooms', 'В комнатах')
     ]
@@ -422,7 +422,15 @@ class RentLongAdvertisement(models.Model):
     freightElevator = models.PositiveIntegerField(default=0)
     passengerElevator = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
-    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
+    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
+
+    furniture = MultiSelectField(choices=FURNITURE_CHOICES, blank=True, null=True)
+    bathroom_choice = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
+    tech = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
+    communication = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+
     rent_per_month = models.PositiveIntegerField()
     utility_payer = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
     prepayment = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES)
@@ -433,13 +441,7 @@ class RentLongAdvertisement(models.Model):
     phone = models.CharField(max_length=30)
     additional_phone = models.CharField(max_length=30, blank=True, null=True)
     communication_method = models.CharField(max_length=70, choices=[('calls_and_messages', 'Звонки и сообщения'), ('whatsapp', 'WhatsApp'), ('only_calls', 'Только звонки')])
-    promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
-    furniture = MultiSelectField(choices=FURNITURE_CHOICES, blank=True, null=True)
-    bathroom_choice = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
-    tech = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
-    communication = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
-    headings = models.CharField(max_length=100)
-    description = models.TextField()
+
 
     class Meta:
         verbose_name = 'Аренда длительная продажа'
