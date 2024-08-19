@@ -256,7 +256,7 @@ class SaleResidential(models.Model):
     address = models.CharField(max_length=400, null=True)
     nearestStop = models.CharField(max_length=400)
     minutesBusStop = models.PositiveIntegerField(blank=True)
-    pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')], default='afoot')
+    pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')], default='foot')
     floor = models.PositiveIntegerField()
     floorsHouse = models.PositiveIntegerField()
     flatNumber = models.PositiveIntegerField(blank=True)
@@ -295,7 +295,7 @@ class SaleResidential(models.Model):
     passengerElevator = models.PositiveIntegerField(default=0)
     combinedBathroom = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
-    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
+    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     CURRENCY_CHOICES = [
@@ -322,12 +322,12 @@ class SaleResidential(models.Model):
 class RentLongAdvertisement(models.Model):
     VIEW_CHOICES = [
         ('outside', 'На улицу'),
-        ('into_the_courtyard', 'Во двор'),
-        ('to_sea', 'На море')
+        ('courtyard', 'Во двор'),
+        ('atSea', 'На море')
     ]
     APARTMENT_ENTRANCE_CHOICES = [
         ('ramp', 'Пандус'),
-        ('garbage_chute', 'Мусоропровод')
+        ('trashChute', 'Мусоропровод')
     ]
     BATHROOM_CHOICES = [
         ('bath', 'Ванна'),
@@ -373,55 +373,56 @@ class RentLongAdvertisement(models.Model):
                                 blank=True)
     estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Коммерческая')],
                                   blank=True)
-    type_rent_long = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')])
+    leaseType = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('daily', 'Посуточно')], blank=True)
 
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
-        ('new_flat', 'Квартира в новостройке'),
+        ('flatNewBuilding', 'Квартира в новостройке'),
         ('room', 'Комната'),
-        ('part_flat', 'Доля в квартире'),
+        ('flatShare', 'Доля в квартире'),
         ('house', 'Дом'),
         ('cottage', 'Коттедж'),
-        ('townhouse', 'Таунхаус'),
-        ('part_house', 'Часть дома'),
-        ('spot', 'Участок')
+        ('tanhouse', 'Таунхаус'),
+        ('partHouse', 'Часть дома'),
+        ('plot', 'Участок')
     ])
-    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True, null=True)
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
-    address = models.CharField(max_length=400)
-    nearest_stop = models.CharField(max_length=400)
-    minute_stop = models.CharField(max_length=400)
-    transport = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
+    address = models.CharField(max_length=400, null=True)
+    nearestStop = models.CharField(max_length=400)
+    minutesBusStop = models.PositiveIntegerField(blank=True, default=0)
+    pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
+                                default='foot')
+    floor = models.PositiveIntegerField()
+    floorsHouse = models.PositiveIntegerField()
+    flatNumber = models.PositiveIntegerField(blank=True, default=0)
     roomsNumber = models.CharField(max_length=20, choices=[
-        ('Atelier', 'Студия'),
+        ('studio', 'Студия'),
         ('1', '1'),
         ('2', '2'),
         ('3', '3'),
         ('4', '4'),
         ('5', '5'),
-        ('6+', '6'),
-        ('free_layout', 'Свободная планировка')
+        ('overSix', '6'),
+        ('freePlanning', 'Свободная планировка')
     ])
-    floor = models.PositiveIntegerField()
-    floors_house = models.PositiveIntegerField()
-    number_flat = models.CharField(max_length=30, blank=True, null=True)
-    total_area = models.PositiveIntegerField()
-    living_area = models.PositiveIntegerField(blank=True, null=True)
-    kitchen_area = models.PositiveIntegerField(blank=True, null=True)
-    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')])
-    photo = models.ImageField(upload_to='images/', blank=True)
-    video = models.CharField(max_length=300, blank=True, null=True)
+
+    totalArea = models.PositiveIntegerField(blank=True, default=0)
+    livingArea = models.PositiveIntegerField(blank=True, null=True)
+    kitchenArea = models.PositiveIntegerField(blank=True, null=True)
+    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')])
+    photos = GenericRelation(Photo)
+    youtubeLink = models.CharField(max_length=300, blank=True, null=True)
 
     viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
-    bathroom_count = models.PositiveIntegerField(default=0, verbose_name='Количество ванных комнат')
-    bathroom_joint_count = models.PositiveIntegerField(default=0, verbose_name='Количество совмещенных ванных комнат')
-    repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
-    elevators_passengers = models.PositiveIntegerField(default=0)
-    elevators_cargo = models.PositiveIntegerField(default=0)
+    separateBathroom = models.PositiveIntegerField(default=0)
+    combinedBathroom = models.PositiveIntegerField(default=0)
+    repair = models.CharField(max_length=70, choices=[('unrepaired', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
+    freightElevator = models.PositiveIntegerField(default=0)
+    passengerElevator = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
-    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')], blank=True, null=True)
+    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
     rent_per_month = models.PositiveIntegerField()
     utility_payer = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
     prepayment = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES)
