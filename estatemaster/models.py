@@ -273,15 +273,14 @@ class SaleResidential(models.Model):
         ('part_house', 'Часть дома'),
         ('spot', 'Участок')
     ])
-    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True, null=True)
     region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
     address = models.CharField(max_length=400)
     nearestStop = models.CharField(max_length=400)
-    minutesBusStop = models.CharField(max_length=400)
+    minutesBusStop = models.PositiveIntegerField(blank=True)
     pathType = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
     floor = models.PositiveIntegerField()
     floorsHouse = models.PositiveIntegerField()
-    flatNumber = models.CharField(max_length=30, blank=True, null=True)
+    flatNumber = models.PositiveIntegerField(blank=True)
     yaerBuilt = models.PositiveIntegerField(blank=True, null=True)
     ceilingHeight = models.FloatField(blank=True, null=True)
     houseType = models.CharField(max_length=100, choices=[
@@ -305,7 +304,6 @@ class SaleResidential(models.Model):
     livingArea = models.PositiveIntegerField(blank=True, null=True)
     kitchenArea = models.PositiveIntegerField(blank=True, null=True)
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')],blank=True)
-    photo = models.ImageField(upload_to='images/',blank=True)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
 
     balconies = models.PositiveIntegerField(default=0)

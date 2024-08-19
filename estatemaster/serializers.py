@@ -183,7 +183,6 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'dealType',
             'estateType',
             'obj',
-            'new_or_no',
             'region',
             'address',
             'nearestStop',
@@ -200,7 +199,6 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
-            'photo',
             'youtubeLink',
             'balconies',
             'loggia',
@@ -233,6 +231,43 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             "phone": obj.phone,
             "whatsapp": obj.whatsapp
         }
+
+
+    def create(self, validated_data):
+        # Extract and remove nested data
+        price_info = validated_data.pop('price_info', {})
+        seller_contacts = validated_data.pop('sellerContacts', {})
+
+        # Add nested fields to validated_data
+        validated_data['price'] = price_info.get('price')
+        validated_data['currency'] = price_info.get('currency')
+        validated_data['phone'] = seller_contacts.get('phone')
+        validated_data['whatsapp'] = seller_contacts.get('whatsapp')
+
+        # Automatically set the user from the request context
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Extract and remove nested data
+        price_info = validated_data.pop('price_info', {})
+        seller_contacts = validated_data.pop('sellerContacts', {})
+
+        # Update instance fields with nested data
+        instance.price = price_info.get('price', instance.price)
+        instance.currency = price_info.get('currency', instance.currency)
+        instance.phone = seller_contacts.get('phone', instance.phone)
+        instance.whatsapp = seller_contacts.get('whatsapp', instance.whatsapp)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 class RentLongAdvertisementSerializer(serializers.ModelSerializer):
     price_info = serializers.SerializerMethodField()
