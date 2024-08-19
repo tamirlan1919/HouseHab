@@ -145,7 +145,7 @@ class BuilderSerializer(serializers.ModelSerializer):
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
     price = serializers.JSONField()
-    sellerContacts = serializers.JSONField()
+    sellerContacts = serializers.SerializerMethodField()
 
     class Meta:
         model = SaleResidential
@@ -204,18 +204,14 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        # Извлечение и распределение данных для полей price и currency
+        # Extract nested price data
         price_data = validated_data.pop('price', None)
 
         if price_data:
             validated_data['price'] = price_data.get('value')
             validated_data['currency'] = price_data.get('currency')
 
-        # Проверка на наличие данных
-        if validated_data.get('price') is None or validated_data.get('currency') is None:
-            raise serializers.ValidationError("Both price value and currency must be provided.")
-
-        # Установка пользователя из контекста запроса
+        # Ensure user is set from the request
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
@@ -223,28 +219,21 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Извлечение и распределение данных для полей price и currency
+        # Extract nested price data
         price_data = validated_data.pop('price', None)
 
         if price_data:
             instance.price = price_data.get('value', instance.price)
             instance.currency = price_data.get('currency', instance.currency)
 
-        # Обновление остальных полей
+        # Update other fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
         return instance
 
-    def to_representation(self, instance):
-        # Переопределяем to_representation для корректного отображения цены в ответе
-        representation = super().to_representation(instance)
-        representation['price'] = {
-            'value': instance.price,
-            'currency': instance.currency
-        }
-        return representation
+
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
