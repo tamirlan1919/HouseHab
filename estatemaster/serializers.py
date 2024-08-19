@@ -216,7 +216,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'saleType',
             'sellerContacts',
             'user',
-            'promotion'
+
         ]
         read_only_fields = ('user',)
 
