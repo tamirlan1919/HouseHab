@@ -144,7 +144,7 @@ class BuilderSerializer(serializers.ModelSerializer):
 
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
-    price_info = serializers.SerializerMethodField()
+    price_data = serializers.SerializerMethodField()
     sellerContacts = serializers.SerializerMethodField()
 
     class Meta:
@@ -185,63 +185,41 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'parking',
             'title',
             'description',
-            'price_info',
+            'price',
+            'currency',
             'saleType',
+            'price_data',  # Renamed from 'price'
             'sellerContacts',
             'user',
-
         ]
         read_only_fields = ('user',)
 
-    def get_price_info(self, obj):
+    def get_price_data(self, obj):
+
         return {
-            'price': obj.price,
-            'currency': obj.currency
+            'currency': obj.currency,
+            'value': obj.price,
         }
 
     def get_sellerContacts(self, obj):
+
         return {
             "phone": obj.phone,
             "whatsapp": obj.whatsapp
         }
 
-
     def create(self, validated_data):
-        # Extract and remove nested data
-        price_info = validated_data.pop('price_info', {})
-        seller_contacts = validated_data.pop('sellerContacts', {})
 
-        # Add nested fields to validated_data
-        validated_data['price'] = price_info.get('price')
-        validated_data['currency'] = price_info.get('currency')
-        validated_data['phone'] = seller_contacts.get('phone')
-        validated_data['whatsapp'] = seller_contacts.get('whatsapp')
-
-        # Automatically set the user from the request context
+        print(validated_data)
+        # Автоматическое задание пользователя из контекста запроса
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
 
+        # Печать окончательных данных перед созданием объекта
+        print("Final Validated Data:", validated_data)
+
         return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        # Extract and remove nested data
-        price_info = validated_data.pop('price_info', {})
-        seller_contacts = validated_data.pop('sellerContacts', {})
-
-        # Update instance fields with nested data
-        instance.price = price_info.get('price', instance.price)
-        instance.currency = price_info.get('currency', instance.currency)
-        instance.phone = seller_contacts.get('phone', instance.phone)
-        instance.whatsapp = seller_contacts.get('whatsapp', instance.whatsapp)
-
-        # Update other fields
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        instance.save()
-        return instance
-
 
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:

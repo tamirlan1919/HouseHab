@@ -254,7 +254,7 @@ class SaleResidential(models.Model):
     ])
     region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
-    nearestStop = models.CharField(max_length=400)
+    nearestStop = models.CharField(max_length=400,null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')], default='foot')
     floor = models.PositiveIntegerField()
@@ -268,7 +268,8 @@ class SaleResidential(models.Model):
         ('panel', 'Панельный'),
         ('block', 'Блочный'),
         ('wooden', 'Деревянный'),
-    ])
+
+    ],blank=True,null=True)
     roomsNumber = models.CharField(max_length=20, choices=[
         ('studio', 'Студия'),
         ('1', '1'),
