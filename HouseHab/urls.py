@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from estatemaster import views
 from estatemaster.serializers import AllAdvertisementsView, FilteredAdvertisementsView
-from estatemaster.views import CustomActivateUser
+from estatemaster.views import CustomActivateUser, PhotoViewSet
 
 router = DefaultRouter()
 router.register(r'promotion-configs', views.PromotionConfigViewSet)
@@ -17,6 +17,8 @@ router.register(r'sale-commercial-advertisements', views.SaleCommercialAdvertise
 router.register(r'rent-commercial-advertisements', views.RentCommercialAdvertisementViewSet)
 router.register(r'promotions', views.PromotionViewSet)
 router.register(r'location', views.LocationViewSet)
+router.register(r'photos', PhotoViewSet, basename='photos')
+
 
 
 urlpatterns = [

@@ -46,33 +46,6 @@ class CustomUserCreateSerializer(serializers.ModelSerializer):
             raise DuplicateFieldException()
 
 
-class RentalSpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RentalSpecialization
-        fields = ['id', 'name']
-
-        def validate_name(self, value):
-            if RentalSpecialization.objects.filter(name=value).exists():
-                raise serializers.ValidationError("Аренда недвижимости with this name already exists.")
-            return value
-
-class MortgageSpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MortgageSpecialization
-        fields = ['id', 'name']
-
-class OtherServiceSpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OtherServiceSpecialization
-        fields = ['id', 'name']
-
-class SaleSpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SaleSpecialization
-        fields = ['id', 'name']
-
-
-from rest_framework import serializers
 
 class ProfessionalProfileSerializer(serializers.ModelSerializer):
 
@@ -268,6 +241,13 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class PhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ['id', 'content_type', 'object_id', 'image', 'uploaded_at']
+        read_only_fields = ['id', 'uploaded_at']
 
 class RentLongAdvertisementSerializer(serializers.ModelSerializer):
     price_info = serializers.SerializerMethodField()

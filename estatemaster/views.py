@@ -262,3 +262,26 @@ class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
 class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer
+
+
+@extend_schema(tags=['Фото для объявлений'])
+class PhotoViewSet(viewsets.ModelViewSet):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def create(self, request, *args, **kwargs):
+        content_type_id = request.data.get('content_type')
+        object_id = request.data.get('object_id')
+
+        if not content_type_id or not object_id:
+            return Response({"error": "content_type and object_id are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        content_type = ContentType.objects.get_for_id(content_type_id)
+        model_class = content_type.model_class()
+        instance = model_class.objects.get(id=object_id)
+
+        if instance.photos.count() >= 5:
+            return Response({"error": "You cannot upload more than 5 photos."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return super().create(request, *args, **kwargs)

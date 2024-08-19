@@ -4,7 +4,9 @@ from django.db import models
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from .managers import CustomUserManager
-
+from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 class Image(models.Model):
@@ -52,44 +54,8 @@ class CustomUser(AbstractUser):
         verbose_name = 'Пользователи'
         verbose_name_plural = 'Пользователь'
 
-class RentalSpecialization(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Аренда недвижимости'
-        verbose_name_plural = 'Аренда недвижимости'
 
 
-class MortgageSpecialization(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-    class Meta:
-        verbose_name = 'Ипотечное кредитование'
-        verbose_name_plural = 'Ипотечное кредитование'
-class OtherServiceSpecialization(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Другие услуги'
-        verbose_name_plural = 'Другие услуги'
-
-class SaleSpecialization(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Продажа недвижимости'
-        verbose_name_plural = 'Продажа недвижимости'
 
 
 class ProfessionalProfile(models.Model):
@@ -230,6 +196,19 @@ class Promotion(models.Model):
 
     def __str__(self):
         return f"{self.get_promotion_type_display()} - {self.duration} days"
+
+
+
+class Photo(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    image = models.ImageField(upload_to='photos/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Photo for {self.content_object}"
+
 class Location(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -251,12 +230,12 @@ class Location(models.Model):
 class SaleResidential(models.Model):
     VIEW_CHOICES = [
         ('outside', 'На улицу'),
-        ('into_the_courtyard', 'Во двор'),
-        ('to_sea', 'На море')
+        ('courtyard', 'Во двор'),
+        ('atSea', 'На море')
     ]
     APARTMENT_ENTRANCE_CHOICES = [
         ('ramp', 'Пандус'),
-        ('garbage_chute', 'Мусоропровод')
+        ('trashChute', 'Мусоропровод')
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')], default='owner',blank=True)
@@ -264,20 +243,20 @@ class SaleResidential(models.Model):
     estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial','Коммерческая')],blank=True)
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
-        ('new_flat', 'Квартира в новостройке'),
+        ('flatNewBuilding', 'Квартира в новостройке'),
         ('room', 'Комната'),
-        ('part_flat', 'Доля в квартире'),
+        ('flatShare', 'Доля в квартире'),
         ('house', 'Дом'),
         ('cottage', 'Коттедж'),
-        ('townhouse', 'Таунхаус'),
-        ('part_house', 'Часть дома'),
-        ('spot', 'Участок')
+        ('tanhouse', 'Таунхаус'),
+        ('partHouse', 'Часть дома'),
+        ('plot', 'Участок')
     ])
     region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
-    address = models.CharField(max_length=400)
+    address = models.CharField(max_length=400, null=True)
     nearestStop = models.CharField(max_length=400)
     minutesBusStop = models.PositiveIntegerField(blank=True)
-    pathType = models.CharField(max_length=20, choices=[('afoot', 'Пешком'), ('car', 'Транспорт')], default='afoot')
+    pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')], default='afoot')
     floor = models.PositiveIntegerField()
     floorsHouse = models.PositiveIntegerField()
     flatNumber = models.PositiveIntegerField(blank=True)
@@ -285,37 +264,38 @@ class SaleResidential(models.Model):
     ceilingHeight = models.FloatField(blank=True, null=True)
     houseType = models.CharField(max_length=100, choices=[
         ('brick', 'Кирпичный'),
-        ('monolit', 'Монолитный'),
+        ('monolithic', 'Монолитный'),
         ('panel', 'Панельный'),
         ('block', 'Блочный'),
-        ('wood', 'Деревянный'),
+        ('wooden', 'Деревянный'),
     ])
     roomsNumber = models.CharField(max_length=20, choices=[
-        ('Atelier', 'Студия'),
+        ('studio', 'Студия'),
         ('1', '1'),
         ('2', '2'),
         ('3', '3'),
         ('4', '4'),
         ('5', '5'),
-        ('6+', '6'),
-        ('free_layout', 'Свободная планировка')
+        ('overSix', '6'),
+        ('freePlanning', 'Свободная планировка')
     ])
     totalArea = models.PositiveIntegerField()
     livingArea = models.PositiveIntegerField(blank=True, null=True)
     kitchenArea = models.PositiveIntegerField(blank=True, null=True)
-    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartment', 'Апартаменты')],blank=True)
+    propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')],blank=True)
+    photos = GenericRelation(Photo)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
 
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
     viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     separateBathroom = models.PositiveIntegerField(default=0)
-    repair = models.CharField(max_length=70, choices=[('without_repair', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
+    repair = models.CharField(max_length=70, choices=[('unrepaired', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
     freightElevator = models.PositiveIntegerField(default=0)
     passengerElevator = models.PositiveIntegerField(default=0)
     combinedBathroom = models.PositiveIntegerField(default=0)
     apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
-    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')], blank=True, null=True)
+    parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     CURRENCY_CHOICES = [
@@ -325,7 +305,7 @@ class SaleResidential(models.Model):
     ]
     price = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
-    saleType = models.CharField(max_length=50, choices=[('only_sale', 'Только продаю'), ('sale_another', 'Одновременно покупаю другую')],blank=True)
+    saleType = models.CharField(max_length=50, choices=[('onlySale', 'Только продаю'), ('buyingAnother', 'Одновременно покупаю другую')],blank=True)
     phone = models.CharField(max_length=30)
     whatsapp = models.CharField(max_length=300)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True, blank=True)
