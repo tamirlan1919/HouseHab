@@ -389,8 +389,8 @@ class RentLongAdvertisement(models.Model):
     ])
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
-    nearestStop = models.CharField(max_length=400)
-    minutesBusStop = models.PositiveIntegerField(blank=True, default=0)
+    nearestStop = models.CharField(max_length=400,null=True)
+    minutesBusStop = models.PositiveIntegerField(blank=True, null=True ,default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
                                 default='foot')
     floor = models.PositiveIntegerField()
@@ -413,7 +413,6 @@ class RentLongAdvertisement(models.Model):
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')])
     photos = GenericRelation(Photo)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
-
     viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
