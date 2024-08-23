@@ -147,6 +147,11 @@ class BuilderSerializer(serializers.ModelSerializer):
 
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
     price = serializers.JSONField()
     sellerContacts = serializers.SerializerMethodField()
 
@@ -173,6 +178,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
+            'photos',
             'youtubeLink',
             'balconies',
             'loggia',
@@ -212,12 +218,25 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             validated_data['price'] = price_data.get('value')
             validated_data['currency'] = price_data.get('currency')
 
+        # Extract and process photo IDs
+        photo_ids = validated_data.pop('photos', [])
+
         # Ensure user is set from the request
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
 
-        return super().create(validated_data)
+        # Create the SaleResidential object
+        sale_residential = super().create(validated_data)
+
+        # Associate photos with the created SaleResidential object
+        if photo_ids:
+            AdvertisementPhoto.objects.filter(id__in=photo_ids, user=request.user).update(
+                content_type=ContentType.objects.get_for_model(SaleResidential),
+                object_id=sale_residential.id
+            )
+
+        return sale_residential
 
     def update(self, instance, validated_data):
         # Extract nested price data
@@ -246,7 +265,11 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
     monthlyRent = serializers.SerializerMethodField()
     deposit = serializers.SerializerMethodField()
     sellerContacts = serializers.SerializerMethodField()
-
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
     # Остальные поля модели
     class Meta:
         model = RentLongAdvertisement
@@ -268,7 +291,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
-
+            'photos',
             'youtubeLink',
             'viewFromWindow',
             'balconies',
@@ -344,14 +367,26 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(data)
 
-    def create(self, validated_data):
-        # Устанавливаем пользователя из контекста запроса
-        user = self.context['request'].user
-        validated_data['user'] = user
-        return super().create(validated_data)
-
     def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+        # Обновление также может включать обновление фотографий (если нужно)
+        photo_ids = validated_data.pop('photo_ids', None)
+
+        # Обновляем объект RentLongAdvertisement
+        rent_advertisement = super().update(instance, validated_data)
+
+        if photo_ids is not None:
+            # Удаляем старые фотографии и добавляем новые
+            AdvertisementPhoto.objects.filter(
+                content_type=ContentType.objects.get_for_model(RentLongAdvertisement),
+                object_id=rent_advertisement.id
+            ).delete()
+
+            AdvertisementPhoto.objects.filter(id__in=photo_ids, user=rent_advertisement.user).update(
+                content_type=ContentType.objects.get_for_model(RentLongAdvertisement),
+                object_id=rent_advertisement.id
+            )
+
+        return rent_advertisement
 
 class RentDayAdvertisementSerializer(serializers.ModelSerializer):
     # Добавление вложенных полей для цены и депозита
@@ -504,6 +539,7 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
 
 
 class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
+
     rent_per_month_info = serializers.SerializerMethodField()
     rent_per_year_per_m2_info = serializers.SerializerMethodField()
     rent_per_month_per_m2_info = serializers.SerializerMethodField()
