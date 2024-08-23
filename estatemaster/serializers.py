@@ -238,7 +238,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdvertisementPhoto
-        fields = ['id', 'content_type', 'object_id', 'image', 'uploaded_at']
+        fields = ['id', 'content_type', 'object_id', 'image']
         read_only_fields = ['id', 'uploaded_at']
 
 
