@@ -143,6 +143,9 @@ class BuilderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
+
 class SaleResidentialSerializer(serializers.ModelSerializer):
     price = serializers.JSONField()
     sellerContacts = serializers.SerializerMethodField()
@@ -238,11 +241,13 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ['id', 'content_type', 'object_id', 'image', 'uploaded_at']
         read_only_fields = ['id', 'uploaded_at']
 
+
 class RentLongAdvertisementSerializer(serializers.ModelSerializer):
-    price_info = serializers.SerializerMethodField()
-    deposit_info = serializers.SerializerMethodField()
+    monthlyRent = serializers.SerializerMethodField()
+    deposit = serializers.SerializerMethodField()
     sellerContacts = serializers.SerializerMethodField()
 
+    # Остальные поля модели
     class Meta:
         model = RentLongAdvertisement
         fields = [
@@ -263,7 +268,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
-            'photos',
+
             'youtubeLink',
             'viewFromWindow',
             'balconies',
@@ -275,42 +280,78 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'freightElevator',
             'apartmentEntrance',
             'parking',
-            'price_info',
-            'utility_payer',
-            'prepayment',
-            'currency',
-            'deposit_info',
-            'rental_period',
-            'living_conditions',
+            'utilityPayment',
+            'prepaymentPeriod',
+            'rentalTerm',
+            'livingConditions',
             'furniture',
-            'bathroom_choice',
-            'tech',
-            'communication',
-            'sellerContacts',
-            'communication_method',
+            'bathroom',
+            'apartment',
+            'connection',
+
             'title',
             'description',
+            'monthlyRent',
+            'deposit',
+            'sellerContacts',
             'user'
         ]
         read_only_fields = ('user',)
 
-    def get_price_info(self, obj):
+    # Методы для сериализации при GET запросах
+    def get_monthlyRent(self, obj):
         return {
-            'rent_per_month': obj.rent_per_month,
-            'currency': obj.currency
+            'value': obj.rent_per_month,
+            'currency': obj.currency_per_month
         }
 
-    def get_deposit_info(self, obj):
+    def get_deposit(self, obj):
         return {
-            'deposit': obj.deposit,
+            'value': obj.deposit,
             'currency': obj.currency
         }
 
     def get_sellerContacts(self, obj):
         return {
-            "phone": obj.phone,
-            "additional_phone": obj.additional_phone
+            'phone': obj.phone,
+            'whatsApp': obj.whatsApp
         }
+
+    # Переопределяем методы для обработки входящих данных при POST/PUT запросах
+    def to_internal_value(self, data):
+        print(data)
+        """
+        Переопределяем метод для обработки вложенных полей при входящих запросах
+        """
+        monthly_rent_data = data.pop('monthlyRent', None)
+        deposit_data = data.pop('deposit', None)
+        seller_contacts_data = data.pop('sellerContacts', None)
+
+        # Обрабатываем monthlyRent
+        if monthly_rent_data:
+            data['rent_per_month'] = monthly_rent_data.get('value')
+            data['currency_per_month'] = monthly_rent_data.get('currency_per_month')
+
+        # Обрабатываем deposit
+        if deposit_data:
+            data['deposit'] = deposit_data.get('value')
+            # Предполагаем, что валюта депозита такая же, как и аренды
+
+        # Обрабатываем sellerContacts
+        if seller_contacts_data:
+            data['phone'] = seller_contacts_data.get('phone')
+            data['whatsApp'] = seller_contacts_data.get('whatsApp')
+
+        return super().to_internal_value(data)
+
+    def create(self, validated_data):
+        # Устанавливаем пользователя из контекста запроса
+        user = self.context['request'].user
+        validated_data['user'] = user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
 
 class RentDayAdvertisementSerializer(serializers.ModelSerializer):
     # Добавление вложенных полей для цены и депозита

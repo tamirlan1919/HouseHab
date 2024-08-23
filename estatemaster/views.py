@@ -285,3 +285,35 @@ class PhotoViewSet(viewsets.ModelViewSet):
             return Response({"error": "You cannot upload more than 5 photos."}, status=status.HTTP_400_BAD_REQUEST)
 
         return super().create(request, *args, **kwargs)
+
+
+@extend_schema(tags=['Мои объявления'])
+
+class UserAdvertisementsViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        user = request.user
+        rent_long = RentLongAdvertisement.objects.filter(user=user)
+        sale_residential = SaleResidential.objects.filter(user=user)
+        rent_day = RentDayAdvertisement.objects.filter(user=user)
+        sale_commercial = SaleCommercialAdvertisement.objects.filter(user=user)
+        rent_commercial = RentCommercialAdvertisement.objects.filter(user=user)
+
+        combined_queryset = list(rent_long) + list(sale_residential) + list(rent_day) + list(sale_commercial) + list(rent_commercial)
+
+        serialized_data = []
+        for obj in combined_queryset:
+            if isinstance(obj, RentLongAdvertisement):
+                serializer = RentLongAdvertisementSerializer(obj)
+            elif isinstance(obj, SaleResidential):
+                serializer = SaleResidentialSerializer(obj)
+            elif isinstance(obj, RentDayAdvertisement):
+                serializer = RentDayAdvertisementSerializer(obj)
+            elif isinstance(obj, SaleCommercialAdvertisement):
+                serializer = SaleCommercialAdvertisementSerializer(obj)
+            elif isinstance(obj, RentCommercialAdvertisement):
+                serializer = RentCommercialAdvertisementSerializer(obj)
+            serialized_data.append(serializer.data)
+
+        return Response(serialized_data)

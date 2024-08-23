@@ -332,15 +332,15 @@ class RentLongAdvertisement(models.Model):
     ]
     BATHROOM_CHOICES = [
         ('bath', 'Ванна'),
-        ('shower', 'Душевая кабина')
+        ('showerRoom', 'Душевая кабина')
     ]
 
     TECH_CHOICES = [
-        ('ac', 'Кондиционер'),
+        ('conditioner', 'Кондиционер'),
         ('fridge', 'Холодильник'),
         ('tv', 'Телевизор'),
         ('dishwasher', 'Посудомоечная машина'),
-        ('washing_machine', 'Стиральная машина')
+        ('washingmMachine', 'Стиральная машина')
     ]
 
     COMMUNICATION_CHOICES = [
@@ -349,14 +349,14 @@ class RentLongAdvertisement(models.Model):
     ]
     FURNITURE_CHOICES = [
         ('noFurniture', 'Без мебели'),
-        ('kitchen', 'На кухне'),
-        ('rooms', 'В комнатах')
+        ('inKitchen', 'На кухне'),
+        ('inRooms', 'В комнатах')
     ]
     PREPAYMENT_CHOICES = [
         ('1_month', 'За 1 месяц'),
         ('2_months', '2 месяца'),
         ('3_months', '3 месяца'),
-        ('4_plus', '4+')
+        ('4+_months', '4+')
     ]
     CURRENCY_CHOICES = [
         ('mzn', 'MZN'),
@@ -364,8 +364,8 @@ class RentLongAdvertisement(models.Model):
         ('eur', 'EUR'),
     ]
     LIVING_CONDITIONS_CHOICES = [
-        ('children_allowed', 'Можно с детьми'),
-        ('pets_allowed', 'Можно с животными')
+        ('allowed_with_children', 'Можно с детьми'),
+        ('allowed_with_pets', 'Можно с животными')
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
@@ -425,22 +425,22 @@ class RentLongAdvertisement(models.Model):
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
 
     furniture = MultiSelectField(choices=FURNITURE_CHOICES, blank=True, null=True)
-    bathroom_choice = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
-    tech = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
-    communication = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
+    bathroom = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
+    apartment = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
+    connection = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
 
     rent_per_month = models.PositiveIntegerField()
-    utility_payer = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
-    prepayment = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES)
+    currency_per_month = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')
+    utilityPayment = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
+    prepaymentPeriod = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES, blank=True)
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='mzn')  # валюта аренды
     deposit = models.PositiveIntegerField(blank=True, null=True)
-    rental_period = models.CharField(max_length=70, choices=[('few_months', 'Несколько месяцев'), ('from_the_year', 'От года')])
-    living_conditions = MultiSelectField(choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
+    rentalTerm = models.CharField(max_length=70, choices=[('several_months', 'Несколько месяцев'), ('year', 'От года')],null=True)
+    livingConditions = MultiSelectField(choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
     phone = models.CharField(max_length=30)
-    additional_phone = models.CharField(max_length=30, blank=True, null=True)
-    communication_method = models.CharField(max_length=70, choices=[('calls_and_messages', 'Звонки и сообщения'), ('whatsapp', 'WhatsApp'), ('only_calls', 'Только звонки')])
+    whatsApp = models.CharField(max_length=30, blank=True, null=True)
 
 
     class Meta:
@@ -448,7 +448,7 @@ class RentLongAdvertisement(models.Model):
         verbose_name_plural = 'Аренда длительная продажа'
 
     def __str__(self):
-        return self.headings
+        return self.title
 
     def clean(self):
         super().clean()
