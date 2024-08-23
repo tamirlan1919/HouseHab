@@ -265,11 +265,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
     monthlyRent = serializers.SerializerMethodField()
     deposit = serializers.SerializerMethodField()
     sellerContacts = serializers.SerializerMethodField()
-    photo_ids = serializers.ListField(
-        child=serializers.IntegerField(),
-        write_only=True,
-        required=False
-    )
+
     # Остальные поля модели
     class Meta:
         model = RentLongAdvertisement
@@ -291,7 +287,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
-            'photos',
+
             'youtubeLink',
             'viewFromWindow',
             'balconies',
@@ -374,17 +370,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         # Обновляем объект RentLongAdvertisement
         rent_advertisement = super().update(instance, validated_data)
 
-        if photo_ids is not None:
-            # Удаляем старые фотографии и добавляем новые
-            AdvertisementPhoto.objects.filter(
-                content_type=ContentType.objects.get_for_model(RentLongAdvertisement),
-                object_id=rent_advertisement.id
-            ).delete()
 
-            AdvertisementPhoto.objects.filter(id__in=photo_ids, user=rent_advertisement.user).update(
-                content_type=ContentType.objects.get_for_model(RentLongAdvertisement),
-                object_id=rent_advertisement.id
-            )
 
         return rent_advertisement
 
