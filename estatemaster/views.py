@@ -266,7 +266,7 @@ class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
 
 @extend_schema(tags=['Фото для объявлений'])
 class PhotoViewSet(viewsets.ModelViewSet):
-    queryset = Photo.objects.all()
+    queryset = AdvertisementPhoto.objects.all()
     serializer_class = PhotoSerializer
     parser_classes = (MultiPartParser, FormParser)
 

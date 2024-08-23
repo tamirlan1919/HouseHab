@@ -198,16 +198,17 @@ class Promotion(models.Model):
         return f"{self.get_promotion_type_display()} - {self.duration} days"
 
 
-
-class Photo(models.Model):
+class AdvertisementPhoto(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Ссылка на пользователя, загружающего фото
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-    image = models.ImageField(upload_to='photos/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    advertisement = GenericForeignKey('content_type', 'object_id')
+
+    image = models.ImageField(upload_to='advertisement_photos/')
+    description = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"Photo for {self.content_object}"
+        return f"Photo for {self.content_type} - {self.description or 'No Description'}"
 
 class Location(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -284,7 +285,7 @@ class SaleResidential(models.Model):
     livingArea = models.PositiveIntegerField(blank=True, null=True)
     kitchenArea = models.PositiveIntegerField(blank=True, null=True)
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')],blank=True)
-    photos = GenericRelation(Photo)
+    photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
 
     balconies = models.PositiveIntegerField(default=0)
@@ -411,7 +412,7 @@ class RentLongAdvertisement(models.Model):
     livingArea = models.PositiveIntegerField(blank=True, null=True)
     kitchenArea = models.PositiveIntegerField(blank=True, null=True)
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')])
-    photos = GenericRelation(Photo)
+    photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
     viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     balconies = models.PositiveIntegerField(default=0)

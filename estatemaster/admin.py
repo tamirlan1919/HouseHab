@@ -78,5 +78,5 @@ admin.site.register(RentLongAdvertisement)
 admin.site.register(RentDayAdvertisement)
 admin.site.register(SaleCommercialAdvertisement)
 admin.site.register(RentCommercialAdvertisement)
-admin.site.register(Photo)
+admin.site.register(AdvertisementPhoto)
 
