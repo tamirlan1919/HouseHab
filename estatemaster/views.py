@@ -265,14 +265,19 @@ class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
 
 
 @extend_schema(tags=['Фото для объявлений'])
-class PhotoViewSet(viewsets.ModelViewSet):
+class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
     queryset = AdvertisementPhoto.objects.all()
-    serializer_class = PhotoSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AdvertisementPhotoSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        photos = request.FILES.getlist('images')
+        photo_instances = []
+        for photo in photos:
+            photo_instance = AdvertisementPhoto.objects.create(user=request.user, image=photo)
+            photo_instances.append(photo_instance)
 
+        serializer = self.get_serializer(photo_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 @extend_schema(tags=['Мои объявления'])
 

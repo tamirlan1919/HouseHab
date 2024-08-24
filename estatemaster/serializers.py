@@ -142,11 +142,21 @@ class BuilderSerializer(serializers.ModelSerializer):
         model = Builder
         fields = '__all__'
 
+class AdvertisementPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdvertisementPhoto
+        fields = ['id', 'image', 'user']
+        read_only_fields = ['id', 'user']
 
+    def create(self, validated_data):
+        # Устанавливаем пользователя из контекста запроса
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
+    photos = AdvertisementPhotoSerializer(many=True, read_only=True)
     photo_ids = serializers.ListField(
         child=serializers.IntegerField(),
         write_only=True,
@@ -195,6 +205,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'price',  # This will now handle both value and currency
             'saleType',
             'sellerContacts',
+            'photo_ids',  # Добавляем photo_ids в список полей
         ]
         read_only_fields = ('user',)
 
@@ -211,42 +222,41 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        # Extract nested price data
+        # Обработка данных о цене
         price_data = validated_data.pop('price', None)
-
         if price_data:
             validated_data['price'] = price_data.get('value')
             validated_data['currency'] = price_data.get('currency')
 
-        # Extract and process photo IDs
-        photo_ids = validated_data.pop('photos', [])
+        # Извлечение и обработка идентификаторов фотографий
+        photo_ids = validated_data.pop('photo_ids', [])
 
-        # Ensure user is set from the request
+        # Установка пользователя из контекста запроса
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
 
-        # Create the SaleResidential object
+        # Создание объекта SaleResidential
         sale_residential = super().create(validated_data)
 
-        # Associate photos with the created SaleResidential object
+        # Связывание фотографий с созданным объектом SaleResidential
         if photo_ids:
+            content_type = ContentType.objects.get_for_model(SaleResidential)
             AdvertisementPhoto.objects.filter(id__in=photo_ids, user=request.user).update(
-                content_type=ContentType.objects.get_for_model(SaleResidential),
+                content_type=content_type,
                 object_id=sale_residential.id
             )
 
         return sale_residential
 
     def update(self, instance, validated_data):
-        # Extract nested price data
+        # Обработка данных о цене
         price_data = validated_data.pop('price', None)
-
         if price_data:
             instance.price = price_data.get('value', instance.price)
             instance.currency = price_data.get('currency', instance.currency)
 
-        # Update other fields
+        # Обновляем другие поля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
@@ -254,17 +264,10 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PhotoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AdvertisementPhoto
-        fields = ['id', 'content_type', 'object_id', 'image']
-        read_only_fields = ['id', 'uploaded_at']
-
-
 class RentLongAdvertisementSerializer(serializers.ModelSerializer):
-    monthlyRent = serializers.SerializerMethodField()
-    deposit = serializers.SerializerMethodField()
-    sellerContacts = serializers.SerializerMethodField()
+    monthlyRent = serializers.JSONField()
+    deposit = serializers.JSONField()
+    sellerContacts = serializers.JSONField()
 
     # Остальные поля модели
     class Meta:
@@ -338,41 +341,31 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
 
     # Переопределяем методы для обработки входящих данных при POST/PUT запросах
     def to_internal_value(self, data):
-        print(data)
-        """
-        Переопределяем метод для обработки вложенных полей при входящих запросах
-        """
+        # Ensure that these fields are lists
+        data['livingConditions'] = data.get('livingConditions', [])
+        data['furniture'] = data.get('furniture', [])
+        data['bathroom'] = data.get('bathroom', [])
+        data['apartment'] = data.get('apartment', [])
+        data['connection'] = data.get('connection', [])
+
+        # Handle other nested fields
         monthly_rent_data = data.pop('monthlyRent', None)
         deposit_data = data.pop('deposit', None)
         seller_contacts_data = data.pop('sellerContacts', None)
 
-        # Обрабатываем monthlyRent
         if monthly_rent_data:
             data['rent_per_month'] = monthly_rent_data.get('value')
-            data['currency_per_month'] = monthly_rent_data.get('currency_per_month')
+            data['currency_per_month'] = monthly_rent_data.get('currency')
 
-        # Обрабатываем deposit
         if deposit_data:
             data['deposit'] = deposit_data.get('value')
-            # Предполагаем, что валюта депозита такая же, как и аренды
+            data['currency'] = deposit_data.get('currency')
 
-        # Обрабатываем sellerContacts
         if seller_contacts_data:
             data['phone'] = seller_contacts_data.get('phone')
             data['whatsApp'] = seller_contacts_data.get('whatsApp')
 
         return super().to_internal_value(data)
-
-    def update(self, instance, validated_data):
-        # Обновление также может включать обновление фотографий (если нужно)
-        photo_ids = validated_data.pop('photo_ids', None)
-
-        # Обновляем объект RentLongAdvertisement
-        rent_advertisement = super().update(instance, validated_data)
-
-
-
-        return rent_advertisement
 
 class RentDayAdvertisementSerializer(serializers.ModelSerializer):
     # Добавление вложенных полей для цены и депозита
@@ -388,7 +381,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'estateType',
             'type_rent_long',
             'obj',
-            'new_or_no',
+
             'address',
             'nearest_stop',
             'minute_stop',

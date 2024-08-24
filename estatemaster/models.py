@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -200,8 +201,8 @@ class Promotion(models.Model):
 
 class AdvertisementPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Ссылка на пользователя, загружающего фото
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
     advertisement = GenericForeignKey('content_type', 'object_id')
 
     image = models.ImageField(upload_to='advertisement_photos/')
@@ -209,7 +210,6 @@ class AdvertisementPhoto(models.Model):
 
     def __str__(self):
         return f"Photo for {self.content_type} - {self.description or 'No Description'}"
-
 class Location(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -514,7 +514,6 @@ class RentDayAdvertisement(models.Model):
     type_rent_long = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('day', 'Посуточно')], blank=True, default='day')
 
     obj = models.CharField(max_length=100, choices=[('flat', 'Квартира'), ('room', 'Комната'), ('house', 'Дом'), ('place', 'Койко-место')], blank=True)
-    new_or_no = models.CharField(max_length=20, choices=[('second', 'Вторичка'), ('new', 'Новостройка')], default='second', blank=True, null=True)
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, blank=True)
     nearest_stop = models.CharField(max_length=400, blank=True)
