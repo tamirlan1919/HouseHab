@@ -206,6 +206,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'saleType',
             'sellerContacts',
             'photo_ids',  # Добавляем photo_ids в список полей
+            'created_at'
         ]
         read_only_fields = ('user',)
 
@@ -341,12 +342,17 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
 
     # Переопределяем методы для обработки входящих данных при POST/PUT запросах
     def to_internal_value(self, data):
-        # Ensure that these fields are lists
-        data['livingConditions'] = data.get('livingConditions', [])
-        data['furniture'] = data.get('furniture', [])
-        data['bathroom'] = data.get('bathroom', [])
-        data['apartment'] = data.get('apartment', [])
-        data['connection'] = data.get('connection', [])
+        # Ensure that these fields are parsed as lists
+        if isinstance(data.get('livingConditions'), str):
+            data['livingConditions'] = data['livingConditions'].strip('][').split(', ')
+        if isinstance(data.get('furniture'), str):
+            data['furniture'] = data['furniture'].strip('][').split(', ')
+        if isinstance(data.get('bathroom'), str):
+            data['bathroom'] = data['bathroom'].strip('][').split(', ')
+        if isinstance(data.get('apartment'), str):
+            data['apartment'] = data['apartment'].strip('][').split(', ')
+        if isinstance(data.get('connection'), str):
+            data['connection'] = data['connection'].strip('][').split(', ')
 
         # Handle other nested fields
         monthly_rent_data = data.pop('monthlyRent', None)
