@@ -951,45 +951,45 @@ class ParkingPriceCommercialField(serializers.Field):
 class MonthlyRentCommercialField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.rent_per_month,
+            'price': value.rent_per_month,
             'currency': value.currency_rent_month
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
-            raise serializers.ValidationError("Invalid data format for 'monthlyRent'. Expected a dictionary with 'value' and 'currency'.")
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'monthlyRent'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'rent_per_month': data.get('value'),
+            'rent_per_month': data.get('price'),
             'currency_rent_month': data.get('currency')
         }
 
 class MonthlyRentPerSqMField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.rent_per_month_per_m2,
+            'price': value.rent_per_month_per_m2,
             'currency': value.currency_rent_month_per_m2
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
-            raise serializers.ValidationError("Invalid data format for 'monthlyRentPerSqM'. Expected a dictionary with 'value' and 'currency'.")
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'monthlyRentPerSqM'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'rent_per_month_per_m2': data.get('value'),
+            'rent_per_month_per_m2': data.get('price'),
             'currency_rent_month_per_m2': data.get('currency')
         }
 
 class SecurityDepositField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.security_deposit,
+            'price': value.security_deposit,
             'currency': value.currency_deposit
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
-            raise serializers.ValidationError("Invalid data format for 'securityDeposit'. Expected a dictionary with 'value' and 'currency'.")
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'securityDeposit'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'security_deposit': data.get('value'),
+            'security_deposit': data.get('price'),
             'currency_deposit': data.get('currency')
         }
 
@@ -1011,15 +1011,15 @@ class SellerContactsCommercialField(serializers.Field):
 class YearlyRentPerSqMField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.rent_per_year_per_m2,
+            'price': value.rent_per_year_per_m2,
             'currency': value.currency_rent_year_per_m2
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
-            raise serializers.ValidationError("Invalid data format for 'yearlyRentPerSqM'. Expected a dictionary with 'value' and 'currency'.")
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'yearlyRentPerSqM'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'rent_per_year_per_m2': data.get('value'),
+            'rent_per_year_per_m2': data.get('price'),
             'currency_rent_year_per_m2': data.get('currency')
         }
 

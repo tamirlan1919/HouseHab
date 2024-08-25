@@ -661,7 +661,7 @@ class SaleCommercialAdvertisement(models.Model):
     status = models.CharField(max_length=100, blank=True, null=True, choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'), ('major_repairs_required', 'Требуется капитальный ремонт'), ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
     furniture_c = models.BooleanField(blank=True, null=True)
     access = models.CharField(max_length=30, blank=True, null=True, choices=[('free', 'Свободный'), ('passing_system', 'Пропускная система')])
-    parking = models.CharField(max_length=30, blank=True, null=True, choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')])
+    parking = models.CharField(max_length=30, blank=True, null=True, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')])
     numberParkingPlaces = models.PositiveIntegerField(blank=True, null=True)
     parkingFees = models.CharField(max_length=30, blank=True, null=True, choices=[('paid', 'Платная'), ('free', 'Бесплатная')])
     parkingPrice = models.PositiveIntegerField(blank=True, null=True)
@@ -869,7 +869,7 @@ class RentCommercialAdvertisement(models.Model):
     access = models.CharField(max_length=30, blank=True, null=True,
                               choices=[('free', 'Свободный'), ('passing_system', 'Пропускная система')])
     parking = models.CharField(max_length=30, blank=True, null=True,
-                               choices=[('ground', 'Наземная'), ('multilevel', 'Многоуровневая'),
+                               choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'),
                                         ('underground', 'Подземная'), ('in_roof', 'На крыше')])
     numberParkingPlaces = models.PositiveIntegerField(blank=True, null=True)
     parkingFees = models.CharField(max_length=30, blank=True, null=True,
@@ -918,9 +918,9 @@ class RentCommercialAdvertisement(models.Model):
     ventilation = models.CharField(max_length=30, blank=True, null=True,
                                    choices=[('natural', 'Естественная'), ('inflow', 'Приточная'), ('none', 'Нет')])
     сonditioning = models.CharField(max_length=30, blank=True, null=True,
-                                    choices=[('local', 'Местное'), ('center', 'Центральное'), ('none', 'Нет')])
+                                    choices=[('local', 'Местное'), ('central', 'Центральное'), ('none', 'Нет')])
     heating = models.CharField(max_length=30, blank=True, null=True,
-                               choices=[('autonomous', 'Автономное'), ('center', 'Центральное'), ('none', 'Нет')])
+                               choices=[('autonomous', 'Автономное'), ('central', 'Центральное'), ('none', 'Нет')])
     fireExtinguishingSystem = models.CharField(max_length=30, blank=True, null=True,
                                                choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'),
                                                         ('powder', 'Порошковая'), ('gas', 'Газовая'),
