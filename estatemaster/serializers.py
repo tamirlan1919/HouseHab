@@ -289,15 +289,15 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
 class MonthlyRentField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.rent_per_month,
+            'price': value.rent_per_month,
             'currency': value.currency_per_month
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
             raise serializers.ValidationError("Invalid data format for 'monthlyRent'. Expected a dictionary with 'value' and 'currency'.")
         return {
-            'rent_per_month': data.get('value'),
+            'rent_per_month': data.get('price'),
             'currency_per_month': data.get('currency')
         }
 
@@ -305,7 +305,7 @@ class MonthlyRentField(serializers.Field):
 class DepositRentField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.deposit,
+            'price': value.deposit,
             'currency': value.currency
         }
 
@@ -313,7 +313,7 @@ class DepositRentField(serializers.Field):
         if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
             raise serializers.ValidationError("Invalid data format for 'deposit'. Expected a dictionary with 'value' and 'currency'.")
         return {
-            'deposit': data.get('value'),
+            'deposit': data.get('price'),
             'currency': data.get('currency')
         }
 

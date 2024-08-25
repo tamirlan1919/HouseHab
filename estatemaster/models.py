@@ -376,7 +376,7 @@ class RentLongAdvertisement(models.Model):
                                 blank=True)
     estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая'), ('commercial', 'Коммерческая')],
                                   blank=True)
-    leaseType = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('daily', 'Посуточно')], blank=True)
+    leaseType = models.CharField(max_length=70, choices=[('longTerm', 'Длительно'), ('daily', 'Посуточно')], blank=True)
 
     obj = models.CharField(max_length=100, choices=[
         ('flat', 'Квартира'),
@@ -504,7 +504,7 @@ class RentDayAdvertisement(models.Model):
                                 blank=True)
     estateType = models.CharField(max_length=50, choices=[('residential', 'Жилая')],
                                   blank=True, default='residential')
-    leaseType = models.CharField(max_length=70, choices=[('long', 'Длительно'), ('daily', 'Посуточно')], blank=True)
+    leaseType = models.CharField(max_length=70, choices=[('longTerm', 'Длительно'), ('daily', 'Посуточно')], blank=True)
     obj = models.CharField(max_length=100, choices=[('flat', 'Квартира'), ('room', 'Комната'), ('house', 'Дом'), ('place', 'Койко-место')], blank=True)
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, blank=True,null=True)
@@ -667,7 +667,7 @@ class SaleCommercialAdvertisement(models.Model):
     parkingPrice = models.PositiveIntegerField(blank=True, null=True)
     parkingCurreny = models.CharField(max_length=3,choices=CURRENCY_CHOICES, default='MZN')
 
-    buildingName = models.CharField(max_length=200)
+    buildingName = models.CharField(max_length=200, blank=True, null=True)
     yearBuilt = models.PositiveIntegerField(blank=True, null=True)
     BUILDING_TYPE_CHOICES = [
         ('administrative_building', 'Административное здание'),
