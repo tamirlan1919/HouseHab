@@ -223,6 +223,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        print(validated_data)
         # Обработка данных о цене
         price_data = validated_data.pop('price', None)
         if price_data:
@@ -231,6 +232,16 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
 
         # Извлечение и обработка идентификаторов фотографий
         photo_ids = validated_data.pop('photo_ids', [])
+
+        # Обработка MultiSelectField данных
+        view_from_window = validated_data.get('viewFromWindow')
+
+        if view_from_window and not isinstance(view_from_window, list):
+            validated_data['viewFromWindow'] = [view_from_window]
+
+        apartment_entrance = validated_data.get('apartmentEntrance')
+        if apartment_entrance and not isinstance(apartment_entrance, list):
+            validated_data['apartmentEntrance'] = [apartment_entrance]
 
         # Установка пользователя из контекста запроса
         request = self.context.get('request')
@@ -257,6 +268,16 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             instance.price = price_data.get('value', instance.price)
             instance.currency = price_data.get('currency', instance.currency)
 
+        # Обработка MultiSelectField данных
+        view_from_window = validated_data.get('viewFromWindow')
+
+        if view_from_window and not isinstance(view_from_window, list):
+            validated_data['viewFromWindow'] = [view_from_window]
+
+        apartment_entrance = validated_data.get('apartmentEntrance')
+        if apartment_entrance and not isinstance(apartment_entrance, list):
+            validated_data['apartmentEntrance'] = [apartment_entrance]
+
         # Обновляем другие поля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -265,12 +286,81 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         return instance
 
 
-class RentLongAdvertisementSerializer(serializers.ModelSerializer):
-    monthlyRent = serializers.JSONField()
-    deposit = serializers.JSONField()
-    sellerContacts = serializers.JSONField()
+class MonthlyRentField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.rent_per_month,
+            'currency': value.currency_per_month
+        }
 
-    # Остальные поля модели
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'monthlyRent'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'rent_per_month': data.get('value'),
+            'currency_per_month': data.get('currency')
+        }
+
+# Кастомное поле для deposit
+class DepositRentField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.deposit,
+            'currency': value.currency
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'deposit'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'deposit': data.get('value'),
+            'currency': data.get('currency')
+        }
+
+# Кастомное поле для sellerContacts
+class SellerContactsField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'phone': value.phone,
+            'whatsApp': value.whatsApp
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'phone' not in data or 'whatsApp' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
+        return {
+            'phone': data.get('phone'),
+            'whatsApp': data.get('whatsApp')
+        }
+
+# Основной сериализатор для RentLongAdvertisement
+class RentLongAdvertisementSerializer(serializers.ModelSerializer):
+    photos = AdvertisementPhotoSerializer(many=True, read_only=True)
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+    monthlyRent = MonthlyRentField(source='*')
+    deposit = DepositRentField(source='*')
+    sellerContacts = SellerContactsField(source='*')
+    furniture = serializers.ListField(
+        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'noFurniture']),
+        write_only=True
+    )
+    bathroom = serializers.ListField(
+        child=serializers.ChoiceField(choices=['bath', 'showerRoom']),
+        write_only=True
+    )
+    apartment = serializers.ListField(
+        child=serializers.ChoiceField(choices=['conditioner', 'fridge', 'tv', 'dishwasher', 'washingMachine']),
+        write_only=True
+    )
+    connection = serializers.ListField(
+        child=serializers.ChoiceField(choices=['internet', 'phone']),
+        write_only=True
+    )
+
     class Meta:
         model = RentLongAdvertisement
         fields = [
@@ -291,8 +381,8 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'livingArea',
             'kitchenArea',
             'propertyType',
-
             'youtubeLink',
+            'photos',
             'viewFromWindow',
             'balconies',
             'loggia',
@@ -311,73 +401,200 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'bathroom',
             'apartment',
             'connection',
-
             'title',
             'description',
+            'user',
             'monthlyRent',
             'deposit',
             'sellerContacts',
-            'user'
+            'photo_ids',
+            'created_at'
         ]
         read_only_fields = ('user',)
 
-    # Методы для сериализации при GET запросах
-    def get_monthlyRent(self, obj):
-        return {
-            'value': obj.rent_per_month,
-            'currency': obj.currency_per_month
-        }
-
-    def get_deposit(self, obj):
-        return {
-            'value': obj.deposit,
-            'currency': obj.currency
-        }
-
-    def get_sellerContacts(self, obj):
-        return {
-            'phone': obj.phone,
-            'whatsApp': obj.whatsApp
-        }
-
-    # Переопределяем методы для обработки входящих данных при POST/PUT запросах
     def to_internal_value(self, data):
-        # Ensure that these fields are parsed as lists
-        if isinstance(data.get('livingConditions'), str):
-            data['livingConditions'] = data['livingConditions'].strip('][').split(', ')
-        if isinstance(data.get('furniture'), str):
-            data['furniture'] = data['furniture'].strip('][').split(', ')
-        if isinstance(data.get('bathroom'), str):
-            data['bathroom'] = data['bathroom'].strip('][').split(', ')
-        if isinstance(data.get('apartment'), str):
-            data['apartment'] = data['apartment'].strip('][').split(', ')
-        if isinstance(data.get('connection'), str):
-            data['connection'] = data['connection'].strip('][').split(', ')
+        """Handle incoming data for POST/PUT requests"""
 
-        # Handle other nested fields
-        monthly_rent_data = data.pop('monthlyRent', None)
-        deposit_data = data.pop('deposit', None)
-        seller_contacts_data = data.pop('sellerContacts', None)
+        # Validate 'furniture' field
+        furniture_data = data.get('furniture')
+        if furniture_data:
+            if 'noFurniture' in furniture_data and len(furniture_data) > 1:
+                raise serializers.ValidationError({'furniture': "'noFurniture' cannot be combined with other options."})
+            valid_furniture_choices = ['noFurniture', 'inKitchen', 'inRooms']
+            for item in furniture_data:
+                if item not in valid_furniture_choices:
+                    raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})
 
-        if monthly_rent_data:
-            data['rent_per_month'] = monthly_rent_data.get('value')
-            data['currency_per_month'] = monthly_rent_data.get('currency')
+        # Validate 'bathroom' field
+        bathroom_data = data.get('bathroom')
+        if bathroom_data:
+            valid_bathroom_choices = ['bath', 'showerRoom']
+            for item in bathroom_data:
+                if item not in valid_bathroom_choices:
+                    raise serializers.ValidationError({'bathroom': f"'{item}' is not a valid choice for bathroom."})
 
-        if deposit_data:
-            data['deposit'] = deposit_data.get('value')
-            data['currency'] = deposit_data.get('currency')
+        # Validate 'apartment' field
+        apartment_data = data.get('apartment')
+        if apartment_data:
+            valid_apartment_choices = ['conditioner', 'fridge', 'tv', 'dishwasher', 'washingMachine']
+            for item in apartment_data:
+                if item not in valid_apartment_choices:
+                    raise serializers.ValidationError({'apartment': f"'{item}' is not a valid choice for apartment."})
 
-        if seller_contacts_data:
-            data['phone'] = seller_contacts_data.get('phone')
-            data['whatsApp'] = seller_contacts_data.get('whatsApp')
+        # Validate 'connection' field
+        connection_data = data.get('connection')
+        if connection_data:
+            valid_connection_choices = ['internet', 'phone']
+            for item in connection_data:
+                if item not in valid_connection_choices:
+                    raise serializers.ValidationError({'connection': f"'{item}' is not a valid choice for connection."})
 
+        # Call the parent's to_internal_value method to handle other fields
         return super().to_internal_value(data)
 
+    def create(self, validated_data):
+        # Handle nested fields for creation
+        photo_ids = validated_data.pop('photo_ids', [])
+
+        # Set the user from the request context
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+
+        # Create the RentLongAdvertisement instance
+        rent_long_advertisement = super().create(validated_data)
+
+        # Associate photos
+        if photo_ids:
+            content_type = ContentType.objects.get_for_model(RentLongAdvertisement)
+            AdvertisementPhoto.objects.filter(id__in=photo_ids).update(
+                content_type=content_type,
+                object_id=rent_long_advertisement.id
+            )
+
+        return rent_long_advertisement
+
+    def update(self, instance, validated_data):
+        # Handle nested fields for update
+        monthly_rent_data = validated_data.pop('monthlyRent', None)
+        if monthly_rent_data:
+            instance.rent_per_month = monthly_rent_data.get('value', instance.rent_per_month)
+            instance.currency_per_month = monthly_rent_data.get('currency', instance.currency_per_month)
+
+        deposit_data = validated_data.pop('deposit', None)
+        if deposit_data:
+            instance.deposit = deposit_data.get('value', instance.deposit)
+            instance.currency = deposit_data.get('currency', instance.currency)
+
+        seller_contacts_data = validated_data.pop('sellerContacts', None)
+        if seller_contacts_data:
+            instance.phone = seller_contacts_data.get('phone', instance.phone)
+            instance.whatsApp = seller_contacts_data.get('whatsApp', instance.whatsApp)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+class DailyRentField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.daily_price,
+            'currency': value.daily_price_currency
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError(
+                "Invalid data format for 'dailyRent'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'daily_price': data.get('value'),
+            'daily_price_currency': data.get('currency')
+        }
+
+
+# Кастомное поле для deposit
+class DepositDayRentField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.deposit,
+            'currency': value.deposit_currency
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError(
+                "Invalid data format for 'deposit'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'deposit': data.get('value'),
+            'deposit_currency': data.get('currency')
+        }
+
+
+# Кастомное поле для sellerContacts
+class SellerDayRentContactsField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'phone': value.phone,
+            'additional_phone': value.additional_phone
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
+            raise serializers.ValidationError(
+                "Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+        return {
+            'phone': data.get('phone'),
+            'additional_phone': data.get('additional_phone')
+        }
+
+
+# Основной сериализатор для RentDayAdvertisement
 class RentDayAdvertisementSerializer(serializers.ModelSerializer):
-    # Добавление вложенных полей для цены и депозита
-    price = serializers.SerializerMethodField()
-    deposit_info = serializers.SerializerMethodField()
-    sellerContacts = serializers.SerializerMethodField()
+    photos = AdvertisementPhotoSerializer(many=True, read_only=True)
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+    dailyRent = DailyRentField(source='*')
+    deposit = DepositDayRentField(source='*')
+    sellerContacts = SellerDayRentContactsField(source='*')
+
+    furniture = serializers.ListField(
+        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'noFurniture']),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    bathroom_choice = serializers.ListField(
+        child=serializers.ChoiceField(choices=['bath', 'showerRoom']),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    tech = serializers.ListField(
+        child=serializers.ChoiceField(choices=['conditioner', 'fridge', 'tv', 'dishwasher', 'washingMachine']),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    communication = serializers.ListField(
+        child=serializers.ChoiceField(choices=['internet', 'phone']),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    living_conditions = serializers.ListField(
+        child=serializers.ChoiceField(choices=['allowed_with_children', 'allowed_with_pets']),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+
     class Meta:
         model = RentDayAdvertisement
         fields = [
@@ -385,27 +602,27 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'accountType',
             'dealType',
             'estateType',
-            'type_rent_long',
+            'leaseType',
             'obj',
-
+            'region',
             'address',
-            'nearest_stop',
-            'minute_stop',
-            'transport',
-            'roomsNumber',
+            'nearestStop',
+            'minutesBusStop',
+            'pathType',
             'floor',
-            'floors_house',
-            'number_flat',
-            'total_area',
-            'kitchen_area',
+            'floorsHouse',
+            'flatNumber',
+            'roomsNumber',
+            'totalArea',
+            'livingArea',
+            'kitchenArea',
             'propertyType',
-            'guest_count',
-            'photo',
-            'video',
-            'headings',
+            'photos',
+            'youtubeLink',
+            'title',
             'description',
-            'price',
-            'deposit_info',
+            'dailyRent',
+            'deposit',
             'furniture',
             'bathroom_choice',
             'tech',
@@ -413,37 +630,191 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'living_conditions',
             'sellerContacts',
             'user',
-            'region',
-            'promotion'
+            'photo_ids',
+            'created_at'
         ]
         read_only_fields = ('user',)
 
+    def to_internal_value(self, data):
+        """Handle incoming data for POST/PUT requests"""
 
-    def get_sellerContacts(self, obj):
+        # Validate 'furniture' field
+        furniture_data = data.get('furniture')
+        if furniture_data:
+            if 'noFurniture' in furniture_data and len(furniture_data) > 1:
+                raise serializers.ValidationError({'furniture': "'noFurniture' cannot be combined with other options."})
+            valid_furniture_choices = ['noFurniture', 'inKitchen', 'inRooms']
+            for item in furniture_data:
+                if item not in valid_furniture_choices:
+                    raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})
+
+        # Validate 'bathroom_choice' field
+        bathroom_data = data.get('bathroom_choice')
+        if bathroom_data:
+            valid_bathroom_choices = ['bath', 'showerRoom']
+            for item in bathroom_data:
+                if item not in valid_bathroom_choices:
+                    raise serializers.ValidationError(
+                        {'bathroom_choice': f"'{item}' is not a valid choice for bathroom."})
+
+        # Validate 'tech' field
+        tech_data = data.get('tech')
+        if tech_data:
+            valid_tech_choices = ['conditioner', 'fridge', 'tv', 'dishwasher', 'washingMachine']
+            for item in tech_data:
+                if item not in valid_tech_choices:
+                    raise serializers.ValidationError({'tech': f"'{item}' is not a valid choice for tech."})
+
+        # Validate 'communication' field
+        communication_data = data.get('communication')
+        if communication_data:
+            valid_communication_choices = ['internet', 'phone']
+            for item in communication_data:
+                if item not in valid_communication_choices:
+                    raise serializers.ValidationError(
+                        {'communication': f"'{item}' is not a valid choice for communication."})
+
+        # Validate 'living_conditions' field
+        living_conditions_data = data.get('living_conditions')
+        if living_conditions_data:
+            valid_living_conditions_choices = ['allowed_with_children', 'allowed_with_pets']
+            for item in living_conditions_data:
+                if item not in valid_living_conditions_choices:
+                    raise serializers.ValidationError(
+                        {'living_conditions': f"'{item}' is not a valid choice for living conditions."})
+
+        return super().to_internal_value(data)
+
+    def create(self, validated_data):
+        # Handle nested fields for creation
+        photo_ids = validated_data.pop('photo_ids', [])
+
+        # Set the user from the request context
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+
+        # Create the RentLongAdvertisement instance
+        rent_long_advertisement = super().create(validated_data)
+
+        # Associate photos
+        if photo_ids:
+            content_type = ContentType.objects.get_for_model(RentLongAdvertisement)
+            AdvertisementPhoto.objects.filter(id__in=photo_ids).update(
+                content_type=content_type,
+                object_id=rent_long_advertisement.id
+            )
+
+        return rent_long_advertisement
+
+    def update(self, instance, validated_data):
+        # Handle nested fields for update
+        daily_rent_data = validated_data.pop('dailyRent', None)
+        if daily_rent_data:
+            instance.daily_price = daily_rent_data.get('value', instance.daily_price)
+            instance.daily_price_currency = daily_rent_data.get('currency', instance.daily_price_currency)
+
+        deposit_data = validated_data.pop('deposit', None)
+        if deposit_data:
+            instance.deposit = deposit_data.get('value', instance.deposit)
+            instance.deposit_currency = deposit_data.get('currency', instance.deposit_currency)
+
+        seller_contacts_data = validated_data.pop('sellerContacts', None)
+        if seller_contacts_data:
+            instance.phone = seller_contacts_data.get('phone', instance.phone)
+            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+
+
+# Кастомные поля для сериализатора
+class PriceForAllField(serializers.Field):
+    def to_representation(self, value):
         return {
-            "phone": obj.phone,
-            "additional_phone": obj.additional_phone
+            'value': value.total_price,
+            'currency': value.currency_total
         }
-    def get_price(self, obj):
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'priceForAll'. Expected a dictionary with 'value' and 'currency'.")
         return {
-            'daily_price': obj.daily_price,
-            'currency': obj.daily_price_currency
+            'total_price': data.get('value'),
+            'currency_total': data.get('currency')
         }
 
-    def get_deposit_info(self, obj):
+class PriceForM2Field(serializers.Field):
+    def to_representation(self, value):
         return {
-            'deposit': obj.deposit,
-            'currency': obj.deposit_currency
+            'value': value.price_per_m2,
+            'currency': value.currency_per
         }
 
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'priceForM2'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'price_per_m2': data.get('value'),
+            'currency_per': data.get('currency')
+        }
 
+class ParkingPriceField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.parkingPrice,
+            'currency': value.parkingCurreny
+        }
 
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'parkingPrice'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'parkingPrice': data.get('value'),
+            'parkingCurreny': data.get('currency')
+        }
 
+class SellerСommercialContactsField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'phone': value.phone,
+            'additional_phone': value.additional_phone
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+        return {
+            'phone': data.get('phone'),
+            'additional_phone': data.get('additional_phone')
+        }
+
+# Основной сериализатор для SaleCommercialAdvertisement
 class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
-    # Вложенные поля для цены и контактов
-    total_price_info = serializers.SerializerMethodField()
-    price_per_m2_info = serializers.SerializerMethodField()
-    sellerContact = serializers.SerializerMethodField()
+    photos = AdvertisementPhotoSerializer(many=True, read_only=True)
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+    priceForAll = PriceForAllField(source='*')
+    priceForM2 = PriceForM2Field(source='*')
+    parkingPrice = ParkingPriceField(source='*')
+    sellerContacts = SellerСommercialContactsField(source='*')
+
+    # Добавление ListField для полей с множественным выбором (MultiSelectField)
+    infrastructure = serializers.ListField(
+        child=serializers.ChoiceField(choices=SaleCommercialAdvertisement.INFRASTRUCTURE_CHOICES),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
 
     class Meta:
         model = SaleCommercialAdvertisement
@@ -455,14 +826,14 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'region',
             'address',
-            'nearest_stop',
-            'minute_stop',
-            'transport',
+            'nearestStop',
+            'minutesBusStop',
+            'pathType',
             'taxNumber',
-            'total_area',
-            'ceiling_height',
+            'totalArea',
+            'ceilingHeights',
             'floor',
-            'floors_house',
+            'floorsHouse',
             'legalAddress',
             'isRoomOccupied',
             'planning',
@@ -474,62 +845,206 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'parking',
             'numberParkingPlaces',
             'parkingFees',
-            'parkingPrice',
-            'parkingCurreny',
-            'name_building',
-            'ageBuild',
-            'typeBuilding',
-            'klassBuild',
-            'areaBuild',
-            'plotBuild',
-            'buildInfo',
-            'buildCategory',
-            'buildDeveloper',
-            'buildManagmentCompany',
-            'buildVentilation',
-            'buildConditioning',
-            'buildHeating',
-            'buildFireStop',
+            'buildingName',
+            'yearBuilt',
+            'buildingType',
+            'buildingClass',
+            'buildingArea',
+            'plot',
+            'category',
+            'developer',
+            'managementCompany',
+            'ventilation',
+            'сonditioning',
+            'heating',
+            'fireExtinguishingSystem',
             'infrastructure',
-            'photo',
-            'video',
-            'headings',
+            'photos',
+            'youtubeLink',
+            'title',
             'description',
-            'total_price_info',
-            'price_per_m2_info',
+            'priceForAll',
+            'priceForM2',
+            'parkingPrice',
+            'currency_total',
+            'currency_per',
             'tax',
-            'agent_bonus',
-            'sellerContact',
-            'promotion',
+            'agentBonus',
+            'sellerContacts',
+            'photo_ids',
+            'created_at'
         ]
         read_only_fields = ('user',)
 
-    def get_total_price_info(self, obj):
+
+
+    def create(self, validated_data):
+        # Handle nested fields for creation
+        photo_ids = validated_data.pop('photo_ids', [])
+
+        # Set the user from the request context
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+
+        # Create the SaleCommercialAdvertisement instance
+        sale_commercial_advertisement = super().create(validated_data)
+
+        # Associate photos
+        if photo_ids:
+            content_type = ContentType.objects.get_for_model(SaleCommercialAdvertisement)
+            AdvertisementPhoto.objects.filter(id__in=photo_ids).update(
+                content_type=content_type,
+                object_id=sale_commercial_advertisement.id
+            )
+
+        return sale_commercial_advertisement
+
+    def update(self, instance, validated_data):
+        # Handle nested fields for update
+        price_for_all_data = validated_data.pop('priceForAll', None)
+        if price_for_all_data:
+            instance.total_price = price_for_all_data.get('value', instance.total_price)
+            instance.currency_total = price_for_all_data.get('currency', instance.currency_total)
+
+        price_for_m2_data = validated_data.pop('priceForM2', None)
+        if price_for_m2_data:
+            instance.price_per_m2 = price_for_m2_data.get('value', instance.price_per_m2)
+            instance.currency_per = price_for_m2_data.get('currency', instance.currency_per)
+
+        parking_price_data = validated_data.pop('parkingPrice', None)
+        if parking_price_data:
+            instance.parkingPrice = parking_price_data.get('value', instance.parkingPrice)
+            instance.parkingCurreny = parking_price_data.get('currency', instance.parkingCurreny)
+
+        seller_contacts_data = validated_data.pop('sellerContacts', None)
+        if seller_contacts_data:
+            instance.phone = seller_contacts_data.get('phone', instance.phone)
+            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
+
+
+# Кастомные поля для сериализатора
+class ParkingPriceCommercialField(serializers.Field):
+    def to_representation(self, value):
         return {
-            'price': obj.total_price,
-            'currency': obj.currency_total
+            'value': value.parkingPrice,
+            'currency': value.parkingCurreny
         }
 
-    def get_price_per_m2_info(self, obj):
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'parkingPrice'. Expected a dictionary with 'value' and 'currency'.")
         return {
-            'price': obj.price_per_m2,
-            'currency': obj.currency_per
+            'parkingPrice': data.get('value'),
+            'parkingCurreny': data.get('currency')
         }
 
-    def get_sellerContact(self, obj):
+class MonthlyRentCommercialField(serializers.Field):
+    def to_representation(self, value):
         return {
-            'phone': obj.phone,
-            'additional_phone': obj.additional_phone
+            'value': value.rent_per_month,
+            'currency': value.currency_rent_month
         }
 
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'monthlyRent'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'rent_per_month': data.get('value'),
+            'currency_rent_month': data.get('currency')
+        }
 
+class MonthlyRentPerSqMField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.rent_per_month_per_m2,
+            'currency': value.currency_rent_month_per_m2
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'monthlyRentPerSqM'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'rent_per_month_per_m2': data.get('value'),
+            'currency_rent_month_per_m2': data.get('currency')
+        }
+
+class SecurityDepositField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.security_deposit,
+            'currency': value.currency_deposit
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'securityDeposit'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'security_deposit': data.get('value'),
+            'currency_deposit': data.get('currency')
+        }
+
+class SellerContactsCommercialField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'phone': value.phone,
+            'additional_phone': value.additional_phone
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+        return {
+            'phone': data.get('phone'),
+            'additional_phone': data.get('additional_phone')
+        }
+
+class YearlyRentPerSqMField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.rent_per_year_per_m2,
+            'currency': value.currency_rent_year_per_m2
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'yearlyRentPerSqM'. Expected a dictionary with 'value' and 'currency'.")
+        return {
+            'rent_per_year_per_m2': data.get('value'),
+            'currency_rent_year_per_m2': data.get('currency')
+        }
+
+# Основной сериализатор для RentCommercialAdvertisement
 class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
+    photos = AdvertisementPhotoSerializer(many=True, read_only=True)
+    photo_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+    parkingPrice = ParkingPriceCommercialField(source='*')
+    monthlyRent = MonthlyRentCommercialField(source='*')
+    monthlyRentPerSqM = MonthlyRentPerSqMField(source='*')
+    securityDeposit = SecurityDepositField(source='*')
+    sellerContacts = SellerContactsCommercialField(source='*')
+    yearlyRentPerSqM = YearlyRentPerSqMField(source='*')
 
-    rent_per_month_info = serializers.SerializerMethodField()
-    rent_per_year_per_m2_info = serializers.SerializerMethodField()
-    rent_per_month_per_m2_info = serializers.SerializerMethodField()
-    deposit_info = serializers.SerializerMethodField()
-    sellerContacts = serializers.SerializerMethodField()
+    # Добавление ListField для полей с множественным выбором (MultiSelectField)
+    infrastructure = serializers.ListField(
+        child=serializers.ChoiceField(choices=RentCommercialAdvertisement.INFRASTRUCTURE_CHOICES),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
 
     class Meta:
         model = RentCommercialAdvertisement
@@ -541,14 +1056,14 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'region',
             'address',
-            'nearest_stop',
-            'minute_stop',
-            'transport',
+            'nearestStop',
+            'minutesBusStop',
+            'pathType',
             'taxNumber',
-            'total_area',
-            'ceiling_height',
+            'totalArea',
+            'ceilingHeights',
             'floor',
-            'floors_house',
+            'floorsHouse',
             'legalAddress',
             'isRoomOccupied',
             'planning',
@@ -560,71 +1075,117 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'parking',
             'numberParkingPlaces',
             'parkingFees',
-            'parkingPrice',
-            'parkingCurreny',
-            'name_building',
-            'ageBuild',
-            'typeBuilding',
-            'klassBuild',
-            'areaBuild',
-            'plotBuild',
-            'buildInfo',
-            'buildCategory',
-            'buildDeveloper',
-            'buildManagmentCompany',
-            'buildVentilation',
-            'buildConditioning',
-            'buildHeating',
-            'buildFireStop',
+            'buildingName',
+            'yearBuilt',
+            'buildingType',
+            'buildingClass',
+            'buildingArea',
+            'plot',
+            'category',
+            'developer',
+            'managementCompany',
+            'ventilation',
+            'сonditioning',
+            'heating',
+            'fireExtinguishingSystem',
             'infrastructure',
-            'photo',
-            'video',
-            'headings',
-            'rent_per_month_info',
-            'rent_per_year_per_m2_info',
-            'rent_per_month_per_m2_info',
+            'photos',
+            'youtubeLink',
+            'title',
+            'description',
+            'rent_per_month',
+            'currency_rent_month',
+            'rent_per_year_per_m2',
+            'currency_rent_year_per_m2',
+            'rent_per_month_per_m2',
+            'currency_rent_month_per_m2',
             'tax',
-            'communal_payments',
-            'operating_costs',
-            'rent_type',
-            'min_rent_period',
-            'rent_holidays',
-            'deposit_info',
+            'utilityPayment',
+            'operatingCosts',
+            'rentalType',
+            'minimumLeaseTerm',
+            'rentalHolidays',
+            'security_deposit',
+            'currency_deposit',
             'prepayment',
-            'agent_bonus',
+            'agentBonus',
+            'phone',
+            'additional_phone',
+            'parkingPrice',
+            'monthlyRent',
+            'monthlyRentPerSqM',
+            'securityDeposit',
             'sellerContacts',
-            'promotion'
+            'yearlyRentPerSqM',
+            'photo_ids',
+            'created_at'
         ]
+        read_only_fields = ('user',)
 
-    def get_rent_per_month_info(self, obj):
-        return {
-            'rent_per_month': obj.rent_per_month,
-            'currency': obj.currency_rent_month
-        }
 
-    def get_rent_per_year_per_m2_info(self, obj):
-        return {
-            'rent_per_year_per_m2': obj.rent_per_year_per_m2,
-            'currency': obj.currency_rent_year_per_m2
-        }
 
-    def get_rent_per_month_per_m2_info(self, obj):
-        return {
-            'rent_per_month_per_m2': obj.rent_per_month_per_m2,
-            'currency': obj.currency_rent_month_per_m2
-        }
 
-    def get_deposit_info(self, obj):
-        return {
-            'security_deposit': obj.security_deposit,
-            'currency': obj.currency_deposit
-        }
+    def create(self, validated_data):
+        # Handle nested fields for creation
+        photo_ids = validated_data.pop('photo_ids', [])
 
-    def get_sellerContacts(self, obj):
-        return {
-            "phone": obj.phone,
-            "additional_phone": obj.additional_phone
-        }
+        # Set the user from the request context
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+
+        # Create the RentCommercialAdvertisement instance
+        rent_commercial_advertisement = super().create(validated_data)
+
+        # Associate photos
+        if photo_ids:
+            content_type = ContentType.objects.get_for_model(RentCommercialAdvertisement)
+            AdvertisementPhoto.objects.filter(id__in=photo_ids).update(
+                content_type=content_type,
+                object_id=rent_commercial_advertisement.id
+            )
+
+        return rent_commercial_advertisement
+
+    def update(self, instance, validated_data):
+        # Handle nested fields for update
+        parking_price_data = validated_data.pop('parkingPrice', None)
+        if parking_price_data:
+            instance.parkingPrice = parking_price_data.get('value', instance.parkingPrice)
+            instance.parkingCurreny = parking_price_data.get('currency', instance.parkingCurreny)
+
+        monthly_rent_data = validated_data.pop('monthlyRent', None)
+        if monthly_rent_data:
+            instance.rent_per_month = monthly_rent_data.get('value', instance.rent_per_month)
+            instance.currency_rent_month = monthly_rent_data.get('currency', instance.currency_rent_month)
+
+        monthly_rent_per_sq_m_data = validated_data.pop('monthlyRentPerSqM', None)
+        if monthly_rent_per_sq_m_data:
+            instance.rent_per_month_per_m2 = monthly_rent_per_sq_m_data.get('value', instance.rent_per_month_per_m2)
+            instance.currency_rent_month_per_m2 = monthly_rent_per_sq_m_data.get('currency', instance.currency_rent_month_per_m2)
+
+        security_deposit_data = validated_data.pop('securityDeposit', None)
+        if security_deposit_data:
+            instance.security_deposit = security_deposit_data.get('value', instance.security_deposit)
+            instance.currency_deposit = security_deposit_data.get('currency', instance.currency_deposit)
+
+        seller_contacts_data = validated_data.pop('sellerContacts', None)
+        if seller_contacts_data:
+            instance.phone = seller_contacts_data.get('phone', instance.phone)
+            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+
+        yearly_rent_per_sq_m_data = validated_data.pop('yearlyRentPerSqM', None)
+        if yearly_rent_per_sq_m_data:
+            instance.rent_per_year_per_m2 = yearly_rent_per_sq_m_data.get('value', instance.rent_per_year_per_m2)
+            instance.currency_rent_year_per_m2 = yearly_rent_per_sq_m_data.get('currency', instance.currency_rent_year_per_m2)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
 
 
 class LocationSerializer(serializers.ModelSerializer):

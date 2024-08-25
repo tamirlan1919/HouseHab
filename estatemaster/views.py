@@ -252,7 +252,7 @@ class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-@extend_schema(tags=['Жилая продажа (Коммерция)'])
+@extend_schema(tags=['Комерческая продажа'])
 class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
     serializer_class = SaleCommercialAdvertisementSerializer
