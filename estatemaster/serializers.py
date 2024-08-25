@@ -310,7 +310,7 @@ class DepositRentField(serializers.Field):
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
             raise serializers.ValidationError("Invalid data format for 'deposit'. Expected a dictionary with 'value' and 'currency'.")
         return {
             'deposit': data.get('price'),
@@ -502,16 +502,16 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
 class DailyRentField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.daily_price,
+            'price': value.daily_price,
             'currency': value.daily_price_currency
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
             raise serializers.ValidationError(
-                "Invalid data format for 'dailyRent'. Expected a dictionary with 'value' and 'currency'.")
+                "Invalid data format for 'price'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'daily_price': data.get('value'),
+            'daily_price': data.get('price'),
             'daily_price_currency': data.get('currency')
         }
 
@@ -520,16 +520,16 @@ class DailyRentField(serializers.Field):
 class DepositDayRentField(serializers.Field):
     def to_representation(self, value):
         return {
-            'value': value.deposit,
+            'price': value.deposit,
             'currency': value.deposit_currency
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
             raise serializers.ValidationError(
-                "Invalid data format for 'deposit'. Expected a dictionary with 'value' and 'currency'.")
+                "Invalid data format for 'deposit'. Expected a dictionary with 'price' and 'currency'.")
         return {
-            'deposit': data.get('value'),
+            'deposit': data.get('price'),
             'deposit_currency': data.get('currency')
         }
 
@@ -539,16 +539,16 @@ class SellerDayRentContactsField(serializers.Field):
     def to_representation(self, value):
         return {
             'phone': value.phone,
-            'additional_phone': value.additional_phone
+            'whatsApp': value.whatsApp
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
+        if not isinstance(data, dict) or 'phone' not in data or 'whatsApp' not in data:
             raise serializers.ValidationError(
-                "Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+                "Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
         return {
             'phone': data.get('phone'),
-            'additional_phone': data.get('additional_phone')
+            'whatsApp': data.get('whatsApp')
         }
 
 
@@ -560,7 +560,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    dailyRent = DailyRentField(source='*')
+    price = DailyRentField(source='*')
     deposit = DepositDayRentField(source='*')
     sellerContacts = SellerDayRentContactsField(source='*')
 
@@ -621,7 +621,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'youtubeLink',
             'title',
             'description',
-            'dailyRent',
+            'price',
             'deposit',
             'furniture',
             'bathroom_choice',
@@ -709,7 +709,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Handle nested fields for update
-        daily_rent_data = validated_data.pop('dailyRent', None)
+        daily_rent_data = validated_data.pop('price', None)
         if daily_rent_data:
             instance.daily_price = daily_rent_data.get('value', instance.daily_price)
             instance.daily_price_currency = daily_rent_data.get('currency', instance.daily_price_currency)
@@ -722,7 +722,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         seller_contacts_data = validated_data.pop('sellerContacts', None)
         if seller_contacts_data:
             instance.phone = seller_contacts_data.get('phone', instance.phone)
-            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+            instance.whatsApp = seller_contacts_data.get('whatsApp', instance.whatsApp)
 
         # Update other fields
         for attr, value in validated_data.items():
@@ -784,15 +784,15 @@ class SellerСommercialContactsField(serializers.Field):
     def to_representation(self, value):
         return {
             'phone': value.phone,
-            'additional_phone': value.additional_phone
+            'whatsApp': value.whatsApp
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
-            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+        if not isinstance(data, dict) or 'phone' not in data or 'whatsApp' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
         return {
             'phone': data.get('phone'),
-            'additional_phone': data.get('additional_phone')
+            'whatsApp': data.get('whatsApp')
         }
 
 # Основной сериализатор для SaleCommercialAdvertisement
@@ -920,7 +920,7 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
         seller_contacts_data = validated_data.pop('sellerContacts', None)
         if seller_contacts_data:
             instance.phone = seller_contacts_data.get('phone', instance.phone)
-            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+            instance.whatsApp = seller_contacts_data.get('whatsApp', instance.whatsApp)
 
         # Update other fields
         for attr, value in validated_data.items():
@@ -997,15 +997,15 @@ class SellerContactsCommercialField(serializers.Field):
     def to_representation(self, value):
         return {
             'phone': value.phone,
-            'additional_phone': value.additional_phone
+            'whatsApp': value.whatsApp
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'phone' not in data or 'additional_phone' not in data:
-            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'additional_phone'.")
+        if not isinstance(data, dict) or 'phone' not in data or 'whatsApp' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
         return {
             'phone': data.get('phone'),
-            'additional_phone': data.get('additional_phone')
+            'whatsApp': data.get('whatsApp')
         }
 
 class YearlyRentPerSqMField(serializers.Field):
@@ -1110,7 +1110,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'prepayment',
             'agentBonus',
             'phone',
-            'additional_phone',
+            'whatsApp',
             'parkingPrice',
             'monthlyRent',
             'monthlyRentPerSqM',
@@ -1172,7 +1172,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
         seller_contacts_data = validated_data.pop('sellerContacts', None)
         if seller_contacts_data:
             instance.phone = seller_contacts_data.get('phone', instance.phone)
-            instance.additional_phone = seller_contacts_data.get('additional_phone', instance.additional_phone)
+            instance.whatsApp = seller_contacts_data.get('whatsApp', instance.whatsApp)
 
         yearly_rent_per_sq_m_data = validated_data.pop('yearlyRentPerSqM', None)
         if yearly_rent_per_sq_m_data:

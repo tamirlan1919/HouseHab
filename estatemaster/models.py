@@ -563,7 +563,7 @@ class RentDayAdvertisement(models.Model):
     communication = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
     living_conditions = MultiSelectField(choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
     phone = models.CharField(max_length=30, blank=True)
-    additional_phone = models.CharField(max_length=30, blank=True, null=True)
+    whatsApp = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     class Meta:
         verbose_name = 'Аренда посуточная продажи'
@@ -724,7 +724,7 @@ class SaleCommercialAdvertisement(models.Model):
 
     # Поля для контактов
     phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True, null=True)
-    additional_phone = models.CharField(max_length=30, verbose_name='Дополнительный номер', blank=True, null=True)
+    whatsApp = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 
@@ -968,7 +968,7 @@ class RentCommercialAdvertisement(models.Model):
 
     # Поля для контактов
     phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True, null=True)
-    additional_phone = models.CharField(max_length=30, verbose_name='Дополнительный номер', blank=True, null=True)
+    whatsApp = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     class Meta:
         verbose_name = 'Комерческие аренды'
