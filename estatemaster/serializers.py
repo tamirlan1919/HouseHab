@@ -502,16 +502,16 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
 class DailyRentField(serializers.Field):
     def to_representation(self, value):
         return {
-            'price': value.daily_price,
+            'value': value.daily_price,
             'currency': value.daily_price_currency
         }
 
     def to_internal_value(self, data):
-        if not isinstance(data, dict) or 'price' not in data or 'currency' not in data:
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
             raise serializers.ValidationError(
-                "Invalid data format for 'price'. Expected a dictionary with 'price' and 'currency'.")
+                "Invalid data format for 'price'. Expected a dictionary with 'value' and 'currency'.")
         return {
-            'daily_price': data.get('price'),
+            'daily_price': data.get('value'),
             'daily_price_currency': data.get('currency')
         }
 
