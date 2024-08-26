@@ -694,18 +694,18 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
 
-        # Create the RentLongAdvertisement instance
-        rent_long_advertisement = super().create(validated_data)
+        # Create the RentDayAdvertisement instance
+        rent_day_advertisement = super().create(validated_data)
 
         # Associate photos
         if photo_ids:
-            content_type = ContentType.objects.get_for_model(RentLongAdvertisement)
+            content_type = ContentType.objects.get_for_model(RentDayAdvertisement)
             AdvertisementPhoto.objects.filter(id__in=photo_ids).update(
                 content_type=content_type,
-                object_id=rent_long_advertisement.id
+                object_id=rent_day_advertisement.id
             )
 
-        return rent_long_advertisement
+        return rent_day_advertisement
 
     def update(self, instance, validated_data):
         # Handle nested fields for update
