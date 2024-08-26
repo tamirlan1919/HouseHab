@@ -430,7 +430,7 @@ class RentLongAdvertisement(models.Model):
     bathroom = MultiSelectField(choices=BATHROOM_CHOICES, blank=True, null=True)
     apartment = MultiSelectField(choices=TECH_CHOICES, blank=True, null=True)
     connection = MultiSelectField(choices=COMMUNICATION_CHOICES, blank=True, null=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,null=True)
     description = models.TextField()
 
     rent_per_month = models.PositiveIntegerField()
@@ -547,7 +547,7 @@ class RentDayAdvertisement(models.Model):
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')])
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
-    title = models.CharField(max_length=100, blank=True)
+    title = models.CharField(max_length=100, blank=True,null=True)
     description = models.TextField(blank=True)
     daily_price = models.PositiveIntegerField(verbose_name='Цена за сутки', blank=True, default=0)
     daily_price_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True)
@@ -647,19 +647,19 @@ class SaleCommercialAdvertisement(models.Model):
     nearestStop = models.CharField(max_length=400, null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True, default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
-                                default='foot')
+                                default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeights = models.PositiveIntegerField(blank=True, null=True)
-    floor = models.PositiveIntegerField()
-    floorsHouse = models.PositiveIntegerField()
+    ceilingHeights = models.PositiveIntegerField(blank=True)
+    floor = models.PositiveIntegerField(null=True)
+    floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True,null=True)
     isRoomOccupied = models.BooleanField(blank=True, null=True)
-    planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')])
+    planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')],null=True)
     numberWetSpots = models.CharField(max_length=50, blank=True, null=True, choices=[('false', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('more_five', '5 и больше')])
-    electricPower = models.FloatField(blank=True, null=True)
-    status = models.CharField(max_length=100, blank=True, null=True, choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'), ('major_repairs_required', 'Требуется капитальный ремонт'), ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
-    furniture_c = models.BooleanField(blank=True, null=True)
+    electricPower = models.FloatField(blank=True,null=True)
+    status = models.CharField(max_length=100, blank=True,  choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'), ('major_repairs_required', 'Требуется капитальный ремонт'), ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
+    furniture_c = models.BooleanField(blank=True)
     access = models.CharField(max_length=30, blank=True, null=True, choices=[('free', 'Свободный'), ('passing_system', 'Пропускная система')])
     parking = models.CharField(max_length=30, blank=True, null=True, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('in_roof', 'На крыше')])
     numberParkingPlaces = models.PositiveIntegerField(blank=True, null=True)
@@ -667,7 +667,7 @@ class SaleCommercialAdvertisement(models.Model):
     parkingPrice = models.PositiveIntegerField(blank=True, null=True)
     parkingCurreny = models.CharField(max_length=3,choices=CURRENCY_CHOICES, default='MZN')
 
-    buildingName = models.CharField(max_length=200, blank=True, null=True)
+    buildingName = models.CharField(max_length=200, blank=True)
     yearBuilt = models.PositiveIntegerField(blank=True, null=True)
     BUILDING_TYPE_CHOICES = [
         ('administrative_building', 'Административное здание'),
@@ -685,10 +685,11 @@ class SaleCommercialAdvertisement(models.Model):
         max_length=50,
         choices=BUILDING_TYPE_CHOICES,
         default='other',  # Optional: set a default value if needed
-        blank=True
+        blank=True,
+        null=True
     )
     buildingClass = models.CharField(max_length=3, blank=True, null=True, choices=[('A', 'A'), ('A+', 'A+'), ('B', 'B'), ('B+', 'B+'), ('B-', 'B-'), ('C', 'C')])
-    buildingArea = models.PositiveIntegerField(blank=True, null=True)
+    buildingArea = models.PositiveIntegerField(blank=True)
     PLOT_CHOICES = [
         ('owned', 'Owned'),
         ('leased', 'Leased'),
@@ -696,20 +697,19 @@ class SaleCommercialAdvertisement(models.Model):
 
     plot = models.CharField(
         max_length=20,  # Adjust as needed
-        blank=True,
-        null=True
+        blank=True
     )
-    category = models.CharField(max_length=30, choices=[('valid', 'Действующее'), ('project', 'Проект'), ('under_construction', 'Строящееся')], blank=True)
-    developer = models.CharField(max_length=200, blank=True, null=True)
-    managementCompany = models.CharField(max_length=200, blank=True, null=True)
+    category = models.CharField(max_length=30, choices=[('valid', 'Действующее'), ('project', 'Проект'), ('under_construction', 'Строящееся')], blank=True, null=True)
+    developer = models.CharField(max_length=200, blank=True)
+    managementCompany = models.CharField(max_length=200, blank=True)
     ventilation = models.CharField(max_length=30, blank=True, null=True, choices=[('natural', 'Естественная'), ('inflow', 'Приточная'), ('none', 'Нет')])
     сonditioning = models.CharField(max_length=30, blank=True, null=True, choices=[('local', 'Местное'), ('central', 'Центральное'), ('none', 'Нет')])
     heating = models.CharField(max_length=30, blank=True, null=True, choices=[('autonomous', 'Автономное'), ('central', 'Центральное'), ('none', 'Нет')])
-    fireExtinguishingSystem = models.CharField(max_length=30, blank=True, null=True, choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'), ('gas', 'Газовая'), ('alarm', 'Сигнализация'), ('false', 'Нет')])
+    fireExtinguishingSystem = models.CharField(max_length=30, blank=True,  choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'), ('gas', 'Газовая'), ('alarm', 'Сигнализация'), ('false', 'Нет')])
     infrastructure = MultiSelectField(choices=INFRASTRUCTURE_CHOICES, blank=True, null=True)
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,null=True)
     description = models.TextField()
     # Пример полей для цены
     total_price = models.PositiveIntegerField(verbose_name='Цена за всё', blank=True, null=True)
@@ -847,25 +847,25 @@ class RentCommercialAdvertisement(models.Model):
     nearestStop = models.CharField(max_length=400, null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True, default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
-                                default='foot')
+                                default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeights = models.PositiveIntegerField(blank=True, null=True)
-    floor = models.PositiveIntegerField()
-    floorsHouse = models.PositiveIntegerField()
+    ceilingHeights = models.PositiveIntegerField(blank=True)
+    floor = models.PositiveIntegerField(null=True)
+    floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True, null=True)
     isRoomOccupied = models.BooleanField(blank=True, null=True)
     planning = models.CharField(max_length=30,
-                                choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')])
+                                choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')], null=True)
     numberWetSpots = models.CharField(max_length=50, blank=True, null=True,
                                       choices=[('false', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'),
                                                ('more_five', '5 и больше')])
     electricPower = models.FloatField(blank=True, null=True)
-    status = models.CharField(max_length=100, blank=True, null=True,
+    status = models.CharField(max_length=100, blank=True,
                               choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'),
                                        ('major_repairs_required', 'Требуется капитальный ремонт'),
                                        ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
-    furniture_c = models.BooleanField(blank=True, null=True)
+    furniture_c = models.BooleanField(blank=True)
     access = models.CharField(max_length=30, blank=True, null=True,
                               choices=[('free', 'Свободный'), ('passing_system', 'Пропускная система')])
     parking = models.CharField(max_length=30, blank=True, null=True,
@@ -895,12 +895,13 @@ class RentCommercialAdvertisement(models.Model):
         max_length=50,
         choices=BUILDING_TYPE_CHOICES,
         default='other',  # Optional: set a default value if needed
-        blank=True
+        blank=True,
+        null=True
     )
     buildingClass = models.CharField(max_length=3, blank=True, null=True,
                                      choices=[('A', 'A'), ('A+', 'A+'), ('B', 'B'), ('B+', 'B+'), ('B-', 'B-'),
                                               ('C', 'C')])
-    buildingArea = models.PositiveIntegerField(blank=True, null=True)
+    buildingArea = models.PositiveIntegerField(blank=True)
     PLOT_CHOICES = [
         ('owned', 'Owned'),
         ('leased', 'Leased'),
@@ -909,26 +910,26 @@ class RentCommercialAdvertisement(models.Model):
     plot = models.CharField(
         max_length=20,  # Adjust as needed
         blank=True,
-        null=True
+
     )
     category = models.CharField(max_length=30, choices=[('valid', 'Действующее'), ('project', 'Проект'),
-                                                        ('under_construction', 'Строящееся')], blank=True)
-    developer = models.CharField(max_length=200, blank=True, null=True)
-    managementCompany = models.CharField(max_length=200, blank=True, null=True)
+                                                        ('under_construction', 'Строящееся')], blank=True,null=True)
+    developer = models.CharField(max_length=200, blank=True)
+    managementCompany = models.CharField(max_length=200, blank=True)
     ventilation = models.CharField(max_length=30, blank=True, null=True,
                                    choices=[('natural', 'Естественная'), ('inflow', 'Приточная'), ('none', 'Нет')])
     сonditioning = models.CharField(max_length=30, blank=True, null=True,
                                     choices=[('local', 'Местное'), ('central', 'Центральное'), ('none', 'Нет')])
     heating = models.CharField(max_length=30, blank=True, null=True,
                                choices=[('autonomous', 'Автономное'), ('central', 'Центральное'), ('none', 'Нет')])
-    fireExtinguishingSystem = models.CharField(max_length=30, blank=True, null=True,
+    fireExtinguishingSystem = models.CharField(max_length=30, blank=True,
                                                choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'),
                                                         ('powder', 'Порошковая'), ('gas', 'Газовая'),
                                                         ('alarm', 'Сигнализация'), ('false', 'Нет')])
     infrastructure = MultiSelectField(choices=INFRASTRUCTURE_CHOICES, blank=True, null=True)
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,null=True)
     description = models.TextField(blank=True)
 
 

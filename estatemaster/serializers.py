@@ -143,15 +143,16 @@ class BuilderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class AdvertisementPhotoSerializer(serializers.ModelSerializer):
+    ids = serializers.IntegerField(source='id', read_only=True)
+    image = serializers.ImageField()
+    user = serializers.ReadOnlyField(source='user.id')
+
     class Meta:
         model = AdvertisementPhoto
-        fields = ['id', 'image', 'user']
-        read_only_fields = ['id', 'user']
+        fields = ['ids', 'image', 'user']
 
     def create(self, validated_data):
-        # Устанавливаем пользователя из контекста запроса
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
+        return AdvertisementPhoto.objects.create(**validated_data)
 
 
 

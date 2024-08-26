@@ -271,13 +271,81 @@ class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         photos = request.FILES.getlist('images')
+        if not photos:
+            return Response({"detail": "No photos uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+
         photo_instances = []
+        first_photo_id = None
+
         for photo in photos:
             photo_instance = AdvertisementPhoto.objects.create(user=request.user, image=photo)
+            if first_photo_id is None:
+                first_photo_id = photo_instance.id  # id первой фотографии
             photo_instances.append(photo_instance)
 
-        serializer = self.get_serializer(photo_instances, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Присваиваем временные идентификаторы для ответа
+        temp_ids = list(range(1, len(photo_instances) + 1))
+        serialized_data = []
+
+        for temp_id, photo_instance in zip(temp_ids, photo_instances):
+            data = {
+                'ids': temp_id,
+                'image': self.request.build_absolute_uri(photo_instance.image.url),
+                'user': photo_instance.user.id
+            }
+            serialized_data.append(data)
+
+        return Response({
+            'id': first_photo_id,  # ID первой фотографии для идентификации набора
+            'photos': serialized_data  # Все фотографии с временными id
+        }, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request, *args, **kwargs):
+        # Переопределяем retrieve для возврата всех фотографий по batch_id
+        batch_id = kwargs['pk']
+
+        try:
+            # Находим первую фотографию с данным batch_id
+            first_photo = AdvertisementPhoto.objects.get(id=batch_id)
+        except AdvertisementPhoto.DoesNotExist:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Находим все фотографии, загруженные тем же пользователем и с последующими ID
+        queryset = AdvertisementPhoto.objects.filter(user=first_photo.user, id__gte=batch_id)
+
+        # Проверяем, какие фотографии относятся к этому batch_id
+        batch_photos = []
+        for photo in queryset:
+            if photo.id == batch_id or photo.id == batch_id + len(batch_photos):
+                batch_photos.append(photo)
+            else:
+                break
+
+        if not batch_photos:
+            return Response({"id": batch_id, "photos": []})
+
+        # Сериализация данных
+        serializer = self.get_serializer(batch_photos, many=True)
+        serialized_data = []
+
+        for i, photo in enumerate(serializer.data):
+            data = {
+                'ids': i + 1,  # Присваиваем временный id от 1 до len(images)
+                'image': photo['image'],
+                'user': photo['user']
+            }
+            serialized_data.append(data)
+
+        return Response({
+            'id': batch_id,
+            'photos': serialized_data
+        })
+
+    def list(self, request, *args, **kwargs):
+        # Возвращаем все фотографии, сгруппированные по batch_id
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 @extend_schema(tags=['Мои объявления'])
 
