@@ -261,7 +261,7 @@ class SaleResidential(models.Model):
     floor = models.PositiveIntegerField()
     floorsHouse = models.PositiveIntegerField()
     flatNumber = models.PositiveIntegerField(blank=True)
-    yaerBuilt = models.PositiveIntegerField(blank=True, null=True)
+    yearBuilt = models.PositiveIntegerField(blank=True, null=True)
     ceilingHeight = models.FloatField(blank=True, null=True)
     houseType = models.CharField(max_length=100, choices=[
         ('brick', 'Кирпичный'),
@@ -309,7 +309,7 @@ class SaleResidential(models.Model):
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
     saleType = models.CharField(max_length=50, choices=[('onlySale', 'Только продаю'), ('buyingAnother', 'Одновременно покупаю другую')],blank=True)
     phone = models.CharField(max_length=30, null=True)
-    whatsapp = models.CharField(max_length=300,null=True)
+    whatsApp = models.CharField(max_length=300,null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True,null=True)
     class Meta:
         verbose_name = 'Жилые прожажи'

@@ -154,7 +154,35 @@ class AdvertisementPhotoSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class SaleSellerContactsField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'phone': value.phone,
+            'whatsApp': value.whatsApp
+        }
 
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'phone' not in data or 'whatsApp' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
+        return {
+            'phone': data.get('phone'),
+            'whatsApp': data.get('whatsApp')
+        }
+
+class SaleGetPrice(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'value': value.price,
+            'currency': value.currency
+        }
+
+    def to_internal_value(self, data):
+        if not isinstance(data, dict) or 'value' not in data or 'currency' not in data:
+            raise serializers.ValidationError("Invalid data format for 'sellerContacts'. Expected a dictionary with 'phone' and 'whatsApp'.")
+        return {
+            'price': data.get('value'),
+            'currency': data.get('currency')
+        }
 
 class SaleResidentialSerializer(serializers.ModelSerializer):
     photos = AdvertisementPhotoSerializer(many=True, read_only=True)
@@ -163,8 +191,8 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    price = serializers.JSONField()
-    sellerContacts = serializers.SerializerMethodField()
+    price = SaleGetPrice(source='*')
+    sellerContacts = SaleSellerContactsField(source='*')
 
     class Meta:
         model = SaleResidential
@@ -181,7 +209,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'floor',
             'floorsHouse',
             'flatNumber',
-            'yaerBuilt',
+            'yearBuilt',
             'ceilingHeight',
             'houseType',
             'roomsNumber',
@@ -867,8 +895,6 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'priceForAll',
             'priceForM2',
             'parkingPrice',
-            'currency_total',
-            'currency_per',
             'tax',
             'agentBonus',
             'sellerContacts',
@@ -1094,20 +1120,12 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'youtubeLink',
             'title',
             'description',
-            'rent_per_month',
-            'currency_rent_month',
-            'rent_per_year_per_m2',
-            'currency_rent_year_per_m2',
-            'rent_per_month_per_m2',
-            'currency_rent_month_per_m2',
             'tax',
             'utilityPayment',
             'operatingCosts',
             'rentalType',
             'minimumLeaseTerm',
             'rentalHolidays',
-            'security_deposit',
-            'currency_deposit',
             'prepayment',
             'agentBonus',
             'phone',
