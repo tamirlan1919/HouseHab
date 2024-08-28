@@ -205,6 +205,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'obj',
             'nearestStop',
             'minutesBusStop',
+            'address',
             'pathType',
             'floor',
             'floorsHouse',
@@ -401,6 +402,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'nearestStop',
             'minutesBusStop',
+            'address',
             'pathType',
             'roomsNumber',
             'floor',
@@ -847,8 +849,10 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SaleCommercialAdvertisement
+
         fields = [
             'id',
+            'user',
             'accountType',
             'dealType',
             'estateType',
@@ -1077,6 +1081,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
         model = RentCommercialAdvertisement
         fields = [
             'id',
+            'user',
             'accountType',
             'dealType',
             'estateType',

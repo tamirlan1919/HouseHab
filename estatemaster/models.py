@@ -623,7 +623,7 @@ class SaleCommercialAdvertisement(models.Model):
         ('percentage_of_deal', 'Процент от сделки'),
     ]
 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,   blank=True)
     accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
                                    default='owner', blank=True)
     dealType = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')], default='sale',
@@ -822,7 +822,7 @@ class RentCommercialAdvertisement(models.Model):
         ('11months', '11 мес'),
         ('1year', 'Год'),
     ]
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,  blank=True)
     accountType = models.CharField(max_length=20, choices=[('owner', 'Собственник'), ('agent', 'Агент')],
                                    default='owner', blank=True)
     dealType = models.CharField(max_length=100, choices=[('sale', 'Продажа'), ('rent', 'Аренда')], default='sale',

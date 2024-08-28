@@ -236,11 +236,13 @@ class BaseAdvertisementViewSet(viewsets.ModelViewSet):
 class SaleResidentialViewSet(viewsets.ModelViewSet):
     queryset = SaleResidential.objects.all()
     serializer_class = SaleResidentialSerializer
+    permission_classes = [AllowAny]
 
 @extend_schema(tags=['Аренда длительная (Жилая)'])
 class RentLongAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentLongAdvertisement.objects.all()
     serializer_class = RentLongAdvertisementSerializer
+    permission_classes = [AllowAny]
 
 
 
@@ -253,15 +255,17 @@ class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
 
 
 @extend_schema(tags=['Комерческая продажа'])
-class SaleCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
+class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
     serializer_class = SaleCommercialAdvertisementSerializer
+    permission_classes = [AllowAny]
 
 
 @extend_schema(tags=['Аренда  Недвижимости (Коммерция)'])
-class RentCommercialAdvertisementViewSet(BaseAdvertisementViewSet):
+class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer
+    permission_classes = [AllowAny]
 
 @extend_schema(tags=['Фото для объявлений'])
 class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
