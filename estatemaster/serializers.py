@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from djoser.utils import decode_uid
 from rest_framework import serializers, status
@@ -154,6 +156,7 @@ class AdvertisementPhotoSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+
 class SaleSellerContactsField(serializers.Field):
     def to_representation(self, value):
         return {
@@ -240,32 +243,20 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ('user',)
 
-    def get_price(self, obj):
-        return {
-            'value': obj.price,
-            'currency': obj.currency,
-        }
-
-    def get_sellerContacts(self, obj):
-        return {
-            "phone": obj.phone,
-            "whatsapp": obj.whatsapp
-        }
-
     def create(self, validated_data):
-        print(validated_data)
         # Обработка данных о цене
         price_data = validated_data.pop('price', None)
-        if price_data:
+        if isinstance(price_data, dict):
             validated_data['price'] = price_data.get('value')
             validated_data['currency'] = price_data.get('currency')
+        elif isinstance(price_data, int):  # Если цена уже целое число
+            validated_data['price'] = price_data
 
         # Извлечение и обработка идентификаторов фотографий
         photo_ids = validated_data.pop('photo_ids', [])
 
         # Обработка MultiSelectField данных
         view_from_window = validated_data.get('viewFromWindow')
-
         if view_from_window and not isinstance(view_from_window, list):
             validated_data['viewFromWindow'] = [view_from_window]
 
