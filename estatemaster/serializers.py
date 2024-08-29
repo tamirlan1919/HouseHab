@@ -147,7 +147,13 @@ class BuilderSerializer(serializers.ModelSerializer):
 class AdvertisementPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdvertisementPhoto
-        fields = ['id', 'image', 'user', 'content_type', 'object_id', 'description', 'photo_group']
+        fields = ['id', 'image', 'user']
+        read_only_fields = ['id', 'user']
+
+    def create(self, validated_data):
+        # Устанавливаем пользователя из контекста запроса
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
 
 class PhotoGroupSerializer(serializers.ModelSerializer):
     photos = AdvertisementPhotoSerializer(many=True, read_only=True)
@@ -155,8 +161,6 @@ class PhotoGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoGroup
         fields = ['id', 'created_at', 'photos']
-
-
 
 class SaleSellerContactsField(serializers.Field):
     def to_representation(self, value):

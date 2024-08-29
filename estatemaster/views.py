@@ -274,15 +274,11 @@ class PhotoGroupViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoGroupSerializer
 
     def create(self, request, *args, **kwargs):
-        content_type_id = request.data.get('content_type_id')
         object_id = request.data.get('object_id')
         photos_data = request.FILES.getlist('photos')
         user = request.user
 
-        try:
-            content_type = ContentType.objects.get(id=content_type_id)
-        except ContentType.DoesNotExist:
-            return Response({'error': 'Invalid content_type_id'}, status=status.HTTP_400_BAD_REQUEST)
+
 
         # Создаем новую группу для фотографий
         photo_group = PhotoGroup.objects.create()
@@ -292,7 +288,6 @@ class PhotoGroupViewSet(viewsets.ModelViewSet):
             photo = AdvertisementPhoto(
                 image=photo_data,
                 user=user,
-                content_type=content_type,
                 object_id=object_id,
                 photo_group=photo_group
             )
