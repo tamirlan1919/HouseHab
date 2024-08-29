@@ -267,26 +267,41 @@ class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     serializer_class = RentCommercialAdvertisementSerializer
     permission_classes = [AllowAny]
 
-@extend_schema(tags=['Фото для объявлений'])
-class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
-    queryset = AdvertisementPhoto.objects.all()
-    serializer_class = AdvertisementPhotoSerializer
+
+@extend_schema(tags=['Группа для фотографий'])
+class PhotoGroupViewSet(viewsets.ModelViewSet):
+    queryset = PhotoGroup.objects.all()
+    serializer_class = PhotoGroupSerializer
 
     def create(self, request, *args, **kwargs):
-        photos = request.FILES.getlist('images')
-        photo_instances = []
-        for photo in photos:
-            photo_instance = AdvertisementPhoto.objects.create(user=request.user, image=photo)
-            photo_instances.append(photo_instance)
+        content_type_id = request.data.get('content_type_id')
+        object_id = request.data.get('object_id')
+        photos_data = request.FILES.getlist('photos')
+        user = request.user
 
-        serializer = self.get_serializer(photo_instances, many=True)
+        try:
+            content_type = ContentType.objects.get(id=content_type_id)
+        except ContentType.DoesNotExist:
+            return Response({'error': 'Invalid content_type_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создаем новую группу для фотографий
+        photo_group = PhotoGroup.objects.create()
+
+        photos = []
+        for photo_data in photos_data:
+            photo = AdvertisementPhoto(
+                image=photo_data,
+                user=user,
+                content_type=content_type,
+                object_id=object_id,
+                photo_group=photo_group
+            )
+            photo.save()
+            photos.append(photo)
+
+        serializer = self.get_serializer(photo_group)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def list(self, request, *args, **kwargs):
-        # Возвращаем все фотографии, сгруппированные по batch_id
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 @extend_schema(tags=['Мои объявления'])
 class UserAdvertisementsViewSet(viewsets.ViewSet):

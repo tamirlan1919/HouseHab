@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
@@ -198,6 +200,13 @@ class Promotion(models.Model):
     def __str__(self):
         return f"{self.get_promotion_type_display()} - {self.duration} days"
 
+class PhotoGroup(models.Model):
+    # Модель для группировки фотографий
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Photo Group {self.id}"
+
 
 class AdvertisementPhoto(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Ссылка на пользователя, загружающего фото
@@ -207,6 +216,7 @@ class AdvertisementPhoto(models.Model):
 
     image = models.ImageField(upload_to='advertisement_photos/')
     description = models.CharField(max_length=255, blank=True, null=True)
+    photo_group = models.ForeignKey(PhotoGroup, related_name='photos', on_delete=models.CASCADE, blank=True, default=1 )
 
     def __str__(self):
         return f"Photo for {self.content_type} - {self.description or 'No Description'}"
