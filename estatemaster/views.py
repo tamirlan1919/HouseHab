@@ -275,7 +275,7 @@ class PhotoGroupViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         object_id = request.data.get('object_id')
-        photos_data = request.FILES.getlist('photos')
+        photos_data = request.FILES.getlist('images')
         user = request.user
 
 
