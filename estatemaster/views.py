@@ -268,6 +268,28 @@ class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
+@extend_schema(tags=['Фото для объявлений'])
+class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
+    queryset = AdvertisementPhoto.objects.all()
+    serializer_class = AdvertisementPhotoSerializer
+
+    def create(self, request, *args, **kwargs):
+        photos = request.FILES.getlist('images')
+        photo_instances = []
+        for photo in photos:
+            photo_instance = AdvertisementPhoto.objects.create(user=request.user, image=photo)
+            photo_instances.append(photo_instance)
+
+        serializer = self.get_serializer(photo_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        # Возвращаем все фотографии, сгруппированные по batch_id
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
 @extend_schema(tags=['Группа для фотографий'])
 class PhotoGroupViewSet(viewsets.ModelViewSet):
     queryset = PhotoGroup.objects.all()

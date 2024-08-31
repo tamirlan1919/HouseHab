@@ -18,6 +18,7 @@ router.register(r'rent-commercial-advertisements', views.RentCommercialAdvertise
 router.register(r'promotions', views.PromotionViewSet)
 router.register(r'location', views.LocationViewSet)
 router.register(r'offer/photos', views.PhotoGroupViewSet, basename='offer-photos')
+router.register(r'offer/individual/photo', views.AdvertisementPhotoViewSet, basename='offer-individual-photo')
 router.register(r'my-advertisements', views.UserAdvertisementsViewSet, basename='my-advertisements')
 
 
