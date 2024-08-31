@@ -425,7 +425,7 @@ class RentLongAdvertisement(models.Model):
     propertyType = models.CharField(max_length=30, choices=[('flat', 'Квартира'), ('apartments', 'Апартаменты')])
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
-    viewFromWindow = models.CharField(max_length=10,choices=VIEW_CHOICES, blank=True, null=True)
+    viewFromWindow = MultiSelectField(choices=VIEW_CHOICES, blank=True, null=True)
     balconies = models.PositiveIntegerField(default=0)
     loggia = models.PositiveIntegerField(default=0)
     separateBathroom = models.PositiveIntegerField(default=0)
@@ -433,7 +433,7 @@ class RentLongAdvertisement(models.Model):
     repair = models.CharField(max_length=70, choices=[('unrepaired', 'Без ремонта'), ('cosmetic', 'Косметический'), ('euro', 'Евро'), ('designer', 'Дизайнерский')], blank=True, null=True)
     freightElevator = models.PositiveIntegerField(default=0)
     passengerElevator = models.PositiveIntegerField(default=0)
-    apartmentEntrance = models.CharField(max_length=10 ,choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
+    apartmentEntrance = MultiSelectField(choices=APARTMENT_ENTRANCE_CHOICES, blank=True, null=True)
     parking = models.CharField(max_length=30, choices=[('ground', 'Наземная'), ('multiLevel', 'Многоуровневая'), ('underground', 'Подземная'), ('rooftop', 'На крыше')], blank=True, null=True)
 
     furniture = MultiSelectField(choices=FURNITURE_CHOICES, blank=True, null=True)

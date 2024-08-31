@@ -201,10 +201,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
     )
     price = SaleGetPrice(source='*')
     sellerContacts = SaleSellerContactsField(source='*')
-    viewFromWindow = serializers.ListField(
-        child=serializers.ChoiceField(choices=['outside', 'courtyard', 'atSea']),
-        write_only=True
-    )
+
     class Meta:
         model = SaleResidential
         fields = [
@@ -264,9 +261,9 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         photo_ids = validated_data.pop('photo_ids', [])
 
         # Обработка MultiSelectField данных
-        # view_from_window = validated_data.get('viewFromWindow')
-        # if view_from_window and not isinstance(view_from_window, list):
-        #     validated_data['viewFromWindow'] = [view_from_window]
+        view_from_window = validated_data.get('viewFromWindow')
+        if view_from_window and not isinstance(view_from_window, list):
+            validated_data['viewFromWindow'] = [view_from_window]
 
         apartment_entrance = validated_data.get('apartmentEntrance')
         if apartment_entrance and not isinstance(apartment_entrance, list):
