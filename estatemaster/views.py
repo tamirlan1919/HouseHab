@@ -299,6 +299,7 @@ class PhotoGroupViewSet(viewsets.ModelViewSet):
 
 
 @extend_schema(tags=['Мои объявления'])
+
 class UserAdvertisementsViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -310,13 +311,20 @@ class UserAdvertisementsViewSet(viewsets.ViewSet):
         sale_commercial = SaleCommercialAdvertisement.objects.filter(user=user)
         rent_commercial = RentCommercialAdvertisement.objects.filter(user=user)
 
-        # Структурируем данные по типам объявлений
-        grouped_data = {
-            'rent_long': [RentLongAdvertisementSerializer(obj).data for obj in rent_long],
-            'sale_residential': [SaleResidentialSerializer(obj).data for obj in sale_residential],
-            'rent_day': [RentDayAdvertisementSerializer(obj).data for obj in rent_day],
-            'sale_commercial': [SaleCommercialAdvertisementSerializer(obj).data for obj in sale_commercial],
-            'rent_commercial': [RentCommercialAdvertisementSerializer(obj).data for obj in rent_commercial],
-        }
+        combined_queryset = list(rent_long) + list(sale_residential) + list(rent_day) + list(sale_commercial) + list(rent_commercial)
 
-        return Response(grouped_data)
+        serialized_data = []
+        for obj in combined_queryset:
+            if isinstance(obj, RentLongAdvertisement):
+                serializer = RentLongAdvertisementSerializer(obj)
+            elif isinstance(obj, SaleResidential):
+                serializer = SaleResidentialSerializer(obj)
+            elif isinstance(obj, RentDayAdvertisement):
+                serializer = RentDayAdvertisementSerializer(obj)
+            elif isinstance(obj, SaleCommercialAdvertisement):
+                serializer = SaleCommercialAdvertisementSerializer(obj)
+            elif isinstance(obj, RentCommercialAdvertisement):
+                serializer = RentCommercialAdvertisementSerializer(obj)
+            serialized_data.append(serializer.data)
+
+        return Response(serialized_data)
