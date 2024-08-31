@@ -201,7 +201,10 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
     )
     price = SaleGetPrice(source='*')
     sellerContacts = SaleSellerContactsField(source='*')
-
+    viewFromWindow = serializers.ListField(
+        child=serializers.ChoiceField(choices=['outside', 'courtyard', 'atSea']),
+        write_only=True
+    )
     class Meta:
         model = SaleResidential
         fields = [
@@ -261,9 +264,9 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
         photo_ids = validated_data.pop('photo_ids', [])
 
         # Обработка MultiSelectField данных
-        view_from_window = validated_data.get('viewFromWindow')
-        if view_from_window and not isinstance(view_from_window, list):
-            validated_data['viewFromWindow'] = [view_from_window]
+        # view_from_window = validated_data.get('viewFromWindow')
+        # if view_from_window and not isinstance(view_from_window, list):
+        #     validated_data['viewFromWindow'] = [view_from_window]
 
         apartment_entrance = validated_data.get('apartmentEntrance')
         if apartment_entrance and not isinstance(apartment_entrance, list):
@@ -483,10 +486,17 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         # Handle nested fields for creation
         photo_ids = validated_data.pop('photo_ids', [])
 
+
+        apartment_entrance = validated_data.get('apartmentEntrance')
+        if apartment_entrance and not isinstance(apartment_entrance, list):
+            validated_data['apartmentEntrance'] = [apartment_entrance]
+
         # Set the user from the request context
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
+
+
 
         # Create the RentLongAdvertisement instance
         rent_long_advertisement = super().create(validated_data)
