@@ -317,8 +317,8 @@ class SaleResidential(models.Model):
     ]
     price = models.PositiveIntegerField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
-    saleType = models.CharField(max_length=50, choices=[('onlySale', 'Только продаю'), ('buyingAnother', 'Одновременно покупаю другую')],blank=True)
-    phone = models.CharField(max_length=30, null=True)
+    saleType = models.CharField(max_length=50, choices=[('onlySale', 'Только продаю'), ('buyingAnother', 'Одновременно покупаю другую')],blank=True, null=True)
+    phone = models.CharField(max_length=30)
     whatsApp = models.CharField(max_length=300,null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True,null=True)
     class Meta:
@@ -446,10 +446,10 @@ class RentLongAdvertisement(models.Model):
     rent_per_month = models.PositiveIntegerField()
     currency_per_month = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
     utilityPayment = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
-    prepaymentPeriod = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES, blank=True)
-    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')  # валюта аренды
+    prepaymentPeriod = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES, blank=True, null=True)
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', null=True)  # валюта аренды
     deposit = models.PositiveIntegerField(blank=True, null=True)
-    rentalTerm = models.CharField(max_length=70, choices=[('several_months', 'Несколько месяцев'), ('year', 'От года')],null=True)
+    rentalTerm = models.CharField(max_length=70, choices=[('several_months', 'Несколько месяцев'), ('year', 'От года')])
     livingConditions = models.CharField(max_length=100,choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
     phone = models.CharField(max_length=30)
     whatsApp = models.CharField(max_length=30, blank=True, null=True)
@@ -562,8 +562,8 @@ class RentDayAdvertisement(models.Model):
     daily_price = models.PositiveIntegerField(verbose_name='Цена за сутки', blank=True, default=0)
     daily_price_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True)
 
-    deposit = models.PositiveIntegerField(verbose_name='Залог', blank=True, default=0)
-    deposit_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True)
+    deposit = models.PositiveIntegerField(verbose_name='Залог', blank=True, default=0, null=True)
+    deposit_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True, null=True)
 
 
 
@@ -660,7 +660,7 @@ class SaleCommercialAdvertisement(models.Model):
                                 default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeights = models.PositiveIntegerField(blank=True)
+    ceilingHeight = models.PositiveIntegerField(blank=True)
     floor = models.PositiveIntegerField(null=True)
     floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True,null=True)
@@ -722,18 +722,18 @@ class SaleCommercialAdvertisement(models.Model):
     title = models.CharField(max_length=100,null=True)
     description = models.TextField()
     # Пример полей для цены
-    total_price = models.PositiveIntegerField(verbose_name='Цена за всё', blank=True, null=True)
-    price_per_m2 = models.PositiveIntegerField(verbose_name='Цена за м2', blank=True, null=True)
+    total_price = models.PositiveIntegerField(verbose_name='Цена за всё', blank=True)
+    price_per_m2 = models.PositiveIntegerField(verbose_name='Цена за м2', blank=True)
     currency_total = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
     currency_per = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
     # Поле для налога
-    tax = models.CharField(max_length=50, choices=TAX_CHOICES, blank=True, null=True)
+    tax = models.CharField(max_length=50, choices=TAX_CHOICES, blank=True)
 
     # Поле для бонуса агенту
     agentBonus = models.CharField(max_length=50, choices=AGENT_BONUS_CHOICES, blank=True, null=True)
 
     # Поля для контактов
-    phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True, null=True)
+    phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True)
     whatsApp = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -860,7 +860,7 @@ class RentCommercialAdvertisement(models.Model):
                                 default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeights = models.PositiveIntegerField(blank=True)
+    ceilingHeight = models.PositiveIntegerField(blank=True)
     floor = models.PositiveIntegerField(null=True)
     floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True, null=True)
