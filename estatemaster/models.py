@@ -216,6 +216,8 @@ class AdvertisementPhoto(models.Model):
 
     image = models.ImageField(upload_to='advertisement_photos/')
     description = models.CharField(max_length=255, blank=True, null=True)
+    isMain = models.BooleanField(default=False)  # New field to indicate the main photo
+
     photo_group = models.ForeignKey(PhotoGroup, related_name='photos', on_delete=models.CASCADE, blank=True, default=1 )
 
     def __str__(self):

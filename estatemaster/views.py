@@ -275,20 +275,40 @@ class AdvertisementPhotoViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         photos = request.FILES.getlist('images')
+        is_main_flags = request.data.getlist('isMain')  # Получаем значения isMain из запроса
         photo_instances = []
-        for photo in photos:
-            photo_instance = AdvertisementPhoto.objects.create(user=request.user, image=photo)
+
+        # Установить первое фото как главное по умолчанию, если не указано другое
+        main_photo_set = False
+
+        for index, photo in enumerate(photos):
+            # Проверка переданного значения isMain или установка главного по умолчанию
+            if index < len(is_main_flags):
+                is_main = is_main_flags[index].lower() == 'true'
+            else:
+                is_main = not main_photo_set  # Ставим True только для первого, если еще не было главного
+
+            # Обновление флага, если главное фото установлено
+            if is_main:
+                main_photo_set = True
+
+            # Создание экземпляра фото
+            photo_instance = AdvertisementPhoto.objects.create(
+                user=request.user,
+                image=photo,
+                isMain=is_main
+            )
+
+            # Если фото установлено как главное, сбрасываем остальные
+            if is_main:
+                AdvertisementPhoto.objects.filter(
+                    photo_group=photo_instance.photo_group, isMain=True
+                ).exclude(id=photo_instance.id).update(isMain=False)
+
             photo_instances.append(photo_instance)
 
         serializer = self.get_serializer(photo_instances, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def list(self, request, *args, **kwargs):
-        # Возвращаем все фотографии, сгруппированные по batch_id
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 @extend_schema(tags=['Группа для фотографий'])
 class PhotoGroupViewSet(viewsets.ModelViewSet):

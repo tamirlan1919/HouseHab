@@ -147,13 +147,21 @@ class BuilderSerializer(serializers.ModelSerializer):
 class AdvertisementPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdvertisementPhoto
-        fields = ['id', 'image', 'user']
+        fields = ['id', 'image', 'user', 'isMain']  # Include isMain
         read_only_fields = ['id', 'user']
 
     def create(self, validated_data):
         # Устанавливаем пользователя из контекста запроса
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        # Ensure only one main photo is set per group
+        if validated_data.get('isMain', False):
+            AdvertisementPhoto.objects.filter(
+                photo_group=instance.photo_group, isMain=True
+            ).update(isMain=False)
+        return super().update(instance, validated_data)
 
 class PhotoGroupSerializer(serializers.ModelSerializer):
     photos = AdvertisementPhotoSerializer(many=True, read_only=True)
