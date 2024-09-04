@@ -446,9 +446,9 @@ class RentLongAdvertisement(models.Model):
     rent_per_month = models.PositiveIntegerField()
     currency_per_month = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
     utilityPayment = models.CharField(max_length=70, choices=[('owner', 'Собственник'), ('tenant', 'Арендатор')])
-    prepaymentPeriod = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES, blank=True, null=True)
-    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', null=True)  # валюта аренды
-    deposit = models.PositiveIntegerField(blank=True, null=True)
+    prepaymentPeriod = models.CharField(max_length=70, choices=PREPAYMENT_CHOICES, blank=True)
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')  # валюта аренды
+    deposit = models.PositiveIntegerField(blank=True)
     rentalTerm = models.CharField(max_length=70, choices=[('several_months', 'Несколько месяцев'), ('year', 'От года')])
     livingConditions = models.CharField(max_length=100,choices=LIVING_CONDITIONS_CHOICES, blank=True, null=True, verbose_name='Условия проживания')
     phone = models.CharField(max_length=30)
@@ -945,40 +945,40 @@ class RentCommercialAdvertisement(models.Model):
 
     rent_per_month_per_m2 = models.PositiveIntegerField(verbose_name='Аренда в месяц за м2', blank=True, null=True)
     rent_per_year_per_m2 = models.PositiveIntegerField(verbose_name='Аренда в год за м2', blank=True, null=True)
-    rent_per_month = models.PositiveIntegerField(verbose_name='Аренда в месяц', blank=True, null=True)
-    currency_rent_month_per_m2 = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
-    currency_rent_year_per_m2 = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
+    rent_per_month = models.PositiveIntegerField(verbose_name='Аренда в месяц', blank=True)
+    currency_rent_month_per_m2 = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', null=True)
+    currency_rent_year_per_m2 = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', null=True)
     currency_rent_month = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
 
     # Поле для налога
     tax = models.CharField(max_length=50, choices=TAX_CHOICES, blank=True, null=True)
 
     # Поле для коммунальных платежей
-    utilityPayment = models.BooleanField(blank=True,null=True)
+    utilityPayment = models.BooleanField(blank=True)
 
     # Поле для эксплуатационных расходов
-    operatingCosts = models.BooleanField(blank=True, null=True)
+    operatingCosts = models.BooleanField(blank=True)
 
     # Поле для типа аренды
-    rentalType = models.CharField(max_length=50, choices=RENT_TYPE_CHOICES, blank=True, null=True)
+    rentalType = models.CharField(max_length=50, choices=RENT_TYPE_CHOICES, blank=True )
 
     # Поле для минимального срока аренды
-    minimumLeaseTerm = models.PositiveIntegerField(verbose_name='Минимальный срок аренды (в месяцах)', blank=True,
-                                                  null=True)
+    minimumLeaseTerm = models.PositiveIntegerField(verbose_name='Минимальный срок аренды (в месяцах)', blank=True
+                                                  )
 
     rentalHolidays = models.BooleanField(blank=True,null=True)
     # Поле для обеспечительного платежа
-    security_deposit = models.PositiveIntegerField(verbose_name='Обеспечительный платеж', blank=True, null=True)
+    security_deposit = models.PositiveIntegerField(verbose_name='Обеспечительный платеж', blank=True)
     currency_deposit = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN')
 
     # Поле для предоплаты
     prepayment = models.CharField(max_length=15, choices=PREPAYMENT_CHOICES, default='year')
 
     # Поле для бонуса агенту
-    agentBonus = models.CharField(max_length=50, choices=AGENT_BONUS_CHOICES, default='false')
+    agentBonus = models.CharField(max_length=50, choices=AGENT_BONUS_CHOICES, default='false', null=True)
 
     # Поля для контактов
-    phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True, null=True)
+    phone = models.CharField(max_length=30, verbose_name='Телефон', blank=True)
     whatsApp = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     class Meta:
