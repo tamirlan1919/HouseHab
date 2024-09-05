@@ -959,7 +959,7 @@ class RentCommercialAdvertisement(models.Model):
     utilityPayment = models.BooleanField(blank=True)
 
     # Поле для эксплуатационных расходов
-    operatingCosts = models.BooleanField(blank=True)
+    operatingСosts = models.BooleanField(blank=True,null=True)
 
     # Поле для типа аренды
     rentalType = models.CharField(max_length=50, choices=RENT_TYPE_CHOICES, blank=True )

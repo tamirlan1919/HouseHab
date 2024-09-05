@@ -1138,7 +1138,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'description',
             'tax',
             'utilityPayment',
-            'operatingCosts',
+            'operatingСosts',
             'rentalType',
             'minimumLeaseTerm',
             'rentalHolidays',
