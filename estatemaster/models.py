@@ -563,7 +563,7 @@ class RentDayAdvertisement(models.Model):
     description = models.TextField(blank=True)
     daily_price = models.PositiveIntegerField(verbose_name='Цена за сутки', blank=True, default=0)
     daily_price_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True)
-
+    guestsNumber = models.PositiveIntegerField(blank=True)
     deposit = models.PositiveIntegerField(verbose_name='Залог', blank=True, default=0, null=True)
     deposit_currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='MZN', blank=True, null=True)
 

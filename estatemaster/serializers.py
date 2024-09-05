@@ -662,6 +662,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'photos',
             'youtubeLink',
             'title',
+            'guestsNumber',
             'description',
             'price',
             'deposit',
