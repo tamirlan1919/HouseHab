@@ -668,7 +668,7 @@ class SaleCommercialAdvertisement(models.Model):
     legalAddress = models.BooleanField(blank=True,null=True)
     isRoomOccupied = models.BooleanField(blank=True, null=True)
     planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')],null=True)
-    numberWetSpots = models.CharField(max_length=50, blank=True, null=True, choices=[('false', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('more_five', '5 и больше')])
+    numberWetSpots = models.CharField(max_length=50, blank=True, null=True, choices=[(False, 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('more_five', '5 и больше'), ('null', 'null')])
     electricPower = models.FloatField(blank=True,null=True)
     status = models.CharField(max_length=100, blank=True,  choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'), ('major_repairs_required', 'Требуется капитальный ремонт'), ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
     furniture_c = models.BooleanField(blank=True)
@@ -717,7 +717,7 @@ class SaleCommercialAdvertisement(models.Model):
     ventilation = models.CharField(max_length=30, blank=True, null=True, choices=[('natural', 'Естественная'), ('inflow', 'Приточная'), ('none', 'Нет')])
     сonditioning = models.CharField(max_length=30, blank=True, null=True, choices=[('local', 'Местное'), ('central', 'Центральное'), ('none', 'Нет')])
     heating = models.CharField(max_length=30, blank=True, null=True, choices=[('autonomous', 'Автономное'), ('central', 'Центральное'), ('none', 'Нет')])
-    fireExtinguishingSystem = models.CharField(max_length=30, blank=True,  choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'), ('gas', 'Газовая'), ('alarm', 'Сигнализация'), ('false', 'Нет')])
+    fireExtinguishingSystem = models.CharField(max_length=30, blank=True, null=True , choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'), ('gas', 'Газовая'), ('alarm', 'Сигнализация'), ('none', 'Нет')])
     infrastructure = MultiSelectField(choices=INFRASTRUCTURE_CHOICES, blank=True, null=True)
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
@@ -870,8 +870,9 @@ class RentCommercialAdvertisement(models.Model):
     planning = models.CharField(max_length=30,
                                 choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')], null=True)
     numberWetSpots = models.CharField(max_length=50, blank=True, null=True,
-                                      choices=[('false', 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'),
-                                               ('more_five', '5 и больше')])
+                                      choices=[(False, 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'),
+                                               ('more_five', '5 и больше'), ('null', 'null')])
+
     electricPower = models.FloatField(blank=True, null=True)
     status = models.CharField(max_length=100, blank=True,
                               choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'),
@@ -934,10 +935,8 @@ class RentCommercialAdvertisement(models.Model):
                                     choices=[('local', 'Местное'), ('central', 'Центральное'), ('none', 'Нет')])
     heating = models.CharField(max_length=30, blank=True, null=True,
                                choices=[('autonomous', 'Автономное'), ('central', 'Центральное'), ('none', 'Нет')])
-    fireExtinguishingSystem = models.CharField(max_length=30, blank=True,
-                                               choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'),
-                                                        ('powder', 'Порошковая'), ('gas', 'Газовая'),
-                                                        ('alarm', 'Сигнализация'), ('false', 'Нет')])
+    fireExtinguishingSystem = models.CharField(max_length=30, blank=True, null=True , choices=[('hydrant', 'Гидрантная'), ('sprinkler', 'Спринклерная'), ('powder', 'Порошковая'), ('gas', 'Газовая'), ('alarm', 'Сигнализация'), ('none', 'Нет')])
+
     infrastructure = MultiSelectField(choices=INFRASTRUCTURE_CHOICES, blank=True, null=True)
     photos = GenericRelation(AdvertisementPhoto)
     youtubeLink = models.CharField(max_length=300, blank=True, null=True)
