@@ -274,7 +274,7 @@ class SaleResidential(models.Model):
     floorsHouse = models.PositiveIntegerField()
     flatNumber = models.PositiveIntegerField(blank=True)
     yearBuilt = models.PositiveIntegerField(blank=True, null=True)
-    ceilingHeight = models.FloatField(blank=True, null=True)
+    ceilingHeight = models.FloatField(blank=True, default=0)
     houseType = models.CharField(max_length=100, choices=[
         ('brick', 'Кирпичный'),
         ('monolithic', 'Монолитный'),
@@ -662,12 +662,12 @@ class SaleCommercialAdvertisement(models.Model):
                                 default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeight = models.PositiveIntegerField(blank=True)
+    ceilingHeight = models.FloatField(blank=True, default=0)
     floor = models.PositiveIntegerField(null=True)
     floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True,null=True)
     isRoomOccupied = models.BooleanField(blank=True, null=True)
-    planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')],null=True)
+    planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная'), (None, '')],null=True)
     numberWetSpots = models.CharField(max_length=50, blank=True, null=True, choices=[(False, 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('more_five', '5 и больше'), ('null', 'null')])
     electricPower = models.FloatField(blank=True,null=True)
     status = models.CharField(max_length=100, blank=True,  choices=[('office_decoration', 'Офисная отделка'), ('finished', 'Под чистовую отделку'), ('major_repairs_required', 'Требуется капитальный ремонт'), ('cosmetic_repairs_required', 'Требуется косметический ремонт')])
@@ -862,13 +862,13 @@ class RentCommercialAdvertisement(models.Model):
                                 default='foot',null=True)
     taxNumber = models.PositiveIntegerField()
     totalArea = models.PositiveIntegerField()
-    ceilingHeight = models.PositiveIntegerField(blank=True)
+    ceilingHeight = models.FloatField(blank=True, default=0)
     floor = models.PositiveIntegerField(null=True)
     floorsHouse = models.PositiveIntegerField(null=True)
     legalAddress = models.BooleanField(blank=True, null=True)
     isRoomOccupied = models.BooleanField(blank=True, null=True)
-    planning = models.CharField(max_length=30,
-                                choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная')], null=True)
+    planning = models.CharField(max_length=30, choices=[('open', 'Открытая'), ('corridor', 'Коридор'), ('cabinet', 'Кабинетная'), (None, '')],null=True)
+
     numberWetSpots = models.CharField(max_length=50, blank=True, null=True,
                                       choices=[(False, 'Нет'), ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'),
                                                ('more_five', '5 и больше'), ('null', 'null')])
