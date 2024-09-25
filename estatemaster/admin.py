@@ -79,4 +79,4 @@ admin.site.register(RentDayAdvertisement)
 admin.site.register(SaleCommercialAdvertisement)
 admin.site.register(RentCommercialAdvertisement)
 admin.site.register(AdvertisementPhoto)
-
+admin.site.register(Favorite)

@@ -20,6 +20,8 @@ router.register(r'location', views.LocationViewSet)
 router.register(r'offer/photos', views.PhotoGroupViewSet, basename='offer-photos')
 router.register(r'offer/individual/photo', views.AdvertisementPhotoViewSet, basename='offer-individual-photo')
 router.register(r'my-advertisements', views.UserAdvertisementsViewSet, basename='my-advertisements')
+router.register(r'favorites', views.FavoritesViewSet, basename='favorites')
+
 
 
 
@@ -35,7 +37,6 @@ urlpatterns = [
     path('auth/check_email/',views.CheckEmail.as_view(), name = 'check_email'),
     path('auth/users/custom-activate/', CustomActivateUser.as_view(), name='custom-activate'),
     path('api/filtered-advertisements/', FilteredAdvertisementsView.as_view(), name='filtered-advertisements'),
-
     path('api/', include(router.urls)),  # Include the router's URLs
 
 

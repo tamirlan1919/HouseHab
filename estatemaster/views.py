@@ -1,7 +1,10 @@
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.exceptions import NotAuthenticated
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -370,3 +373,66 @@ class UserAdvertisementsViewSet(viewsets.ViewSet):
             serialized_data.append(serializer.data)
 
         return Response(serialized_data)
+
+
+
+
+@extend_schema(tags=['Избранное'])
+
+class FavoritesViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post'], url_path='add/(?P<model_name>[^/.]+)')
+    def add_to_favorites(self, request, pk=None, model_name=None):
+        model = ContentType.objects.get(model=model_name).model_class()
+        advertisement = get_object_or_404(model, id=pk)
+        request.user.add_to_favorites(advertisement)
+        return Response({'status': 'гаджи делает'})
+
+    @action(detail=True, methods=['post'], url_path='remove/(?P<model_name>[^/.]+)')
+    def remove_from_favorites(self, request, pk=None, model_name=None):
+        model = ContentType.objects.get(model=model_name).model_class()
+        advertisement = get_object_or_404(model, id=pk)
+        request.user.remove_from_favorites(advertisement)
+        return Response({'status': 'гаджи пока не делает'})
+
+    @action(detail=False, methods=['get'], url_path='')
+    def favorite_list(self, request):
+        favorites = request.user.favorites.all()  # Получаем все избранные объекты для пользователя
+        result = {
+            'SaleResidential': [],
+            'RentLongAdvertisement': [],
+            'RentDayAdvertisement': [],
+            'SaleCommercialAdvertisement': [],
+            'RentCommercialAdvertisement': []
+        }
+
+        # Проходим по каждому избранному объекту
+        for favorite in favorites:
+            instance = favorite.content_object  # Это GenericForeignKey, который возвращает сам объект объявления
+
+            # В зависимости от модели используем соответствующий сериализатор и добавляем данные в соответствующий раздел
+            if isinstance(instance, SaleResidential):
+                serializer = SaleResidentialSerializer(instance)
+                result['SaleResidential'].append(serializer.data)
+            elif isinstance(instance, RentLongAdvertisement):
+                serializer = RentLongAdvertisementSerializer(instance)
+                result['RentLongAdvertisement'].append(serializer.data)
+            elif isinstance(instance, RentDayAdvertisement):
+                serializer = RentDayAdvertisementSerializer(instance)
+                result['RentDayAdvertisement'].append(serializer.data)
+            elif isinstance(instance, SaleCommercialAdvertisement):
+                serializer = SaleCommercialAdvertisementSerializer(instance)
+                result['SaleCommercialAdvertisement'].append(serializer.data)
+            elif isinstance(instance, RentCommercialAdvertisement):
+                serializer = RentCommercialAdvertisementSerializer(instance)
+                result['RentCommercialAdvertisement'].append(serializer.data)
+
+        return Response(result)
+
+
+    @action(detail=False, methods=['delete'], url_path='remove_all')
+    def remove_all(self, request):
+        # Удаляем все избранные объекты для пользователя
+        request.user.favorites.all().delete()
+        return Response({'status': 'all favorites removed'}, status=204)

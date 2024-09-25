@@ -37,6 +37,21 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['phone_number', 'account_type']
     objects = CustomUserManager()
 
+    def add_to_favorites(self, advertisement):
+        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+        Favorite.objects.get_or_create(user=self, advertisement_type=content_type, object_id=advertisement.id)
+
+    def remove_from_favorites(self, advertisement):
+        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+        Favorite.objects.filter(user=self, advertisement_type=content_type, object_id=advertisement.id).delete()
+
+    def is_favorite(self, advertisement):
+        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+        return Favorite.objects.filter(user=self, advertisement_type=content_type, object_id=advertisement.id).exists()
+
+    def get_favorites(self):
+        return Favorite.objects.filter(user=self)
+
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='custom_users',
@@ -1003,3 +1018,19 @@ class RentCommercialAdvertisement(models.Model):
                 raise ValidationError({
                     'plot': 'Must be a number or one of the following choices: "owned", "leased".'
                 })
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
+    advertisement_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)  # Для хранения типа объявления (продажа, аренда и т.д.)
+    object_id = models.PositiveIntegerField()  # Идентификатор конкретного объявления
+    content_object = GenericForeignKey('advertisement_type', 'object_id')  # Генерик-ссылка на объект объявления
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
+        unique_together = ('user', 'advertisement_type', 'object_id')  # Гарантия уникальности для избранного объекта
+
+    def __str__(self):
+        return f"{self.user.username} - {self.content_object}"
