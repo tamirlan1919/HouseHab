@@ -196,6 +196,7 @@ DJOSER = {
         'user_create': 'estatemaster.serializers.CustomUserCreateSerializer',
         'current_user': 'estatemaster.serializers.CustomUserProfileSerializer',
         'activation': 'estatemaster.serializers.CustomActivationSerializer',
+        'user/id': 'estatemaster.serializers.CustomUserProfileSerializer',
 
     },
 

@@ -27,11 +27,10 @@ router.register(r'favorites', views.FavoritesViewSet, basename='favorites')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('auth/users/<int:id>/', views.PublicUserDetailView.as_view(), name='public-user-detail'),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
-    path('auth/users/<int:id>/', views.PublicUserDetailView.as_view(), name='public-user-detail'),
-
     path('api/all-advertisements/', AllAdvertisementsView.as_view(), name='all-advertisements'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
