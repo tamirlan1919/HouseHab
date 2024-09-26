@@ -389,12 +389,12 @@ class FavoritesViewSet(viewsets.ViewSet):
         request.user.add_to_favorites(advertisement)
         return Response({'status': 'гаджи делает'})
 
-    @action(detail=True, methods=['post'], url_path='remove/(?P<model_name>[^/.]+)')
+    @action(detail=True, methods=['delete'], url_path='remove/(?P<model_name>[^/.]+)')
     def remove_from_favorites(self, request, pk=None, model_name=None):
         model = ContentType.objects.get(model=model_name).model_class()
         advertisement = get_object_or_404(model, id=pk)
         request.user.remove_from_favorites(advertisement)
-        return Response({'status': 'гаджи пока не делает'})
+        return Response({'status': 'гаджи  делает'})
 
     @action(detail=False, methods=['get'], url_path='')
     def favorite_list(self, request):
@@ -436,3 +436,13 @@ class FavoritesViewSet(viewsets.ViewSet):
         # Удаляем все избранные объекты для пользователя
         request.user.favorites.all().delete()
         return Response({'status': 'all favorites removed'}, status=204)
+
+
+class PublicUserDetailView(APIView):
+    permission_classes = [AllowAny]  # Открытый доступ
+    print('hello')
+
+    def get(self, request, id, *args, **kwargs):
+        user = get_object_or_404(CustomUser, id=id)
+        serializer = CustomUserProfileSerializer(user)
+        return Response(serializer.data)

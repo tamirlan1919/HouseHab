@@ -30,10 +30,13 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.urls.jwt')),
+    path('auth/users/<int:id>/', views.PublicUserDetailView.as_view(), name='public-user-detail'),
+
     path('api/all-advertisements/', AllAdvertisementsView.as_view(), name='all-advertisements'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='docs'),
     path('auth/users/create/', views.CustomUserCreateView.as_view(), name='user-create'),
+
     path('auth/check_email/',views.CheckEmail.as_view(), name = 'check_email'),
     path('auth/users/custom-activate/', CustomActivateUser.as_view(), name='custom-activate'),
     path('api/filtered-advertisements/', FilteredAdvertisementsView.as_view(), name='filtered-advertisements'),
