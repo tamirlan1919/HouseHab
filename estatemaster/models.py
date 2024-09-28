@@ -256,6 +256,8 @@ class Location(models.Model):
         super(Location, self).save(*args, **kwargs)
 
 class SaleResidential(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     VIEW_CHOICES = [
         ('outside', 'На улицу'),
         ('courtyard', 'Во двор'),
@@ -350,6 +352,8 @@ class SaleResidential(models.Model):
 
 
 class RentLongAdvertisement(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     VIEW_CHOICES = [
         ('outside', 'На улицу'),
         ('courtyard', 'Во двор'),
@@ -487,6 +491,8 @@ class RentLongAdvertisement(models.Model):
             raise ValidationError("Вы не можете выбрать 'Без мебели' с другими вариантами.")
 
 class RentDayAdvertisement(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     BATHROOM_CHOICES = [
         ('bath', 'Ванна'),
         ('showerRoom', 'Душевая кабина')
@@ -606,6 +612,8 @@ class RentDayAdvertisement(models.Model):
             raise ValidationError("Вы не можете выбрать 'Без мебели' с другими вариантами.")
 
 class SaleCommercialAdvertisement(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     CURRENCY_CHOICES = [
         ('MZN', 'MZN'),
         ('USD', 'Доллар'),
@@ -777,6 +785,7 @@ class SaleCommercialAdvertisement(models.Model):
                 })
 
 class RentCommercialAdvertisement(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 
     CURRENCY_CHOICES = [
@@ -1023,7 +1032,7 @@ class RentCommercialAdvertisement(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='favorites')
     advertisement_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)  # Для хранения типа объявления (продажа, аренда и т.д.)
-    object_id = models.PositiveIntegerField()  # Идентификатор конкретного объявления
+    object_id = models.UUIDField()  # Use UUIDField instead of PositiveIntegerField
     content_object = GenericForeignKey('advertisement_type', 'object_id')  # Генерик-ссылка на объект объявления
     added_at = models.DateTimeField(auto_now_add=True)
 

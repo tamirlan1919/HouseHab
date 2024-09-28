@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -382,19 +384,67 @@ class UserAdvertisementsViewSet(viewsets.ViewSet):
 class FavoritesViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
-    @action(detail=True, methods=['post'], url_path='add/(?P<model_name>[^/.]+)')
-    def add_to_favorites(self, request, pk=None, model_name=None):
+    @action(detail=False, methods=['delete'], url_path='(?P<uuid>[^/.]+)')
+    def remove_from_favorites(self, request, uuid=None):
+
+        # Проверяем, является ли переданный UUID корректным
+        try:
+            advertisement_uuid = UUID(uuid)
+        except ValueError:
+            return Response({'error': 'Invalid UUID'}, status=400)
+
+        # Получаем объект рекламы по UUID
+        advertisement = self.get_advertisement_by_uuid(advertisement_uuid)
+        if advertisement is None:
+            return Response({'error': 'Advertisement not found'}, status=404)
+
+        # Получаем тип контента рекламы
+        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+
+        # Ищем запись в избранном
+        favorite = Favorite.objects.filter(
+            user=request.user,
+            advertisement_type=content_type,
+            object_id=advertisement_uuid
+        ).first()
+
+        # Если запись не найдена, возвращаем ошибку
+        if not favorite:
+            return Response({'error': 'Favorite not found'}, status=404)
+
+        # Удаляем запись из избранного
+        favorite.delete()
+        return Response({'status': 'removed'})
+
+    @action(detail=False, methods=['post'], url_path='(?P<uuid>[^/.]+)/(?P<model_name>[^/.]+)')
+    def add_to_favorites(self, request, uuid=None, model_name=None):
+        try:
+            # Validate the UUID format
+            advertisement_uuid = UUID(uuid, version=4)
+        except ValueError:
+            return Response({'error': 'Invalid UUID format'}, status=400)
+
+        # Get the model class using model_name
         model = ContentType.objects.get(model=model_name).model_class()
-        advertisement = get_object_or_404(model, id=pk)
+
+        # Attempt to retrieve the advertisement using the UUID
+        advertisement = get_object_or_404(model, id=advertisement_uuid)
+
+        # Add the advertisement to the user's favorites
         request.user.add_to_favorites(advertisement)
         return Response({'status': 'added'})
 
-    @action(detail=True, methods=['delete'], url_path='remove/(?P<model_name>[^/.]+)')
-    def remove_from_favorites(self, request, pk=None, model_name=None):
-        model = ContentType.objects.get(model=model_name).model_class()
-        advertisement = get_object_or_404(model, id=pk)
-        request.user.remove_from_favorites(advertisement)
-        return Response({'status': 'removed'})
+    def get_advertisement_by_uuid(self, advertisement_uuid):
+        # Iterate through all the advertisement models to find the one with the given UUID
+        models = [SaleResidential, RentLongAdvertisement, RentDayAdvertisement, SaleCommercialAdvertisement, RentCommercialAdvertisement]
+        for model in models:
+            try:
+                advertisement = model.objects.get(id=advertisement_uuid)
+                return advertisement
+            except model.DoesNotExist:
+                continue
+        return None
+
 
 
 
@@ -442,7 +492,7 @@ class FavoritesViewSet(viewsets.ViewSet):
 
 @permission_classes([AllowAny])
 class PublicUserDetailView(APIView):
-    print('вава')
+
     def get(self, request, id, *args, **kwargs):
         user = get_object_or_404(CustomUser, id=id)
         serializer = CustomUserProfileSerializer(user)
