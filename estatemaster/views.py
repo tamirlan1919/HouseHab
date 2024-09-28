@@ -416,24 +416,22 @@ class FavoritesViewSet(viewsets.ViewSet):
         favorite.delete()
         return Response({'status': 'removed'})
 
-    @action(detail=False, methods=['post'], url_path='(?P<uuid>[^/.]+)/(?P<model_name>[^/.]+)')
-    def add_to_favorites(self, request, uuid=None, model_name=None):
+    @action(detail=False, methods=['post'], url_path='(?P<uuid>[^/.]+)')
+    def add_to_favorites(self, request, uuid=None):
+        # Validate UUID format
         try:
-            # Validate the UUID format
             advertisement_uuid = UUID(uuid, version=4)
         except ValueError:
             return Response({'error': 'Invalid UUID format'}, status=400)
 
-        # Get the model class using model_name
-        model = ContentType.objects.get(model=model_name).model_class()
+        # Retrieve the advertisement
+        advertisement = self.get_advertisement_by_uuid(advertisement_uuid)
+        if not advertisement:
+            return Response({'error': 'Advertisement not found'}, status=404)
 
-        # Attempt to retrieve the advertisement using the UUID
-        advertisement = get_object_or_404(model, id=advertisement_uuid)
-
-        # Add the advertisement to the user's favorites
+        # Add to favorites
         request.user.add_to_favorites(advertisement)
         return Response({'status': 'added'})
-
     def get_advertisement_by_uuid(self, advertisement_uuid):
         # Iterate through all the advertisement models to find the one with the given UUID
         models = [SaleResidential, RentLongAdvertisement, RentDayAdvertisement, SaleCommercialAdvertisement, RentCommercialAdvertisement]

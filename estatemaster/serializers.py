@@ -200,6 +200,32 @@ class SaleGetPrice(serializers.Field):
             'currency': data.get('currency')
         }
 
+
+class LocationField(serializers.Field):
+    def to_representation(self, value):
+        return {
+            'lat': value.lat,
+            'lng': value.lng
+        }
+
+    def to_internal_value(self, data):
+        # Validate that the input is a dictionary with both 'lat' and 'lng'
+        if not isinstance(data, dict) or 'lat' not in data or 'lng' not in data:
+            raise serializers.ValidationError(
+                "Invalid data format for 'location'. Expected a dictionary with 'lat' and 'lng'.")
+
+        # Validate lat and lng are of appropriate types, float or convertible to float
+        try:
+            lat = float(data.get('lat'))
+            lng = float(data.get('lng'))
+        except (TypeError, ValueError):
+            raise serializers.ValidationError("'lat' and 'lng' must be valid float numbers.")
+
+        return {
+            'lat': lat,
+            'lng': lng
+        }
+
 class SaleResidentialSerializer(serializers.ModelSerializer):
     photos = AdvertisementPhotoSerializer(many=True, read_only=True)
     photo_ids = serializers.ListField(
@@ -209,7 +235,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
     )
     price = SaleGetPrice(source='*')
     sellerContacts = SaleSellerContactsField(source='*')
-
+    coordinates = LocationField(source='*')
     class Meta:
         model = SaleResidential
         fields = [
@@ -222,6 +248,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             'nearestStop',
             'minutesBusStop',
             'address',
+            'coordinates',
             'pathType',
             'floor',
             'floorsHouse',
@@ -394,6 +421,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         child=serializers.ChoiceField(choices=['internet', 'phone']),
         write_only=True
     )
+    coordinates = LocationField(source='*')
 
     class Meta:
         model = RentLongAdvertisement
@@ -406,6 +434,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'nearestStop',
             'minutesBusStop',
+            'coordinates',
             'address',
             'pathType',
             'roomsNumber',
@@ -636,6 +665,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         required=False,
         allow_empty=True
     )
+    coordinates = LocationField(source='*')
 
     class Meta:
         model = RentDayAdvertisement
@@ -648,6 +678,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'region',
             'address',
+            'coordinates',
             'nearestStop',
             'minutesBusStop',
             'pathType',
@@ -858,6 +889,7 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
         required=False,
         allow_empty=True
     )
+    coordinates = LocationField(source='*')
 
     class Meta:
         model = SaleCommercialAdvertisement
@@ -871,6 +903,7 @@ class SaleCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'region',
             'address',
+            'coordinates',
             'nearestStop',
             'minutesBusStop',
             'pathType',
@@ -1088,6 +1121,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
         required=False,
         allow_empty=True
     )
+    coordinates = LocationField(source='*')
 
     class Meta:
         model = RentCommercialAdvertisement
@@ -1100,6 +1134,7 @@ class RentCommercialAdvertisementSerializer(serializers.ModelSerializer):
             'obj',
             'region',
             'address',
+            'coordinates',
             'nearestStop',
             'minutesBusStop',
             'pathType',

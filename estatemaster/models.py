@@ -283,6 +283,8 @@ class SaleResidential(models.Model):
     ])
     region = models.OneToOneField(Location, on_delete=models.CASCADE,blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
+    lat = models.FloatField(blank=True)
+    lng = models.FloatField(blank=True)
     nearestStop = models.CharField(max_length=400,null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')], default='foot')
@@ -421,6 +423,8 @@ class RentLongAdvertisement(models.Model):
     ])
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
+    lat = models.FloatField(blank=True)
+    lng = models.FloatField(blank=True)
     nearestStop = models.CharField(max_length=400,null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True ,default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
@@ -555,6 +559,8 @@ class RentDayAdvertisement(models.Model):
     ], blank=True)
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
+    lat = models.FloatField(blank=True)
+    lng = models.FloatField(blank=True)
     nearestStop = models.CharField(max_length=400, null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True, default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
@@ -678,6 +684,8 @@ class SaleCommercialAdvertisement(models.Model):
     ])
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
+    lat = models.FloatField(blank=True)
+    lng = models.FloatField(blank=True)
     nearestStop = models.CharField(max_length=400, null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True, default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
@@ -879,6 +887,8 @@ class RentCommercialAdvertisement(models.Model):
 
     region = models.ForeignKey(Location, on_delete=models.CASCADE, blank=True, null=True)
     address = models.CharField(max_length=400, null=True)
+    lat = models.FloatField(blank=True)
+    lng = models.FloatField(blank=True)
     nearestStop = models.CharField(max_length=400, null=True)
     minutesBusStop = models.PositiveIntegerField(blank=True, null=True, default=0)
     pathType = models.CharField(max_length=20, choices=[('foot', 'Пешком'), ('transport', 'Транспорт')],
