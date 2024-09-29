@@ -380,44 +380,27 @@ class UserAdvertisementsViewSet(viewsets.ViewSet):
 
 
 @extend_schema(tags=['Избранное'])
-
-class FavoritesViewSet(viewsets.ViewSet):
+class FavoritesAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @action(detail=False, methods=['delete'], url_path='(?P<uuid>[^/.]+)')
-    def remove_from_favorites(self, request, uuid=None):
+    def get(self, request):
+        # Получаем список избранных
+        favorites = request.user.favorites.all()
+        result = []
 
-        # Проверяем, является ли переданный UUID корректным
-        try:
-            advertisement_uuid = UUID(uuid)
-        except ValueError:
-            return Response({'error': 'Invalid UUID'}, status=400)
+        # Проходим по каждому избранному объекту и добавляем его в результат
+        for favorite in favorites:
+            instance = favorite.content_object
+            model_name = instance.__class__.__name__
+            serializer_class = globals().get(f'{model_name}Serializer')
 
-        # Получаем объект рекламы по UUID
-        advertisement = self.get_advertisement_by_uuid(advertisement_uuid)
-        if advertisement is None:
-            return Response({'error': 'Advertisement not found'}, status=404)
+            if serializer_class:
+                serializer = serializer_class(instance)
+                result.append(serializer.data)
 
-        # Получаем тип контента рекламы
-        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+        return Response(result, status=200)
 
-        # Ищем запись в избранном
-        favorite = Favorite.objects.filter(
-            user=request.user,
-            advertisement_type=content_type,
-            object_id=advertisement_uuid
-        ).first()
-
-        # Если запись не найдена, возвращаем ошибку
-        if not favorite:
-            return Response({'error': 'Favorite not found'}, status=404)
-
-        # Удаляем запись из избранного
-        favorite.delete()
-        return Response({'status': 'removed'})
-
-    @action(detail=False, methods=['post'], url_path='(?P<uuid>[^/.]+)')
-    def add_to_favorites(self, request, uuid=None):
+    def post(self, request, uuid=None):
         # Validate UUID format
         try:
             advertisement_uuid = UUID(uuid, version=4)
@@ -432,8 +415,35 @@ class FavoritesViewSet(viewsets.ViewSet):
         # Add to favorites
         request.user.add_to_favorites(advertisement)
         return Response({'status': 'added'})
+
+    def delete(self, request, uuid=None):
+        # Validate UUID format
+        try:
+            advertisement_uuid = UUID(uuid)
+        except ValueError:
+            return Response({'error': 'Invalid UUID'}, status=400)
+
+        # Retrieve the advertisement
+        advertisement = self.get_advertisement_by_uuid(advertisement_uuid)
+        if not advertisement:
+            return Response({'error': 'Advertisement not found'}, status=404)
+
+        content_type = ContentType.objects.get_for_model(advertisement.__class__)
+        favorite = Favorite.objects.filter(
+            user=request.user,
+            advertisement_type=content_type,
+            object_id=advertisement_uuid
+        ).first()
+
+        if not favorite:
+            return Response({'error': 'Favorite not found'}, status=404)
+
+        # Удаление из избранного
+        favorite.delete()
+        return Response({'status': 'removed'})
+
     def get_advertisement_by_uuid(self, advertisement_uuid):
-        # Iterate through all the advertisement models to find the one with the given UUID
+        # Ищем объект среди всех моделей объявлений
         models = [SaleResidential, RentLongAdvertisement, RentDayAdvertisement, SaleCommercialAdvertisement, RentCommercialAdvertisement]
         for model in models:
             try:
@@ -443,50 +453,20 @@ class FavoritesViewSet(viewsets.ViewSet):
                 continue
         return None
 
-
-
-
-    @action(detail=False, methods=['get'], url_path='')
-    def favorite_list(self, request):
-        favorites = request.user.favorites.all()  # Получаем все избранные объекты для пользователя
-        result = {
-            'SaleResidential': [],
-            'RentLongAdvertisement': [],
-            'RentDayAdvertisement': [],
-            'SaleCommercialAdvertisement': [],
-            'RentCommercialAdvertisement': []
-        }
-
-        # Проходим по каждому избранному объекту
-        for favorite in favorites:
-            instance = favorite.content_object  # Это GenericForeignKey, который возвращает сам объект объявления
-
-            # В зависимости от модели используем соответствующий сериализатор и добавляем данные в соответствующий раздел
-            if isinstance(instance, SaleResidential):
-                serializer = SaleResidentialSerializer(instance)
-                result['SaleResidential'].append(serializer.data)
-            elif isinstance(instance, RentLongAdvertisement):
-                serializer = RentLongAdvertisementSerializer(instance)
-                result['RentLongAdvertisement'].append(serializer.data)
-            elif isinstance(instance, RentDayAdvertisement):
-                serializer = RentDayAdvertisementSerializer(instance)
-                result['RentDayAdvertisement'].append(serializer.data)
-            elif isinstance(instance, SaleCommercialAdvertisement):
-                serializer = SaleCommercialAdvertisementSerializer(instance)
-                result['SaleCommercialAdvertisement'].append(serializer.data)
-            elif isinstance(instance, RentCommercialAdvertisement):
-                serializer = RentCommercialAdvertisementSerializer(instance)
-                result['RentCommercialAdvertisement'].append(serializer.data)
-
-        return Response(result)
-
-
-    @action(detail=False, methods=['delete'], url_path='remove_all')
-    def remove_all(self, request):
-        # Удаляем все избранные объекты для пользователя
+    # Удаление всех избранных объектов
+    def delete_all(self, request):
         request.user.favorites.all().delete()
         return Response({'status': 'all favorites removed'}, status=204)
 
+
+@extend_schema(tags=['Избранное удаление всех'])
+class RemoveAllFavoritesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        # Логика для удаления всех избранных
+        request.user.favorites.all().delete()
+        return Response({'status': 'all favorites removed'}, status=204)
 
 @permission_classes([AllowAny])
 class PublicUserDetailView(APIView):
