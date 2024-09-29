@@ -224,9 +224,10 @@ class PhotoGroup(models.Model):
 
 
 class AdvertisementPhoto(models.Model):
+
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)  # Ссылка на пользователя, загружающего фото
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
-    object_id = models.PositiveIntegerField(null=True, blank=True)
+    object_id = models.UUIDField(null=True)  # UUID для связи с объектом
     advertisement = GenericForeignKey('content_type', 'object_id')
 
     image = models.ImageField(upload_to='advertisement_photos/')
@@ -346,7 +347,7 @@ class SaleResidential(models.Model):
         verbose_name_plural = 'Жилая продажа'
 
     def __str__(self):
-        return self.title
+        return self.description
 
 
 

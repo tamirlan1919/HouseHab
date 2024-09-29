@@ -317,7 +317,7 @@ class SaleResidentialSerializer(serializers.ModelSerializer):
             content_type = ContentType.objects.get_for_model(SaleResidential)
             AdvertisementPhoto.objects.filter(id__in=photo_ids, user=request.user).update(
                 content_type=content_type,
-                object_id=sale_residential.id
+                object_id=str(sale_residential.id)
             )
 
         return sale_residential
