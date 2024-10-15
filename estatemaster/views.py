@@ -2,6 +2,7 @@ from uuid import UUID
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
 from rest_framework import status
@@ -13,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 from .models import *
+from .filters import *
 from rest_framework import generics, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -241,6 +243,8 @@ class BaseAdvertisementViewSet(viewsets.ModelViewSet):
 class SaleResidentialViewSet(viewsets.ModelViewSet):
     queryset = SaleResidential.objects.all()
     serializer_class = SaleResidentialSerializer
+    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
+    filterset_class = SaleResidentialFilter  # Указываем класс фильтра
     permission_classes = [AllowAny]
 
 @extend_schema(tags=['Аренда длительная (Жилая)'])
@@ -263,6 +267,8 @@ class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
 class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = SaleCommercialAdvertisement.objects.all()
     serializer_class = SaleCommercialAdvertisementSerializer
+    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
+    filterset_class = SaleCommercialFilter  # Указываем класс фильтра
     permission_classes = [AllowAny]
 
 
@@ -475,3 +481,5 @@ class PublicUserDetailView(APIView):
         user = get_object_or_404(CustomUser, id=id)
         serializer = CustomUserProfileSerializer(user)
         return Response(serializer.data)
+
+

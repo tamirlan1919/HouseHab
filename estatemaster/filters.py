@@ -1,0 +1,114 @@
+import django_filters
+from .models import *
+
+
+class SaleResidentialFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    roomsNumber = django_filters.MultipleChoiceFilter(
+        field_name='roomsNumber',
+        choices = [
+            ('studio', 'Студия'),
+            ('1', '1'),
+            ('2', '2'),
+            ('3', '3'),
+            ('4', '4'),
+            ('5', '5'),
+            ('overSix', '6'),
+            ('freePlanning', 'Свободная планировка')
+        ]
+    )
+    obj = django_filters.MultipleChoiceFilter(
+        field_name= 'obj',
+        choices = [
+            ('flat', 'Квартира'),
+            ('flatNewBuilding', 'Квартира в новостройке'),
+            ('room', 'Комната'),
+            ('flatShare', 'Доля в квартире'),
+            ('house', 'Дом'),
+            ('cottage', 'Коттедж'),
+            ('tanhouse', 'Таунхаус'),
+            ('partHouse', 'Часть дома'),
+            ('plot', 'Участок')
+        ]
+    )
+    address = django_filters.CharFilter(field_name='address')
+
+    class Meta:
+        model = SaleResidential
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+
+
+
+class SaleCommercialFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    roomsNumber = django_filters.MultipleChoiceFilter(
+        field_name='roomsNumber',
+        choices = [
+            ('studio', 'Студия'),
+            ('1', '1'),
+            ('2', '2'),
+            ('3', '3'),
+            ('4', '4'),
+            ('5', '5'),
+            ('overSix', '6'),
+            ('freePlanning', 'Свободная планировка')
+        ]
+    )
+    obj = django_filters.MultipleChoiceFilter(
+        field_name= 'obj',
+        choices = [
+            ('office', 'Офис'),
+            ('building', 'Здание'),
+            ('retail_space', 'Торговая площадь'),
+            ('free_place', 'Помещение свободного назначения'),
+            ('production', 'Производство'),
+            ('warehouse', 'Склад'),
+            ('garage', 'Гараж'),
+            ('business', 'Бизнес'),
+            ('commercial_land', 'Коммерческая земля')
+        ]
+    )
+    address = django_filters.CharFilter(field_name='address')
+
+    class Meta:
+        model = SaleCommercialAdvertisement
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+
+
+class SaleCommercialFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    roomsNumber = django_filters.MultipleChoiceFilter(
+        field_name='roomsNumber',
+        choices = [
+            ('studio', 'Студия'),
+            ('1', '1'),
+            ('2', '2'),
+            ('3', '3'),
+            ('4', '4'),
+            ('5', '5'),
+            ('overSix', '6'),
+            ('freePlanning', 'Свободная планировка')
+        ]
+    )
+    obj = django_filters.MultipleChoiceFilter(
+        field_name= 'obj',
+        choices = [
+            ('office', 'Офис'),
+            ('building', 'Здание'),
+            ('retail_space', 'Торговая площадь'),
+            ('free_place', 'Помещение свободного назначения'),
+            ('production', 'Производство'),
+            ('warehouse', 'Склад'),
+            ('garage', 'Гараж'),
+            ('business', 'Бизнес'),
+            ('commercial_land', 'Коммерческая земля')
+        ]
+    )
+    address = django_filters.CharFilter(field_name='address')
+
+    class Meta:
+        model = SaleCommercialAdvertisement
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
