@@ -11,3 +11,4 @@ pillow
 django-cors-headers
 tzdata
 django-multiselectfield
+django-filter
