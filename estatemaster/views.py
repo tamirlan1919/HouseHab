@@ -251,6 +251,8 @@ class SaleResidentialViewSet(viewsets.ModelViewSet):
 class RentLongAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentLongAdvertisement.objects.all()
     serializer_class = RentLongAdvertisementSerializer
+    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
+    filterset_class = RentLongFilter  # Указываем класс фильтра
     permission_classes = [AllowAny]
 
 
@@ -276,6 +278,8 @@ class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
 class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer
+    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
+    filterset_class = RentCommercialFilter  # Указываем класс фильтра
     permission_classes = [AllowAny]
 
 
