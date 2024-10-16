@@ -28,7 +28,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             ('freePlanning', 'Свободная планировка')
         ]
     )
-    obj = django_filters.ListFilter(
+    obj = ListFilter(
         field_name= 'obj',
         choices = [
             ('flat', 'Квартира'),
@@ -53,7 +53,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
 class SaleCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    roomsNumber = django_filters.ListFilter(
+    roomsNumber = ListFilter(
         field_name='roomsNumber',
         choices = [
             ('studio', 'Студия'),
@@ -66,7 +66,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
             ('freePlanning', 'Свободная планировка')
         ]
     )
-    obj = django_filters.ListFilter(
+    obj = ListFilter(
         field_name= 'obj',
         choices = [
             ('office', 'Офис'),
@@ -91,7 +91,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
 class RentLongFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    obj = django_filters.ListFilter(
+    obj = ListFilter(
         field_name='obj',
         choices=[
             ('flat', 'Квартира'),
@@ -106,7 +106,7 @@ class RentLongFilter(django_filters.FilterSet):
         ]
     )
     address = django_filters.CharFilter(field_name='address')
-    roomsNumber = django_filters.ListFilter(
+    roomsNumber = ListFilter(
         field_name='roomsNumber',
         choices=[
             ('studio', 'Студия'),
@@ -128,7 +128,7 @@ class RentLongFilter(django_filters.FilterSet):
 class RentCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    obj = django_filters.ListFilter(
+    obj = ListFilter(
         field_name='obj',
         choices=[
             ('office', 'Офис'),
@@ -143,7 +143,7 @@ class RentCommercialFilter(django_filters.FilterSet):
         ]
     )
     address = django_filters.CharFilter(field_name='address')
-    roomsNumber = django_filters.ListFilter(
+    roomsNumber = ListFilter(
         field_name='roomsNumber',
         choices=[
             ('studio', 'Студия'),
