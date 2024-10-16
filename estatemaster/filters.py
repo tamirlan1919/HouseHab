@@ -1,23 +1,27 @@
 import django_filters
+from django_filters import rest_framework as filters
 from .models import *
 
-from django_filters import rest_framework as filters
-class ListFilter(filters.BaseCSVFilter, filters.CharFilter):
+
+class ArrayFilter(filters.BaseCSVFilter, filters.CharFilter):
     """
-    Фильтр для работы с запросами вида roomsNumber=[1,2,3]
+    Фильтр для работы с запросами вида roomsNumber=[1,2]
     Преобразует строку в список значений.
     """
     def filter(self, qs, value):
         if value:
-            value = value.strip('[]').split(',')  # Убираем квадратные скобки и разделяем по запятым
+            # Убираем квадратные скобки и разделяем строку по запятым
+            value = value.strip('[]').split(',')
         return super().filter(qs, value)
 
 class SaleResidentialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    roomsNumber = ListFilter(
+
+    # Используем MultipleChoiceFilter для множественного выбора комнат
+    roomsNumber = django_filters.MultipleChoiceFilter(
         field_name='roomsNumber',
-        choices = [
+        choices=[
             ('studio', 'Студия'),
             ('1', '1'),
             ('2', '2'),
@@ -28,70 +32,9 @@ class SaleResidentialFilter(django_filters.FilterSet):
             ('freePlanning', 'Свободная планировка')
         ]
     )
-    obj = ListFilter(
-        field_name= 'obj',
-        choices = [
-            ('flat', 'Квартира'),
-            ('flatNewBuilding', 'Квартира в новостройке'),
-            ('room', 'Комната'),
-            ('flatShare', 'Доля в квартире'),
-            ('house', 'Дом'),
-            ('cottage', 'Коттедж'),
-            ('tanhouse', 'Таунхаус'),
-            ('partHouse', 'Часть дома'),
-            ('plot', 'Участок')
-        ]
-    )
-    address = django_filters.CharFilter(field_name='address')
 
-    class Meta:
-        model = SaleResidential
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
-
-
-
-class SaleCommercialFilter(django_filters.FilterSet):
-    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    roomsNumber = ListFilter(
-        field_name='roomsNumber',
-        choices = [
-            ('studio', 'Студия'),
-            ('1', '1'),
-            ('2', '2'),
-            ('3', '3'),
-            ('4', '4'),
-            ('5', '5'),
-            ('overSix', '6'),
-            ('freePlanning', 'Свободная планировка')
-        ]
-    )
-    obj = ListFilter(
-        field_name= 'obj',
-        choices = [
-            ('office', 'Офис'),
-            ('building', 'Здание'),
-            ('retail_space', 'Торговая площадь'),
-            ('free_place', 'Помещение свободного назначения'),
-            ('production', 'Производство'),
-            ('warehouse', 'Склад'),
-            ('garage', 'Гараж'),
-            ('business', 'Бизнес'),
-            ('commercial_land', 'Коммерческая земля')
-        ]
-    )
-    address = django_filters.CharFilter(field_name='address')
-
-    class Meta:
-        model = SaleCommercialAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
-
-
-
-class RentLongFilter(django_filters.FilterSet):
-    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    obj = ListFilter(
+    # Для obj также используем MultipleChoiceFilter
+    obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
             ('flat', 'Квартира'),
@@ -105,8 +48,20 @@ class RentLongFilter(django_filters.FilterSet):
             ('plot', 'Участок')
         ]
     )
+
     address = django_filters.CharFilter(field_name='address')
-    roomsNumber = ListFilter(
+
+    class Meta:
+        model = SaleResidential
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+
+
+class SaleCommercialFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+
+    # MultipleChoiceFilter для количества комнат
+    roomsNumber = django_filters.MultipleChoiceFilter(
         field_name='roomsNumber',
         choices=[
             ('studio', 'Студия'),
@@ -119,6 +74,65 @@ class RentLongFilter(django_filters.FilterSet):
             ('freePlanning', 'Свободная планировка')
         ]
     )
+
+    # MultipleChoiceFilter для выбора объектов
+    obj = django_filters.MultipleChoiceFilter(
+        field_name='obj',
+        choices=[
+            ('office', 'Офис'),
+            ('building', 'Здание'),
+            ('retail_space', 'Торговая площадь'),
+            ('free_place', 'Помещение свободного назначения'),
+            ('production', 'Производство'),
+            ('warehouse', 'Склад'),
+            ('garage', 'Гараж'),
+            ('business', 'Бизнес'),
+            ('commercial_land', 'Коммерческая земля')
+        ]
+    )
+
+    address = django_filters.CharFilter(field_name='address')
+
+    class Meta:
+        model = SaleCommercialAdvertisement
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+
+class RentLongFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+
+    # Фильтр по объекту с множественным выбором
+    obj = django_filters.MultipleChoiceFilter(
+        field_name='obj',
+        choices=[
+            ('flat', 'Квартира'),
+            ('flatNewBuilding', 'Квартира в новостройке'),
+            ('room', 'Комната'),
+            ('flatShare', 'Доля в квартире'),
+            ('house', 'Дом'),
+            ('cottage', 'Коттедж'),
+            ('tanhouse', 'Таунхаус'),
+            ('partHouse', 'Часть дома'),
+            ('plot', 'Участок')
+        ]
+    )
+
+    # Фильтр по количеству комнат с множественным выбором
+    roomsNumber = django_filters.MultipleChoiceFilter(
+        field_name='roomsNumber',
+        choices=[
+            ('studio', 'Студия'),
+            ('1', '1'),
+            ('2', '2'),
+            ('3', '3'),
+            ('4', '4'),
+            ('5', '5'),
+            ('overSix', '6'),
+            ('freePlanning', 'Свободная планировка')
+        ]
+    )
+
+    address = django_filters.CharFilter(field_name='address')
 
     class Meta:
         model = RentLongAdvertisement
@@ -128,7 +142,9 @@ class RentLongFilter(django_filters.FilterSet):
 class RentCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    obj = ListFilter(
+
+    # Фильтр по объекту с множественным выбором
+    obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
             ('office', 'Офис'),
@@ -142,8 +158,9 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('commercial_land', 'Коммерческая земля')
         ]
     )
-    address = django_filters.CharFilter(field_name='address')
-    roomsNumber = ListFilter(
+
+    # Фильтр по количеству комнат с множественным выбором
+    roomsNumber = django_filters.MultipleChoiceFilter(
         field_name='roomsNumber',
         choices=[
             ('studio', 'Студия'),
@@ -156,6 +173,8 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('freePlanning', 'Свободная планировка')
         ]
     )
+
+    address = django_filters.CharFilter(field_name='address')
 
     class Meta:
         model = RentCommercialAdvertisement
