@@ -243,8 +243,8 @@ class BaseAdvertisementViewSet(viewsets.ModelViewSet):
 class SaleResidentialViewSet(viewsets.ModelViewSet):
     queryset = SaleResidential.objects.all()
     serializer_class = SaleResidentialSerializer
-    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
-    filterset_class = SaleResidentialFilter  # Указываем класс фильтра
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SaleResidentialFilter
     permission_classes = [AllowAny]
 
 @extend_schema(tags=['Аренда длительная (Жилая)'])
