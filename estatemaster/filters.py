@@ -56,10 +56,6 @@ class SaleCommercialFilter(django_filters.FilterSet):
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
 
     # MultipleChoiceFilter для количества комнат
-    roomsNumber = ArrayFilter(
-        field_name='roomsNumber'
-
-    )
 
     # MultipleChoiceFilter для выбора объектов
     obj = django_filters.MultipleChoiceFilter(

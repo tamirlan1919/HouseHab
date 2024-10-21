@@ -775,8 +775,8 @@ class SaleCommercialAdvertisement(models.Model):
         verbose_name = 'Комерческие продажи'
         verbose_name_plural = 'Комерческая продажа'
     def __str__(self):
-        return self.title
 
+        return self.title
     def clean(self):
         super().clean()
         # Validate the 'plot' field to ensure it meets the requirements
