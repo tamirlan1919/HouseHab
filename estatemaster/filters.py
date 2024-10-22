@@ -77,7 +77,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
 
     class Meta:
         model = SaleCommercialAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+        fields = ['obj', 'address', 'max_price', 'min_price']
 
 class RentLongFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
