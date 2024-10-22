@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Q
 from django_filters import rest_framework as filters
 from .models import *
 
@@ -52,8 +53,8 @@ class SaleResidentialFilter(django_filters.FilterSet):
 
 
 class SaleCommercialFilter(django_filters.FilterSet):
-    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    min_price = django_filters.NumberFilter(method='filter_by_price_range', label='Min Price')
+    max_price = django_filters.NumberFilter(method='filter_by_price_range', label='Max Price')
 
     # MultipleChoiceFilter для количества комнат
 
@@ -78,6 +79,17 @@ class SaleCommercialFilter(django_filters.FilterSet):
     class Meta:
         model = SaleCommercialAdvertisement
         fields = ['obj', 'address', 'max_price', 'min_price']
+
+    def filter_by_price_range(self, queryset, name, value):
+        if name == 'min_price':
+            return queryset.filter(
+                Q(total_price__gte=value) | Q(price_per_m2__gte=value)
+            )
+        if name == 'max_price':
+            return queryset.filter(
+                Q(total_price__lte=value) | Q(price_per_m2__lte=value)
+            )
+        return queryset
 
 class RentLongFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
