@@ -12,3 +12,5 @@ django-cors-headers
 tzdata
 django-multiselectfield
 django-filter
+boto3
+django-storages

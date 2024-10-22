@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'django_filters',  # Убедись, что это приложение установлено
+    'storages'
 
 ]
 
@@ -182,6 +183,25 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
 ]
 
+
+AWS_ACCESS_KEY_ID = 'T1RGMQIMAJS38V4NYJI3'
+AWS_SECRET_ACCESS_KEY = '88p1a30mm4DEm1yGd9qLtCW2mEdmc75y77h0JMZS'
+AWS_STORAGE_BUCKET_NAME = 'b02bf8d8-myback'
+AWS_S3_REGION_NAME = 'ru-1'  # Пример: 'ru-1'
+AWS_S3_ENDPOINT_URL = 'https://s3.timeweb.cloud'
+
+AWS_DEFAULT_ACL = None
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_LOCATION = 'media'
+
+# Используем S3 для хранения файлов
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Указываем, куда будут загружаться файлы
+MEDIA_URL = f'https://s3.timeweb.cloud/{AWS_STORAGE_BUCKET_NAME}/{AWS_LOCATION}/'
 
 
 
