@@ -12,6 +12,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
+def advertisement_upload_to(instance, filename):
+    # Сохраняет файлы в папке advertisement_photos
+    return f'advertisement_photos/{uuid.uuid4()}/{filename}'
+
+def photos_upload_to(instance, filename):
+    # Сохраняет файлы в папке photos
+    return f'photos/{uuid.uuid4()}/{filename}'
+
 class Image(models.Model):
     image = models.ImageField(upload_to='images/')
     owner = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='uploaded_images')
@@ -230,7 +238,7 @@ class AdvertisementPhoto(models.Model):
     object_id = models.UUIDField(null=True)  # UUID для связи с объектом
     advertisement = GenericForeignKey('content_type', 'object_id')
 
-    image = models.ImageField(upload_to='advertisement_photos/')
+    image = models.ImageField(upload_to=advertisement_upload_to)
     description = models.CharField(max_length=255, blank=True, null=True)
     isMain = models.BooleanField(default=False)  # New field to indicate the main photo
 
