@@ -46,10 +46,32 @@ class SaleResidentialFilter(django_filters.FilterSet):
     )
 
     address = django_filters.CharFilter(field_name='address')
-
+    accountType = django_filters.CharFilter(field_name='accountType')
+    pathType = django_filters.MultipleChoiceFilter(
+        field_name='pathType',
+        choices=
+        [
+            ('foot', 'Пешком'),
+            ('transport', 'Транспорт')
+        ]
+    )
+    min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    min_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
+    max_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
+    min_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
+    max_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
+    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
+    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
+    balconies = django_filters.NumberFilter(field_name='balconies')
+    loggia = django_filters.NumberFilter(field_name='loggia')
     class Meta:
         model = SaleResidential
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+                  'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
+                  'min_kitchenArea', 'max_kitchenArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'balconies',
+                  'loggia']
 
 
 class SaleCommercialFilter(django_filters.FilterSet):
@@ -75,10 +97,30 @@ class SaleCommercialFilter(django_filters.FilterSet):
     )
 
     address = django_filters.CharFilter(field_name='address')
+    accountType = django_filters.CharFilter(field_name='accountType')
+    pathType = django_filters.MultipleChoiceFilter(
+        field_name='pathType',
+        choices =
+        [
+            ('foot', 'Пешком'),
+            ('transport', 'Транспорт')
+        ]
+    )
+    min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
+    planning = django_filters.MultipleChoiceFilter(
+        field_name='planning',
+        choices=[
+            ('open', 'Открытая'),
+            ('corridor', 'Коридор'),
+            ('cabinet', 'Кабинетная')
+        ])
 
     class Meta:
         model = SaleCommercialAdvertisement
-        fields = ['obj', 'address', 'max_price', 'min_price']
+        fields = ['obj', 'address',  'max_price', 'min_price', 'accountType', 'pathType',
+                  'min_totalArea', 'max_totalArea',  'ceilingHeight', 'planning']
 
     def filter_by_price_range(self, queryset, name, value):
         if name == 'min_price':
@@ -118,10 +160,33 @@ class RentLongFilter(django_filters.FilterSet):
     )
 
     address = django_filters.CharFilter(field_name='address')
+    accountType = django_filters.CharFilter(field_name='accountType')
+    pathType = django_filters.MultipleChoiceFilter(
+        field_name='pathType',
+        choices=
+        [
+            ('foot', 'Пешком'),
+            ('transport', 'Транспорт')
+        ]
+    )
+    min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    min_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
+    max_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
+    min_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
+    max_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
+    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
+    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
+    balconies = django_filters.NumberFilter(field_name='balconies')
+    loggia = django_filters.NumberFilter(field_name='loggia')
 
     class Meta:
         model = RentLongAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+                  'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
+                  'min_kitchenArea', 'max_kitchenArea', 'separateBathroom', 'combinedBathroom',
+                  'balconies',
+                  'loggia']
 
 
 class RentCommercialFilter(django_filters.FilterSet):
@@ -150,8 +215,34 @@ class RentCommercialFilter(django_filters.FilterSet):
 
     )
 
-    address = django_filters.CharFilter(field_name='address')
 
+    address = django_filters.CharFilter(field_name='address')
+    accountType = django_filters.CharFilter(field_name='accountType')
+    pathType = django_filters.MultipleChoiceFilter(
+        field_name='pathType',
+        choices=
+        [
+            ('foot', 'Пешком'),
+            ('transport', 'Транспорт')
+        ]
+    )
+    min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
+    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
+    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
+    balconies = django_filters.NumberFilter(field_name='balconies')
+    loggia = django_filters.NumberFilter(field_name='loggia')
+    planning = django_filters.MultipleChoiceFilter(
+        field_name='planning',
+        choices=[
+            ('open', 'Открытая'),
+            ('corridor', 'Коридор'),
+            ('cabinet', 'Кабинетная')
+        ])
     class Meta:
         model = RentCommercialAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price']
+        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+                  'min_totalArea', 'max_totalArea',  'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'balconies',
+                  'loggia', 'planning']
