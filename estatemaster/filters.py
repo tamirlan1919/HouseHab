@@ -3,32 +3,39 @@ from django.db.models import Q
 from django_filters import rest_framework as filters
 from .models import *
 
-
 class ArrayFilter(filters.BaseCSVFilter, filters.CharFilter):
     def filter(self, qs, value):
         if value:
             if isinstance(value, list):
-                # If value is a list, combine it into a single string
                 cleaned_value = ','.join(value)
             else:
                 cleaned_value = value
-            # Remove any brackets from the string
             cleaned_value = cleaned_value.replace('[', '').replace(']', '')
-            # Split the string into individual values
             values = [v.strip() for v in cleaned_value.split(',')]
             return qs.filter(**{f"{self.field_name}__in": values})
         return qs
 
 
+class ArrayMinFilter(filters.BaseCSVFilter, filters.CharFilter):
+    def filter(self, qs, value):
+        if value:
+            if isinstance(value, list):
+                cleaned_value = ','.join(value)
+            else:
+                cleaned_value = value
+            cleaned_value = cleaned_value.replace('[', '').replace(']', '')
+
+            # Convert values to a list of floats and get the minimum
+            values = [float(v.strip()) for v in cleaned_value.split(',') if v.strip()]
+            if values:
+                min_value = min(values)
+                return qs.filter(**{f"{self.field_name}__gte": min_value})
+        return qs
+
 class SaleResidentialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-
-    # Используем кастомный ArrayFilter
-    roomsNumber = ArrayFilter(
-        field_name='roomsNumber',
-
-    )
+    roomsNumber = ArrayFilter(field_name='roomsNumber')
 
     obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
@@ -49,8 +56,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
     accountType = django_filters.CharFilter(field_name='accountType')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
-        choices=
-        [
+        choices=[
             ('foot', 'Пешком'),
             ('transport', 'Транспорт')
         ]
@@ -61,26 +67,30 @@ class SaleResidentialFilter(django_filters.FilterSet):
     max_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
     min_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
     max_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
-    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
-    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
-    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
-    balconies = django_filters.NumberFilter(field_name='balconies')
-    loggia = django_filters.NumberFilter(field_name='loggia')
+
+    # Boolean filters for balcony and loggia
+    balcony = django_filters.BooleanFilter(field_name='balconies', label='Balcony Exists')
+    loggia = django_filters.BooleanFilter(field_name='loggia', label='Loggia Exists')
+
+    # Multi-select for ceilingHeight
+    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
+
+    # Boolean filters for separateBathroom and combinedBathroom
+    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+
     class Meta:
         model = SaleResidential
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
-                  'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
-                  'min_kitchenArea', 'max_kitchenArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'balconies',
-                  'loggia']
-
+        fields = [
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+            'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
+            'min_kitchenArea', 'max_kitchenArea', 'ceilingHeight', 'balcony', 'loggia',
+            'separateBathroom', 'combinedBathroom'
+        ]
 
 class SaleCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(method='filter_by_price_range', label='Min Price')
     max_price = django_filters.NumberFilter(method='filter_by_price_range', label='Max Price')
-
-    # MultipleChoiceFilter для количества комнат
-
-    # MultipleChoiceFilter для выбора объектов
     obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
@@ -100,15 +110,21 @@ class SaleCommercialFilter(django_filters.FilterSet):
     accountType = django_filters.CharFilter(field_name='accountType')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
-        choices =
-        [
+        choices=[
             ('foot', 'Пешком'),
             ('transport', 'Транспорт')
         ]
     )
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
     max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
-    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
+
+    # Multi-select for ceilingHeight
+    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
+
+    # Boolean filters for separateBathroom and combinedBathroom
+    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+
     planning = django_filters.MultipleChoiceFilter(
         field_name='planning',
         choices=[
@@ -119,8 +135,10 @@ class SaleCommercialFilter(django_filters.FilterSet):
 
     class Meta:
         model = SaleCommercialAdvertisement
-        fields = ['obj', 'address',  'max_price', 'min_price', 'accountType', 'pathType',
-                  'min_totalArea', 'max_totalArea',  'ceilingHeight', 'planning']
+        fields = [
+            'obj', 'address', 'max_price', 'min_price', 'accountType', 'pathType',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'planning'
+        ]
 
     def filter_by_price_range(self, queryset, name, value):
         if name == 'min_price':
@@ -136,8 +154,6 @@ class SaleCommercialFilter(django_filters.FilterSet):
 class RentLongFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-
-    # Фильтр по объекту с множественным выбором
     obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
@@ -152,48 +168,41 @@ class RentLongFilter(django_filters.FilterSet):
             ('plot', 'Участок')
         ]
     )
-
-    # Фильтр по количеству комнат с множественным выбором
-    roomsNumber = ArrayFilter(
-        field_name='roomsNumber'
-
-    )
-
+    roomsNumber = ArrayFilter(field_name='roomsNumber')
     address = django_filters.CharFilter(field_name='address')
     accountType = django_filters.CharFilter(field_name='accountType')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
-        choices=
-        [
+        choices=[
             ('foot', 'Пешком'),
             ('transport', 'Транспорт')
         ]
     )
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
     max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
-    min_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
-    max_livingArea = django_filters.NumberFilter(field_name='livingArea', lookup_expr='gte')
-    min_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
-    max_kitchenArea = django_filters.NumberFilter(field_name='kitchenArea', lookup_expr='gte')
-    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
-    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
-    balconies = django_filters.NumberFilter(field_name='balconies')
-    loggia = django_filters.NumberFilter(field_name='loggia')
+
+    # Boolean filters for balcony and loggia
+    balcony = django_filters.BooleanFilter(field_name='balconies', label='Balcony Exists')
+    loggia = django_filters.BooleanFilter(field_name='loggia', label='Loggia Exists')
+
+    # Multi-select for ceilingHeight
+    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
+
+    # Boolean filters for separateBathroom and combinedBathroom
+    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
 
     class Meta:
         model = RentLongAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
-                  'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
-                  'min_kitchenArea', 'max_kitchenArea', 'separateBathroom', 'combinedBathroom',
-                  'balconies',
-                  'loggia']
-
+        fields = [
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'balcony', 'loggia',
+            'separateBathroom', 'combinedBathroom'
+        ]
 
 class RentCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-
-    # Фильтр по объекту с множественным выбором
     obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
@@ -208,20 +217,12 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('commercial_land', 'Коммерческая земля')
         ]
     )
-
-    # Фильтр по количеству комнат с множественным выбором
-    roomsNumber = ArrayFilter(
-        field_name='roomsNumber'
-
-    )
-
-
+    roomsNumber = ArrayFilter(field_name='roomsNumber')
     address = django_filters.CharFilter(field_name='address')
     accountType = django_filters.CharFilter(field_name='accountType')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
-        choices=
-        [
+        choices=[
             ('foot', 'Пешком'),
             ('transport', 'Транспорт')
         ]
@@ -229,11 +230,17 @@ class RentCommercialFilter(django_filters.FilterSet):
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
     max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
 
-    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight')
-    separateBathroom = django_filters.NumberFilter(field_name='separateBathroom')
-    combinedBathroom = django_filters.NumberFilter(field_name='combinedBathroom')
-    balconies = django_filters.NumberFilter(field_name='balconies')
-    loggia = django_filters.NumberFilter(field_name='loggia')
+    # Multi-select for ceilingHeight
+    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
+
+    # Boolean filters for separateBathroom and combinedBathroom
+    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+
+    # Boolean filters for balcony and loggia
+    balcony = django_filters.BooleanFilter(field_name='balconies', label='Balcony Exists')
+    loggia = django_filters.BooleanFilter(field_name='loggia', label='Loggia Exists')
+
     planning = django_filters.MultipleChoiceFilter(
         field_name='planning',
         choices=[
@@ -241,8 +248,11 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('corridor', 'Коридор'),
             ('cabinet', 'Кабинетная')
         ])
+
     class Meta:
         model = RentCommercialAdvertisement
-        fields = ['obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
-                  'min_totalArea', 'max_totalArea',  'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'balconies',
-                  'loggia', 'planning']
+        fields = [
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom',
+            'balcony', 'loggia', 'planning'
+        ]
