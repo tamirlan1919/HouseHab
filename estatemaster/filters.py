@@ -73,11 +73,12 @@ class SaleResidentialFilter(django_filters.FilterSet):
     loggia = django_filters.BooleanFilter(field_name='loggia', label='Loggia Exists')
 
     # Multi-select for ceilingHeight
-    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
+                                                label='Minimum Ceiling Height')
 
-    # Boolean filters for separateBathroom and combinedBathroom
-    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    # Boolean filters for bathroom and combinedBathroom
+    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
 
     class Meta:
         model = SaleResidential
@@ -85,7 +86,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
             'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
             'min_kitchenArea', 'max_kitchenArea', 'ceilingHeight', 'balcony', 'loggia',
-            'separateBathroom', 'combinedBathroom'
+            'bathroom', 'combined'
         ]
 
 class SaleCommercialFilter(django_filters.FilterSet):
@@ -119,11 +120,11 @@ class SaleCommercialFilter(django_filters.FilterSet):
     max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
 
     # Multi-select for ceilingHeight
-    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
-
-    # Boolean filters for separateBathroom and combinedBathroom
-    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
+                                                label='Minimum Ceiling Height')
+    # Boolean filters for bathroom and combined
+    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
 
     planning = django_filters.MultipleChoiceFilter(
         field_name='planning',
@@ -137,7 +138,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
         model = SaleCommercialAdvertisement
         fields = [
             'obj', 'address', 'max_price', 'min_price', 'accountType', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom', 'planning'
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom', 'combined', 'planning'
         ]
 
     def filter_by_price_range(self, queryset, name, value):
@@ -186,18 +187,18 @@ class RentLongFilter(django_filters.FilterSet):
     loggia = django_filters.BooleanFilter(field_name='loggia', label='Loggia Exists')
 
     # Multi-select for ceilingHeight
-    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
-
-    # Boolean filters for separateBathroom and combinedBathroom
-    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
+                                                label='Minimum Ceiling Height')
+    # Boolean filters for bathroom and combined
+    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
 
     class Meta:
         model = RentLongAdvertisement
         fields = [
             'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
             'min_totalArea', 'max_totalArea', 'ceilingHeight', 'balcony', 'loggia',
-            'separateBathroom', 'combinedBathroom'
+            'bathroom', 'combined'
         ]
 
 class RentCommercialFilter(django_filters.FilterSet):
@@ -231,11 +232,11 @@ class RentCommercialFilter(django_filters.FilterSet):
     max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
 
     # Multi-select for ceilingHeight
-    ceilingHeight = ArrayMinFilter(field_name='ceilingHeight')
-
-    # Boolean filters for separateBathroom and combinedBathroom
-    separateBathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combinedBathroom = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
+                                                label='Minimum Ceiling Height')
+    # Boolean filters for bathroom and combined
+    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
+    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
 
     # Boolean filters for balcony and loggia
     balcony = django_filters.BooleanFilter(field_name='balconies', label='Balcony Exists')
@@ -253,6 +254,6 @@ class RentCommercialFilter(django_filters.FilterSet):
         model = RentCommercialAdvertisement
         fields = [
             'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'separateBathroom', 'combinedBathroom',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom', 'combined',
             'balcony', 'loggia', 'planning'
         ]
