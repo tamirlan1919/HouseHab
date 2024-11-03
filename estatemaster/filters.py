@@ -53,7 +53,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
     )
 
     address = django_filters.CharFilter(field_name='address')
-    accountType = django_filters.CharFilter(field_name='accountType')
+    fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
         choices=[
@@ -77,16 +77,31 @@ class SaleResidentialFilter(django_filters.FilterSet):
                                                 label='Minimum Ceiling Height')
 
     # Boolean filters for bathroom and combinedBathroom
-    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+
+    # Bathroom choice
+    bathroom = django_filters.ChoiceFilter(
+        method='filter_bathroom_type',
+        choices=[
+            ('combined', 'Combined Bathroom'),
+            ('separate', 'Separate Bathroom')
+        ],
+        label='Bathroom Type'
+    )
+
+    def filter_bathroom_type(self, queryset, name, value):
+        if value == 'combined':
+            return queryset.filter(combinedBathroom=True)
+        elif value == 'separate':
+            return queryset.filter(separateBathroom=True)
+        return queryset
 
     class Meta:
         model = SaleResidential
         fields = [
-            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'fromOwner', 'pathType',
             'min_totalArea', 'max_totalArea', 'min_livingArea', 'max_livingArea',
             'min_kitchenArea', 'max_kitchenArea', 'ceilingHeight', 'balcony', 'loggia',
-            'bathroom', 'combined'
+            'bathroom'
         ]
 
 class SaleCommercialFilter(django_filters.FilterSet):
@@ -108,7 +123,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
     )
 
     address = django_filters.CharFilter(field_name='address')
-    accountType = django_filters.CharFilter(field_name='accountType')
+    fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
         choices=[
@@ -123,8 +138,21 @@ class SaleCommercialFilter(django_filters.FilterSet):
     ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
                                                 label='Minimum Ceiling Height')
     # Boolean filters for bathroom and combined
-    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    bathroom = django_filters.ChoiceFilter(
+        method='filter_bathroom_type',
+        choices=[
+            ('combined', 'Combined Bathroom'),
+            ('separate', 'Separate Bathroom')
+        ],
+        label='Bathroom Type'
+    )
+
+    def filter_bathroom_type(self, queryset, name, value):
+        if value == 'combined':
+            return queryset.filter(combinedBathroom=True)
+        elif value == 'separate':
+            return queryset.filter(separateBathroom=True)
+        return queryset
 
     planning = django_filters.MultipleChoiceFilter(
         field_name='planning',
@@ -137,8 +165,8 @@ class SaleCommercialFilter(django_filters.FilterSet):
     class Meta:
         model = SaleCommercialAdvertisement
         fields = [
-            'obj', 'address', 'max_price', 'min_price', 'accountType', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom', 'combined', 'planning'
+            'obj', 'address', 'max_price', 'min_price', 'fromOwner', 'pathType',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom',  'planning'
         ]
 
     def filter_by_price_range(self, queryset, name, value):
@@ -171,7 +199,7 @@ class RentLongFilter(django_filters.FilterSet):
     )
     roomsNumber = ArrayFilter(field_name='roomsNumber')
     address = django_filters.CharFilter(field_name='address')
-    accountType = django_filters.CharFilter(field_name='accountType')
+    fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
         choices=[
@@ -190,15 +218,28 @@ class RentLongFilter(django_filters.FilterSet):
     ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
                                                 label='Minimum Ceiling Height')
     # Boolean filters for bathroom and combined
-    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    bathroom = django_filters.ChoiceFilter(
+        method='filter_bathroom_type',
+        choices=[
+            ('combined', 'Combined Bathroom'),
+            ('separate', 'Separate Bathroom')
+        ],
+        label='Bathroom Type'
+    )
+
+    def filter_bathroom_type(self, queryset, name, value):
+        if value == 'combined':
+            return queryset.filter(combinedBathroom=True)
+        elif value == 'separate':
+            return queryset.filter(separateBathroom=True)
+        return queryset
 
     class Meta:
         model = RentLongAdvertisement
         fields = [
-            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'fromOwner', 'pathType',
             'min_totalArea', 'max_totalArea', 'ceilingHeight', 'balcony', 'loggia',
-            'bathroom', 'combined'
+            'bathroom'
         ]
 
 class RentCommercialFilter(django_filters.FilterSet):
@@ -220,7 +261,7 @@ class RentCommercialFilter(django_filters.FilterSet):
     )
     roomsNumber = ArrayFilter(field_name='roomsNumber')
     address = django_filters.CharFilter(field_name='address')
-    accountType = django_filters.CharFilter(field_name='accountType')
+    fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
         choices=[
@@ -235,8 +276,21 @@ class RentCommercialFilter(django_filters.FilterSet):
     ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
                                                 label='Minimum Ceiling Height')
     # Boolean filters for bathroom and combined
-    bathroom = django_filters.BooleanFilter(field_name='separateBathroom', label='Separate Bathroom Exists')
-    combined = django_filters.BooleanFilter(field_name='combinedBathroom', label='Combined Bathroom Exists')
+    bathroom = django_filters.ChoiceFilter(
+        method='filter_bathroom_type',
+        choices=[
+            ('combined', 'Combined Bathroom'),
+            ('separate', 'Separate Bathroom')
+        ],
+        label='Bathroom Type'
+    )
+
+    def filter_bathroom_type(self, queryset, name, value):
+        if value == 'combined':
+            return queryset.filter(combinedBathroom=True)
+        elif value == 'separate':
+            return queryset.filter(separateBathroom=True)
+        return queryset
 
     # Boolean filters for balcony and loggia
     balcony = django_filters.BooleanFilter(field_name='balconies', label='Balcony Exists')
@@ -253,7 +307,7 @@ class RentCommercialFilter(django_filters.FilterSet):
     class Meta:
         model = RentCommercialAdvertisement
         fields = [
-            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'accountType', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom', 'combined',
+            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'fromOwner', 'pathType',
+            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom',
             'balcony', 'loggia', 'planning'
         ]
