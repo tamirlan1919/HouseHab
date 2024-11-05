@@ -158,6 +158,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             'ceilingHeight', 'bathroom'
         ]
 
+
 class SaleCommercialFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(method='filter_by_price_range', label='Min Price')
     max_price = django_filters.NumberFilter(method='filter_by_price_range', label='Max Price')
@@ -190,12 +191,11 @@ class SaleCommercialFilter(django_filters.FilterSet):
         ]
     )
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
-    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='lte')
 
-    # Multi-select for ceilingHeight
     ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
                                                 label='Minimum Ceiling Height')
-    # Boolean filters for bathroom and combined
+
     bathroom = django_filters.ChoiceFilter(
         method='filter_bathroom_type',
         choices=[
@@ -204,14 +204,49 @@ class SaleCommercialFilter(django_filters.FilterSet):
         ],
         label='Bathroom Type'
     )
+
     planning = django_filters.MultipleChoiceFilter(
         field_name='planning',
         choices=[
             ('open', 'Открытая'),
             ('corridor', 'Коридор'),
             ('cabinet', 'Кабинетная')
-        ])
+        ]
+    )
 
+    min_floor = django_filters.NumberFilter(field_name='floor', lookup_expr='gte', label='Floor From')
+    max_floor = django_filters.NumberFilter(field_name='floor', lookup_expr='lte', label='Floor To')
+
+    not_first = django_filters.BooleanFilter(method='filter_not_first', label='Not First Floor')
+    not_last = django_filters.BooleanFilter(method='filter_not_last', label='Not Last Floor')
+    only_last = django_filters.BooleanFilter(method='filter_only_last', label='Only Last Floor')
+    penthouse = django_filters.BooleanFilter(method='filter_penthouse', label='Penthouse')
+
+    year_built_min = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='gte')
+    year_built_max = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='lte')
+
+    def filter_not_first(self, queryset, name, value):
+        if value:
+            return queryset.exclude(floor=1)  # Exclude first floor
+        return queryset
+
+    def filter_not_last(self, queryset, name, value):
+        max_floor = 20  # Replace with actual max floor if dynamically available
+        if value:
+            return queryset.exclude(floor=max_floor)  # Exclude last floor
+        return queryset
+
+    def filter_only_last(self, queryset, name, value):
+        max_floor = 20  # Replace with actual max floor if dynamically available
+        if value:
+            return queryset.filter(floor=max_floor)  # Only last floor
+        return queryset
+
+    def filter_penthouse(self, queryset, name, value):
+        penthouse_floor = 20  # Adjust this as per your criteria
+        if value:
+            return queryset.filter(floor=penthouse_floor)  # Filter for penthouse floor
+        return queryset
 
     def filter_bathroom_type(self, queryset, name, value):
         if value == 'combined':
@@ -219,7 +254,6 @@ class SaleCommercialFilter(django_filters.FilterSet):
         elif value == 'separate':
             return queryset.filter(separateBathroom=True)
         return queryset
-
 
     def filter_by_price_range(self, queryset, name, value):
         if name == 'min_price':
@@ -235,11 +269,12 @@ class SaleCommercialFilter(django_filters.FilterSet):
     class Meta:
         model = SaleCommercialAdvertisement
         fields = [
-            'obj', 'address', 'max_price', 'min_price', 'fromOwner', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom',  'planning'
+            'min_price', 'max_price', 'is_total', 'is_per_month', 'subway_minute', 'obj',
+            'address', 'fromOwner', 'pathType', 'min_totalArea', 'max_totalArea',
+            'ceilingHeight', 'bathroom', 'planning', 'min_floor', 'max_floor',
+            'not_first', 'not_last', 'only_last', 'penthouse', 'year_built_min',
+            'year_built_max'
         ]
-
-
 
 class RentLongFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
