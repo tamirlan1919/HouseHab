@@ -464,7 +464,7 @@ class RentDailyFilter(django_filters.FilterSet):
     )
     roomsNumber = ArrayFilter(field_name='roomsNumber')
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
-    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='lte')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
@@ -556,6 +556,17 @@ class RentDailyFilter(django_filters.FilterSet):
                 query |= Q(apartment__contains=item) | Q(connection__contains=item) | Q(furniture__contains=item)
             return queryset.filter(query)
         return queryset
+
+    class Meta:
+        model = RentDayAdvertisement
+        fields = [
+                    'min_price', 'max_price', 'obj', 'roomsNumber', 'min_totalArea', 'max_totalArea',
+                    'fromOwner', 'pathType', 'subway_minute', 'min_kitchenArea', 'max_kitchenArea',
+                    'livingConditions', 'amenities', 'min_floor', 'max_floor', 'min_floor_in_house',
+                    'max_floor_in_house', 'not_first', 'not_last', 'only_last', 'penthouse',
+                    'propertyType', 'no_deposit'
+                ]
+
 
 
 class RentCommercialFilter(django_filters.FilterSet):
