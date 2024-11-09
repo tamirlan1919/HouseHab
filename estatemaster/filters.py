@@ -570,8 +570,10 @@ class RentDailyFilter(django_filters.FilterSet):
 
 
 class RentCommercialFilter(django_filters.FilterSet):
-    min_price = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
-    max_price = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    min_price = django_filters.NumberFilter(method='filter_by_price_range', label='Min Price')
+    max_price = django_filters.NumberFilter(method='filter_by_price_range', label='Max Price')
+    is_total = django_filters.BooleanFilter(field_name='currency_rent_month')
+    is_per_month = django_filters.BooleanFilter(field_name='currency_rent_month_per_m2')
     obj = django_filters.MultipleChoiceFilter(
         field_name='obj',
         choices=[
@@ -586,7 +588,6 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('commercial_land', 'Коммерческая земля')
         ]
     )
-    roomsNumber = ArrayFilter(field_name='roomsNumber')
     address = django_filters.CharFilter(field_name='address')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
@@ -596,8 +597,10 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('transport', 'Транспорт')
         ]
     )
+    subway_minute = django_filters.NumberFilter(field_name='minutesBusStop', lookup_expr='gte')
+
     min_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
-    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='gte')
+    max_totalArea = django_filters.NumberFilter(field_name='totalArea', lookup_expr='lte')
 
     # Multi-select for ceilingHeight
     ceilingHeight = django_filters.NumberFilter(field_name='ceilingHeight', lookup_expr='gte',
@@ -611,6 +614,17 @@ class RentCommercialFilter(django_filters.FilterSet):
         ],
         label='Bathroom Type'
     )
+
+    def filter_by_price_range(self, queryset, name, value):
+        if name == 'min_price':
+            return queryset.filter(
+                Q(rent_per_month__gte=value) | Q(rent_per_month_per_m2__gte=value)
+            )
+        if name == 'max_price':
+            return queryset.filter(
+                Q(rent_per_month__lte=value) | Q(rent_per_month_per_m2__lte=value)
+            )
+        return queryset
 
     def filter_bathroom_type(self, queryset, name, value):
         if value == 'combined':
@@ -631,10 +645,70 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('cabinet', 'Кабинетная')
         ])
 
+    min_floor = django_filters.NumberFilter(field_name='floor', lookup_expr='gte', label='Floor From')
+    max_floor = django_filters.NumberFilter(field_name='floor', lookup_expr='lte', label='Floor To')
+    min_floor_in_house = django_filters.NumberFilter(field_name='floorsHouse', lookup_expr='gte', label='Мин этажей')
+    max_floor_in_house = django_filters.NumberFilter(field_name='floorsHouse', lookup_expr='lte', label='Макс этажей')
+
+    not_first = django_filters.BooleanFilter(method='filter_not_first', label='Not First Floor')
+    not_last = django_filters.BooleanFilter(method='filter_not_last', label='Not Last Floor')
+    only_last = django_filters.BooleanFilter(method='filter_only_last', label='Only Last Floor')
+    penthouse = django_filters.BooleanFilter(method='filter_penthouse', label='Penthouse')
+    year_built_min = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='gte')
+    year_built_max = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='lte')
+    # Filter for 'Без залога' (Without Deposit)
+    no_deposit = django_filters.BooleanFilter(
+        field_name='security_deposit',
+        method='filter_no_deposit',
+        label='Без залога'
+    )
+
+    # Filter for 'Без комиссии' (Without Commission)
+    no_commission = django_filters.BooleanFilter(
+        field_name='agentBonus',
+        method='filter_no_commission',
+        label='Без комиссии'
+    )
+    def filter_not_first(self, queryset, name, value):
+        if value:
+            return queryset.exclude(floor=1)
+        return queryset
+
+    def filter_not_last(self, queryset, name, value):
+        max_floor = 20  # Замените на актуальный максимальный этаж, если доступен динамически
+        if value:
+            return queryset.exclude(floor=max_floor)
+        return queryset
+
+    def filter_only_last(self, queryset, name, value):
+        max_floor = 20  # Замените на актуальный максимальный этаж, если доступен динамически
+        if value:
+            return queryset.filter(floor=max_floor)
+        return queryset
+
+    def filter_penthouse(self, queryset, name, value):
+        penthouse_floor = 20  # Настройте это значение в зависимости от ваших требований
+        if value:
+            return queryset.filter(floor=penthouse_floor)
+        return queryset
+
+    def filter_no_deposit(self, queryset, name, value):
+        if value:  # If True, filter for zero or empty deposit
+            return queryset.filter(security_deposit__isnull=True) | queryset.filter(security_deposit=0)
+        return queryset
+
+    def filter_no_commission(self, queryset, name, value):
+        if value:  # If True, filter for no agent commission
+            return queryset.filter(agentBonus='Нет')
+        return queryset
+
     class Meta:
         model = RentCommercialAdvertisement
         fields = [
-            'obj', 'address', 'roomsNumber', 'max_price', 'min_price', 'fromOwner', 'pathType',
-            'min_totalArea', 'max_totalArea', 'ceilingHeight', 'bathroom',
-            'balcony', 'loggia', 'planning'
+            'min_price', 'max_price', 'is_total', 'is_per_month', 'obj', 'address',
+            'fromOwner', 'pathType', 'subway_minute', 'min_totalArea', 'max_totalArea',
+            'ceilingHeight', 'bathroom', 'balcony', 'loggia', 'planning', 'min_floor',
+            'max_floor', 'min_floor_in_house', 'max_floor_in_house', 'not_first',
+            'not_last', 'only_last', 'penthouse', 'year_built_min', 'year_built_max',
+            'no_deposit', 'no_commission'
         ]
