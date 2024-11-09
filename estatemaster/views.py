@@ -17,6 +17,8 @@ from .models import *
 from .filters import *
 from rest_framework import generics, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import F, Value, CharField, IntegerField, DecimalField, BooleanField
+
 
 class CustomUserCreateView(APIView):
     def post(self, request, *args, **kwargs):
@@ -487,3 +489,45 @@ class PublicUserDetailView(APIView):
         return Response(serializer.data)
 
 
+@extend_schema(tags=['Кол-во комнат'])
+class RoomCountView(APIView):
+    def get(self, request):
+        data = {
+            "studio": SaleResidential.objects.filter(roomsNumber='studio').count() +
+                      RentDayAdvertisement.objects.filter(roomsNumber='studio').count() +
+                      RentLongAdvertisement.objects.filter(roomsNumber='studio').count(),
+
+            "1_room": SaleResidential.objects.filter(roomsNumber='1').count() +
+                      RentDayAdvertisement.objects.filter(roomsNumber='1').count() +
+                      RentLongAdvertisement.objects.filter(roomsNumber='1').count(),
+
+            "2_rooms": SaleResidential.objects.filter(roomsNumber='2').count() +
+                       RentDayAdvertisement.objects.filter(roomsNumber='2').count() +
+                       RentLongAdvertisement.objects.filter(roomsNumber='2').count(),
+
+            "3_rooms": SaleResidential.objects.filter(roomsNumber='3').count() +
+                       RentDayAdvertisement.objects.filter(roomsNumber='3').count() +
+                       RentLongAdvertisement.objects.filter(roomsNumber='3').count(),
+
+            "4_rooms": SaleResidential.objects.filter(roomsNumber='4').count() +
+                       RentDayAdvertisement.objects.filter(roomsNumber='4').count() +
+                       RentLongAdvertisement.objects.filter(roomsNumber='4').count(),
+
+            "5_rooms": SaleResidential.objects.filter(roomsNumber='5').count() +
+                       RentDayAdvertisement.objects.filter(roomsNumber='5').count() +
+                       RentLongAdvertisement.objects.filter(roomsNumber='5').count(),
+
+            "over_6_rooms": SaleResidential.objects.filter(roomsNumber='overSix').count() +
+                            RentDayAdvertisement.objects.filter(roomsNumber='6+').count() +
+                            RentLongAdvertisement.objects.filter(roomsNumber='overSix').count(),
+
+            "secondary_market": SaleResidential.objects.filter(obj='flat').count() +
+                                RentDayAdvertisement.objects.filter(obj='flat').count() +
+                                RentLongAdvertisement.objects.filter(obj='flat').count(),
+
+            "new_building": SaleResidential.objects.filter(obj='flatNewBuilding').count() +
+                            RentDayAdvertisement.objects.filter(obj='flatNewBuilding').count() +
+                            RentLongAdvertisement.objects.filter(obj='flatNewBuilding').count()
+        }
+
+        return Response(data)
