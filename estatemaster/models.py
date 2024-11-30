@@ -619,7 +619,7 @@ class RentDayAdvertisement(models.Model):
         verbose_name_plural = 'Аренда посуточная продажа'
 
     def __str__(self):
-        return self.title
+        return self.description
 
     def clean(self):
         super().clean()

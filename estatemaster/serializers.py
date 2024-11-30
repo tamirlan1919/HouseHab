@@ -482,13 +482,16 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         # Validate 'furniture' field
         furniture_data = data.get('furniture')
         if furniture_data:
+            if isinstance(furniture_data, str):
+                furniture_data = [furniture_data]
             if 'no_furniture' in furniture_data and len(furniture_data) > 1:
-                raise serializers.ValidationError({'furniture': "'no_furniture' cannot be combined with other options."})
+                raise serializers.ValidationError(
+                    {'furniture': "'no_furniture' cannot be combined with other options."})
             valid_furniture_choices = ['no_furniture', 'inKitchen', 'inRooms']
             for item in furniture_data:
                 if item not in valid_furniture_choices:
                     raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})
-
+            data['furniture'] = furniture_data
         # Validate 'bathroom' field
         bathroom_data = data.get('bathroom')
         if bathroom_data:
@@ -715,12 +718,16 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         # Validate 'furniture' field
         furniture_data = data.get('furniture')
         if furniture_data:
+            if isinstance(furniture_data, str):
+                furniture_data = [furniture_data]
             if 'no_furniture' in furniture_data and len(furniture_data) > 1:
-                raise serializers.ValidationError({'furniture': "'no_furniture' cannot be combined with other options."})
+                raise serializers.ValidationError(
+                    {'furniture': "'no_furniture' cannot be combined with other options."})
             valid_furniture_choices = ['no_furniture', 'inKitchen', 'inRooms']
             for item in furniture_data:
                 if item not in valid_furniture_choices:
                     raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})
+            data['furniture'] = furniture_data
 
         # Validate 'bathroom_choice' field
         bathroom_data = data.get('bathroom_choice')
