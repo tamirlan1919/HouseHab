@@ -406,7 +406,7 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
     deposit = DepositRentField(source='*')
     sellerContacts = SellerContactsField(source='*')
     furniture = serializers.ListField(
-        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'noFurniture']),
+        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'no_furniture']),
         write_only=True
     )
     bathroom = serializers.ListField(
@@ -482,9 +482,9 @@ class RentLongAdvertisementSerializer(serializers.ModelSerializer):
         # Validate 'furniture' field
         furniture_data = data.get('furniture')
         if furniture_data:
-            if 'noFurniture' in furniture_data and len(furniture_data) > 1:
-                raise serializers.ValidationError({'furniture': "'noFurniture' cannot be combined with other options."})
-            valid_furniture_choices = ['noFurniture', 'inKitchen', 'inRooms']
+            if 'no_furniture' in furniture_data and len(furniture_data) > 1:
+                raise serializers.ValidationError({'furniture': "'no_furniture' cannot be combined with other options."})
+            valid_furniture_choices = ['no_furniture', 'inKitchen', 'inRooms']
             for item in furniture_data:
                 if item not in valid_furniture_choices:
                     raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})
@@ -636,7 +636,7 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
     sellerContacts = SellerDayRentContactsField(source='*')
 
     furniture = serializers.ListField(
-        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'noFurniture']),
+        child=serializers.ChoiceField(choices=['inKitchen', 'inRooms', 'no_furniture']),
         write_only=True,
         required=False,
         allow_empty=True
@@ -715,9 +715,9 @@ class RentDayAdvertisementSerializer(serializers.ModelSerializer):
         # Validate 'furniture' field
         furniture_data = data.get('furniture')
         if furniture_data:
-            if 'noFurniture' in furniture_data and len(furniture_data) > 1:
-                raise serializers.ValidationError({'furniture': "'noFurniture' cannot be combined with other options."})
-            valid_furniture_choices = ['noFurniture', 'inKitchen', 'inRooms']
+            if 'no_furniture' in furniture_data and len(furniture_data) > 1:
+                raise serializers.ValidationError({'furniture': "'no_furniture' cannot be combined with other options."})
+            valid_furniture_choices = ['no_furniture', 'inKitchen', 'inRooms']
             for item in furniture_data:
                 if item not in valid_furniture_choices:
                     raise serializers.ValidationError({'furniture': f"'{item}' is not a valid choice for furniture."})

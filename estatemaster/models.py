@@ -398,7 +398,7 @@ class RentLongAdvertisement(models.Model):
         ('phone', 'Телефон')
     ]
     FURNITURE_CHOICES = [
-        ('noFurniture', 'Без мебели'),
+        ('no_furniture', 'Без мебели'),
         ('inKitchen', 'На кухне'),
         ('inRooms', 'В комнатах')
     ]
@@ -535,7 +535,7 @@ class RentDayAdvertisement(models.Model):
         ('phone', 'Телефон')
     ]
     FURNITURE_CHOICES = [
-        ('noFurniture', 'Без мебели'),
+        ('no_furniture', 'Без мебели'),
         ('inKitchen', 'На кухне'),
         ('inRooms', 'В комнатах')
     ]
