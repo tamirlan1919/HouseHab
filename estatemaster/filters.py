@@ -4,6 +4,12 @@ from django_filters import rest_framework as filters
 from .models import *
 
 
+RENTAL_TERMS = {
+    'one_month': "Не более 1 месяца",
+    'two_month': "Не более 2 месяца",
+    'three_month': "Не более 3 месяца",
+}
+
 class ArrayFilter(filters.BaseCSVFilter, filters.CharFilter):
     def filter(self, qs, value):
         if value:
@@ -347,10 +353,12 @@ class RentLongFilter(django_filters.FilterSet):
     )
 
     rentalTerm = django_filters.MultipleChoiceFilter(
-        field_name='rentalTerm',
+        method='filter_rental_term',
+
         choices=[
-            ('several_months', 'Несколько месяцев'),
-            ('year', 'От года')
+            ('one_month', "Не более 1 месяца"),
+            ('two_month', "Не более 2 месяца"),
+            ('three_month', "Не более 3 месяца"),
         ]
     )
 
@@ -393,6 +401,12 @@ class RentLongFilter(django_filters.FilterSet):
     is_freightElevator = django_filters.BooleanFilter(field_name='freightElevator', label='Грузовой лифт')
     is_passengerElevator = django_filters.BooleanFilter(field_name='passengerElevator', label='Пассажирский лифт')
     no_deposit = django_filters.BooleanFilter(method='filter_no_deposit', label='Без залога')
+
+    def filter_rental_term(self, queryset, name, value):
+        if value[0] in ['one_month', 'two_month', 'three_month']:
+            value = ['several_months']
+
+        return queryset.filter(rentalTerm__in=value)
 
     def filter_not_first(self, queryset, name, value):
         if value:
