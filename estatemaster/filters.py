@@ -352,13 +352,12 @@ class RentLongFilter(django_filters.FilterSet):
         ]
     )
 
-    rentalTerm = django_filters.MultipleChoiceFilter(
-        method='filter_rental_term',
+    rentalTerm = django_filters.ChoiceFilter(
+        field_name='rentalTerm',
 
         choices=[
-            ('one_month', "Не более 1 месяца"),
-            ('two_month', "Не более 2 месяца"),
-            ('three_month', "Не более 3 месяца"),
+            ('several_months', 'Несколько месяцев'),
+            ('year', 'От года')
         ]
     )
 
@@ -401,12 +400,6 @@ class RentLongFilter(django_filters.FilterSet):
     is_freightElevator = django_filters.BooleanFilter(field_name='freightElevator', label='Грузовой лифт')
     is_passengerElevator = django_filters.BooleanFilter(field_name='passengerElevator', label='Пассажирский лифт')
     no_deposit = django_filters.BooleanFilter(method='filter_no_deposit', label='Без залога')
-
-    def filter_rental_term(self, queryset, name, value):
-        if value[0] in ['one_month', 'two_month', 'three_month']:
-            value = ['several_months']
-
-        return queryset.filter(rentalTerm__in=value)
 
     def filter_not_first(self, queryset, name, value):
         if value:
