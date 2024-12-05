@@ -232,7 +232,32 @@ class SaleCommercialFilter(django_filters.FilterSet):
 
     year_built_min = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='gte')
     year_built_max = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='lte')
-
+    buildingClass = django_filters.ChoiceFilter(field_name='buildingClass',
+                                                choices=[
+                                                    ('A', 'A'),
+                                                    ('A+', 'A+'),
+                                                    ('B', 'B'),
+                                                    ('B+', 'B+'),
+                                                    ('B-', 'B-'),
+                                                    ('C', 'C')
+                                                ])
+    furniture_c = django_filters.BooleanFilter(field_name='furniture_c')
+    access = django_filters.ChoiceFilter(
+        field_name='access',
+        choices=[
+            ('free', 'Свободный'),
+            ('passing_system', 'Пропускная система')
+        ]
+    )
+    no_commission = django_filters.BooleanFilter(
+        field_name='agentBonus',
+        method='filter_no_commission',
+        label='Без комиссии'
+    )
+    def filter_no_commission(self, queryset, name, value):
+        if value:  # If True, filter for no agent commission
+            return queryset.filter(agentBonus='Нет')
+        return queryset
     def filter_not_first(self, queryset, name, value):
         if value:
             return queryset.exclude(floor=1)  # Exclude first floor
@@ -281,7 +306,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
             'address', 'fromOwner', 'pathType', 'min_totalArea', 'max_totalArea',
             'ceilingHeight', 'bathroom', 'planning', 'min_floor', 'max_floor',
             'not_first', 'not_last', 'only_last', 'penthouse', 'year_built_min',
-            'year_built_max'
+            'year_built_max', 'buildingClass', 'access', 'furniture_c', 'no_commission'
         ]
 
 
@@ -663,6 +688,23 @@ class RentCommercialFilter(django_filters.FilterSet):
     penthouse = django_filters.BooleanFilter(method='filter_penthouse', label='Penthouse')
     year_built_min = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='gte')
     year_built_max = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='lte')
+    access = django_filters.ChoiceFilter(
+        field_name='access',
+        choices =[
+            ('free', 'Свободный'),
+            ('passing_system', 'Пропускная система')
+        ]
+    )
+    furniture_c = django_filters.BooleanFilter(field_name='furniture_c')
+    buildingClass = django_filters.ChoiceFilter(field_name='buildingClass',
+                                                choices = [
+                                                    ('A', 'A'),
+                                                    ('A+', 'A+'),
+                                                    ('B', 'B'),
+                                                    ('B+', 'B+'),
+                                                    ('B-', 'B-'),
+                                                    ('C', 'C')
+                                                ])
     # Filter for 'Без залога' (Without Deposit)
     no_deposit = django_filters.BooleanFilter(
         field_name='security_deposit',
@@ -717,5 +759,5 @@ class RentCommercialFilter(django_filters.FilterSet):
             'ceilingHeight', 'bathroom', 'balcony', 'loggia', 'planning', 'min_floor',
             'max_floor', 'min_floor_in_house', 'max_floor_in_house', 'not_first',
             'not_last', 'only_last', 'penthouse', 'year_built_min', 'year_built_max',
-            'no_deposit', 'no_commission'
+            'no_deposit', 'no_commission', 'furniture_c', 'buildingClass', 'access'
         ]
