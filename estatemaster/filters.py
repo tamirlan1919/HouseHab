@@ -232,7 +232,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
 
     year_built_min = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='gte')
     year_built_max = django_filters.NumberFilter(field_name='yearBuilt', lookup_expr='lte')
-    buildingClass = django_filters.ChoiceFilter(field_name='buildingClass',
+    buildingClass = django_filters.MultipleChoiceFilter(field_name='buildingClass',
                                                 choices=[
                                                     ('A', 'A'),
                                                     ('A+', 'A+'),
@@ -703,7 +703,7 @@ class RentCommercialFilter(django_filters.FilterSet):
         ]
     )
     furniture_c = django_filters.BooleanFilter(field_name='furniture_c')
-    buildingClass = django_filters.ChoiceFilter(field_name='buildingClass',
+    buildingClass = django_filters.MultipleChoiceFilter(field_name='buildingClass',
                                                 choices = [
                                                     ('A', 'A'),
                                                     ('A+', 'A+'),
