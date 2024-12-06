@@ -254,6 +254,13 @@ class SaleCommercialFilter(django_filters.FilterSet):
         method='filter_no_commission',
         label='Без комиссии'
     )
+    rentalType = django_filters.ChoiceFilter(
+        field_name='rentalType',
+        choices=[
+            ('long-term', 'Долгосрочная'),
+            ('short-term', 'Краткосрочная'),
+        ]
+    )
     def filter_no_commission(self, queryset, name, value):
         if value:  # If True, filter for no agent commission
             return queryset.filter(agentBonus='Нет')
@@ -306,7 +313,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
             'address', 'fromOwner', 'pathType', 'min_totalArea', 'max_totalArea',
             'ceilingHeight', 'bathroom', 'planning', 'min_floor', 'max_floor',
             'not_first', 'not_last', 'only_last', 'penthouse', 'year_built_min',
-            'year_built_max', 'buildingClass', 'access', 'furniture_c', 'no_commission'
+            'year_built_max', 'buildingClass', 'access', 'furniture_c', 'no_commission', 'rentalType'
         ]
 
 
@@ -718,6 +725,13 @@ class RentCommercialFilter(django_filters.FilterSet):
         method='filter_no_commission',
         label='Без комиссии'
     )
+    rentalType = django_filters.ChoiceFilter(
+        field_name='rentalType',
+        choices = [
+            ('long-term', 'Долгосрочная'),
+            ('short-term', 'Краткосрочная'),
+        ]
+    )
     def filter_not_first(self, queryset, name, value):
         if value:
             return queryset.exclude(floor=1)
@@ -759,5 +773,5 @@ class RentCommercialFilter(django_filters.FilterSet):
             'ceilingHeight', 'bathroom', 'balcony', 'loggia', 'planning', 'min_floor',
             'max_floor', 'min_floor_in_house', 'max_floor_in_house', 'not_first',
             'not_last', 'only_last', 'penthouse', 'year_built_min', 'year_built_max',
-            'no_deposit', 'no_commission', 'furniture_c', 'buildingClass', 'access'
+            'no_deposit', 'no_commission', 'furniture_c', 'buildingClass', 'access', 'rentalType'
         ]
