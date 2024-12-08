@@ -497,23 +497,23 @@ class RoomCountView(APIView):
                       RentDayAdvertisement.objects.filter(roomsNumber='studio').count() +
                       RentLongAdvertisement.objects.filter(roomsNumber='studio').count(),
 
-            "1_room": SaleResidential.objects.filter(roomsNumber='1').count() +
+            "one_rooms": SaleResidential.objects.filter(roomsNumber='1').count() +
                       RentDayAdvertisement.objects.filter(roomsNumber='1').count() +
                       RentLongAdvertisement.objects.filter(roomsNumber='1').count(),
 
-            "2_rooms": SaleResidential.objects.filter(roomsNumber='2').count() +
+            "two_rooms": SaleResidential.objects.filter(roomsNumber='2').count() +
                        RentDayAdvertisement.objects.filter(roomsNumber='2').count() +
                        RentLongAdvertisement.objects.filter(roomsNumber='2').count(),
 
-            "3_rooms": SaleResidential.objects.filter(roomsNumber='3').count() +
+            "three_rooms": SaleResidential.objects.filter(roomsNumber='3').count() +
                        RentDayAdvertisement.objects.filter(roomsNumber='3').count() +
                        RentLongAdvertisement.objects.filter(roomsNumber='3').count(),
 
-            "4_rooms": SaleResidential.objects.filter(roomsNumber='4').count() +
+            "four_rooms": SaleResidential.objects.filter(roomsNumber='4').count() +
                        RentDayAdvertisement.objects.filter(roomsNumber='4').count() +
                        RentLongAdvertisement.objects.filter(roomsNumber='4').count(),
 
-            "5_rooms": SaleResidential.objects.filter(roomsNumber='5').count() +
+            "five_rooms": SaleResidential.objects.filter(roomsNumber='5').count() +
                        RentDayAdvertisement.objects.filter(roomsNumber='5').count() +
                        RentLongAdvertisement.objects.filter(roomsNumber='5').count(),
 
