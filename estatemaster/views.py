@@ -521,11 +521,11 @@ class RoomCountView(APIView):
                             RentDayAdvertisement.objects.filter(roomsNumber='6+').count() +
                             RentLongAdvertisement.objects.filter(roomsNumber='overSix').count(),
 
-            "secondary_market": SaleResidential.objects.filter(obj='flat').count() +
+            "secondary_flat": SaleResidential.objects.filter(obj='flat').count() +
                                 RentDayAdvertisement.objects.filter(obj='flat').count() +
                                 RentLongAdvertisement.objects.filter(obj='flat').count(),
 
-            "new_building": SaleResidential.objects.filter(obj='flatNewBuilding').count() +
+            "new_flat": SaleResidential.objects.filter(obj='flatNewBuilding').count() +
                             RentDayAdvertisement.objects.filter(obj='flatNewBuilding').count() +
                             RentLongAdvertisement.objects.filter(obj='flatNewBuilding').count()
         }
