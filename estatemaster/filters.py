@@ -114,7 +114,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
         ]
     )
 
-    address = django_filters.CharFilter(field_name='address')
+    address = django_filters.CharFilter(field_name='address', lookup_expr='icontains')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
 
     pathType = django_filters.MultipleChoiceFilter(
@@ -189,7 +189,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
         ]
     )
 
-    address = django_filters.CharFilter(field_name='address')
+    address = django_filters.CharFilter(field_name='address', lookup_expr='icontains')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
@@ -337,7 +337,7 @@ class RentLongFilter(django_filters.FilterSet):
     )
 
     roomsNumber = ArrayFilter(field_name='roomsNumber')
-    address = django_filters.CharFilter(field_name='address')
+    address = django_filters.CharFilter(field_name='address', lookup_expr='icontains')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
 
     pathType = django_filters.MultipleChoiceFilter(
@@ -627,7 +627,7 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('commercial_land', 'Коммерческая земля')
         ]
     )
-    address = django_filters.CharFilter(field_name='address')
+    address = django_filters.CharFilter(field_name='address', lookup_expr='icontains')
     fromOwner = django_filters.BooleanFilter(field_name='accountType', label='От собственника')
     pathType = django_filters.MultipleChoiceFilter(
         field_name='pathType',
