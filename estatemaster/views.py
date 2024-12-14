@@ -264,6 +264,8 @@ class RentLongAdvertisementViewSet(viewsets.ModelViewSet):
 class RentDayAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentDayAdvertisement.objects.all()
     serializer_class = RentDayAdvertisementSerializer
+    filter_backends = [DjangoFilterBackend]  # Подключаем backend для фильтрации
+    filterset_class = RentDailyFilter  # Указываем класс фильтра
     permission_classes = [AllowAny]
 
 

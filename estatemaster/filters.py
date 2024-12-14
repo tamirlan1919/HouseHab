@@ -603,7 +603,7 @@ class RentDailyFilter(django_filters.FilterSet):
                     'fromOwner', 'pathType', 'subway_minute', 'min_kitchenArea', 'max_kitchenArea',
                     'livingConditions', 'amenities', 'min_floor', 'max_floor', 'min_floor_in_house',
                     'max_floor_in_house', 'not_first', 'not_last', 'only_last', 'penthouse',
-                    'propertyType', 'no_deposit'
+                    'propertyType', 'no_deposit', 'guestsNumber'
                 ]
 
 
