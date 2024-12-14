@@ -549,7 +549,7 @@ class RentDailyFilter(django_filters.FilterSet):
     not_last = django_filters.BooleanFilter(method='filter_not_last', label='Not Last Floor')
     only_last = django_filters.BooleanFilter(method='filter_only_last', label='Only Last Floor')
     penthouse = django_filters.BooleanFilter(method='filter_penthouse', label='Penthouse')
-
+    guestsNumber = django_filters.NumberFilter(field_name='guestsNumber')
     propertyType = django_filters.MultipleChoiceFilter(
         field_name='propertyType',
         choices=[
