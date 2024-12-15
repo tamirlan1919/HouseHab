@@ -533,3 +533,43 @@ class RoomCountView(APIView):
         }
 
         return Response(data)
+
+
+@extend_schema(tags=['Полезные ссылки'])
+class UsefulLinksView(APIView):
+    def get(self, request):
+        data = {
+            "buy_flat": {
+                "one_room": SaleResidential.objects.filter(obj='flat', dealType='sale', roomsNumber='1').count(),
+                "two_rooms": SaleResidential.objects.filter(obj='flat', dealType='sale', roomsNumber='2').count(),
+                "three_rooms": SaleResidential.objects.filter(obj='flat', dealType='sale', roomsNumber='3').count(),
+            },
+            "rent_flat": {
+                "one_room": RentLongAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='1').count() +
+                            RentDayAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='1').count(),
+                "two_rooms": RentLongAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='2').count() +
+                             RentDayAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='2').count(),
+                "three_rooms": RentLongAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='3').count() +
+                               RentDayAdvertisement.objects.filter(obj='flat', dealType='rent', roomsNumber='3').count(),
+            },
+            "daily_rent": {
+                "apartments": RentDayAdvertisement.objects.filter(obj='flat', dealType='rent', leaseType='daily').count(),
+                "room": RentDayAdvertisement.objects.filter(obj='room', dealType='rent', leaseType='daily').count(),
+                "hostel": RentDayAdvertisement.objects.filter(obj='place', dealType='rent', leaseType='daily').count(),
+                "guest_house": RentDayAdvertisement.objects.filter(obj='house', dealType='rent', leaseType='daily').count(),
+            },
+            "villas_land": {
+                # Примерная логика, нужно адаптировать под ваши данные
+                "catalog": SaleResidential.objects.filter(obj='plot').count(),
+                "buy_beach_house": SaleResidential.objects.filter(obj='house').count(),
+                "rent_beach_house": RentLongAdvertisement.objects.filter(obj='house', dealType='rent').count()
+            },
+            "commercial": {
+                # Аналогично, подставляйте нужные фильтры для коммерческой недвижимости
+                "buy_office_shop_warehouse": SaleCommercialAdvertisement.objects.filter(dealType='sale').count(),
+                "rent_warehouse": RentCommercialAdvertisement.objects.filter(obj='git ', dealType='rent').count(),
+                "rent_commercial_space": RentCommercialAdvertisement.objects.filter(dealType='rent').count(),
+            }
+        }
+
+        return Response(data)

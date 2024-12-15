@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from estatemaster import views
 from estatemaster.serializers import AllAdvertisementsView, FilteredAdvertisementsView
-from estatemaster.views import CustomActivateUser, RoomCountView
+from estatemaster.views import CustomActivateUser, RoomCountView, UsefulLinksView
 
 router = DefaultRouter()
 router.register(r'promotion-configs', views.PromotionConfigViewSet)
@@ -40,7 +40,7 @@ urlpatterns = [
     path('api/filtered-advertisements/', FilteredAdvertisementsView.as_view(), name='filtered-advertisements'),
     path('api/', include(router.urls)),  # Include the router's URLs
     path('api/room-count/', RoomCountView.as_view(), name='room_count'),
-
+    path('api/useful-links/', UsefulLinksView.as_view(), name='useful-links'),
     path('api/favorites/', views.FavoritesAPIView.as_view(), name='favorites'),  # Для списка избранного
     path('api/favorites/remove_all/', views.RemoveAllFavoritesAPIView.as_view(), name='favorites-remove-all'),
     path('api/favorites/<uuid>/', views.FavoritesAPIView.as_view(), name='favorites-detail'),
