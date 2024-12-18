@@ -169,7 +169,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
-            'created_at': 'Дата объявления',
+            'created_at': 'Дата объявленияя',
             'id': 'ID объявления'
         }
     )

@@ -4,7 +4,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiResponse, extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action, permission_classes
@@ -278,7 +279,16 @@ class SaleCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-@extend_schema(tags=['Аренда  Недвижимости (Коммерция)'])
+@extend_schema(tags=['Аренда  Недвижимости (Коммерция)'],
+               parameters=[
+                   OpenApiParameter(
+                       name='ordering',
+                       description='Сортировка по полю. Пример: ordering=price или ordering=-price',
+                       required=False,
+                       type=OpenApiTypes.STR
+                   ),
+               ]
+               )
 class RentCommercialAdvertisementViewSet(viewsets.ModelViewSet):
     queryset = RentCommercialAdvertisement.objects.all()
     serializer_class = RentCommercialAdvertisementSerializer
