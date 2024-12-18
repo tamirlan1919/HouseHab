@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from django.http import JsonResponse
@@ -369,8 +370,17 @@ class PhotoGroupViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@extend_schema(tags=['Мои объявления'])
-
+@extend_schema(
+    tags=['Мои объявления'],
+    parameters=[
+        OpenApiParameter(
+            name='ordering',
+            description='Сортировка по доступным полям. Пример: ordering=created_at или ordering=-created_at',
+            required=False,
+            type=OpenApiTypes.STR
+        ),
+    ]
+)
 class UserAdvertisementsViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -383,6 +393,22 @@ class UserAdvertisementsViewSet(viewsets.ViewSet):
         rent_commercial = RentCommercialAdvertisement.objects.filter(user=user)
 
         combined_queryset = list(rent_long) + list(sale_residential) + list(rent_day) + list(sale_commercial) + list(rent_commercial)
+
+        ordering = request.query_params.get('ordering', None)
+        if ordering:
+            reverse = ordering.startswith('-')
+            field_name = ordering.lstrip('-')
+
+            # Функция для извлечения значения поля, при None подставляем минимально возможную дату
+            def sort_key(obj):
+                value = getattr(obj, field_name, None)
+                if value is None:
+                    # Если поле None, подставим минимально возможную дату для сравнения или любое значение
+                    # Если у вас число или строка - подставьте 0 или "" соответственно
+                    return datetime(1970, 1, 1)
+                return value
+
+            combined_queryset.sort(key=sort_key, reverse=reverse)
 
         serialized_data = []
         for obj in combined_queryset:

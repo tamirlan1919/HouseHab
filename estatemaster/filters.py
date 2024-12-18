@@ -147,7 +147,14 @@ class SaleResidentialFilter(django_filters.FilterSet):
         ],
         label='Bathroom Type'
     )
-
+    currency = django_filters.ChoiceFilter(field_name='currency',
+                                           choices=[
+                                               ('MZN', 'MZN'),
+                                               ('USD', 'Доллар'),
+                                               ('EUR', 'Евро'),
+                                           ],
+                                           label='Валюта'
+                                           )
     def filter_bathroom_type(self, queryset, name, value):
         if value == 'combined':
             return queryset.filter(combinedBathroom=True)
@@ -182,7 +189,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             'not_first', 'not_last', 'only_last', 'penthouse', 'obj', 'address',
             'fromOwner', 'pathType', 'min_totalArea', 'max_totalArea', 'min_livingArea',
             'max_livingArea', 'min_kitchenArea', 'max_kitchenArea', 'balcony', 'loggia',
-            'ceilingHeight', 'bathroom'
+            'ceilingHeight', 'bathroom', 'currency'
         ]
 
 
@@ -534,7 +541,14 @@ class RentLongFilter(django_filters.FilterSet):
             'id': 'ID объявления'
         }
     )
-
+    currency = django_filters.ChoiceFilter(field_name='currency',
+                                           choices=[
+                                               ('MZN', 'MZN'),
+                                               ('USD', 'Доллар'),
+                                               ('EUR', 'Евро'),
+                                           ],
+                                           label='Валюта'
+                                           )
     class Meta:
         model = RentLongAdvertisement
         fields = [
@@ -543,7 +557,7 @@ class RentLongFilter(django_filters.FilterSet):
             'balcony', 'loggia', 'ceilingHeight', 'bathroom', 'amenities', 'rentalTerm',
             'livingConditions', 'repair', 'min_floor', 'max_floor', 'min_floor_in_house',
             'max_floor_in_house', 'not_first', 'not_last', 'only_last', 'penthouse',
-            'propertyType', 'is_freightElevator', 'is_passengerElevator', 'no_deposit'
+            'propertyType', 'is_freightElevator', 'is_passengerElevator', 'no_deposit', 'currency'
 
         ]
 
@@ -731,7 +745,30 @@ class RentCommercialFilter(django_filters.FilterSet):
         ],
         label='Bathroom Type'
     )
-
+    currency_rent_month_per_m2 = django_filters.ChoiceFilter(field_name='currency_rent_month_per_m2',
+                                           choices=[
+                                               ('MZN', 'MZN'),
+                                               ('USD', 'Доллар'),
+                                               ('EUR', 'Евро'),
+                                           ],
+                                           label='Валюта для арендыв месяц за кв м'
+                                           )
+    currency_rent_year_per_m2 = django_filters.ChoiceFilter(field_name='currency_rent_year_per_m2',
+                                                             choices=[
+                                                                 ('MZN', 'MZN'),
+                                                                 ('USD', 'Доллар'),
+                                                                 ('EUR', 'Евро'),
+                                                             ],
+                                                             label='Валюта для аренды в год за кв м'
+                                                             )
+    currency_rent_month = django_filters.ChoiceFilter(field_name='currency_rent_month',
+                                                             choices=[
+                                                                 ('MZN', 'MZN'),
+                                                                 ('USD', 'Доллар'),
+                                                                 ('EUR', 'Евро'),
+                                                             ],
+                                                             label='Валюта для аренды в месяц'
+                                                             )
     def filter_by_price_range(self, queryset, name, value):
         if name == 'min_price':
             return queryset.filter(
@@ -873,5 +910,6 @@ class RentCommercialFilter(django_filters.FilterSet):
             'ceilingHeight', 'bathroom', 'balcony', 'loggia', 'planning', 'min_floor',
             'max_floor', 'min_floor_in_house', 'max_floor_in_house', 'not_first',
             'not_last', 'only_last', 'penthouse', 'year_built_min', 'year_built_max',
-            'no_deposit', 'no_commission', 'furniture_c', 'buildingClass', 'access', 'rentalType'
+            'no_deposit', 'no_commission', 'furniture_c', 'buildingClass', 'access', 'rentalType',
+            'currency_rent_month_per_m2','currency_rent_year_per_m2', 'currency_rent_month'
         ]
