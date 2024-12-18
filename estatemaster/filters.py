@@ -161,6 +161,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             ('totalArea', 'totalArea'),
             ('minutesBusStop', 'minutesBusStop'),
             ('address', 'address'),
+            ('created_at', 'created_at'),
             ('id', 'id')
         ],
         field_labels={
@@ -168,6 +169,7 @@ class SaleResidentialFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
+            'created_at': 'Дата объявления',
             'id': 'ID объявления'
         }
     )
@@ -330,6 +332,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
             ('totalArea', 'totalArea'),
             ('minutesBusStop', 'minutesBusStop'),
             ('address', 'address'),
+            ('created_at', 'created_at'),
             ('id', 'id')
         ],
         field_labels={
@@ -338,6 +341,7 @@ class SaleCommercialFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
+            'created_at': 'Дата объявления',
             'id': 'ID объявления'
         }
     )
@@ -518,6 +522,7 @@ class RentLongFilter(django_filters.FilterSet):
             ('totalArea', 'totalArea'),
             ('minutesBusStop', 'minutesBusStop'),
             ('address', 'address'),
+            ('created_at', 'created_at'),
             ('id', 'id')
         ],
         field_labels={
@@ -525,6 +530,7 @@ class RentLongFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
+            'created_at': 'Дата объявления',
             'id': 'ID объявления'
         }
     )
@@ -655,6 +661,7 @@ class RentDailyFilter(django_filters.FilterSet):
             ('totalArea', 'totalArea'),
             ('minutesBusStop', 'minutesBusStop'),
             ('address', 'address'),
+            ('created_at', 'created_at'),
             ('id', 'id')
         ],
         field_labels={
@@ -662,6 +669,7 @@ class RentDailyFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
+            'created_at': 'Дата объявления',
             'id': 'ID объявления'
         }
     )
@@ -842,7 +850,9 @@ class RentCommercialFilter(django_filters.FilterSet):
             ('totalArea', 'totalArea'),
             ('minutesBusStop', 'minutesBusStop'),
             ('address', 'address'),
+            ('created_at', 'created_at'),
             ('id', 'id')
+
         ],
         field_labels={
             'rent_per_month_per_m2': 'Аренда в месяц за м2',
@@ -850,6 +860,7 @@ class RentCommercialFilter(django_filters.FilterSet):
             'totalArea': 'Общая площадь',
             'minutesBusStop': 'Время до метро',
             'address': 'Адрес',
+            'created_at': 'Дата добавления',
             'id': 'ID объявления'
         }
     )
