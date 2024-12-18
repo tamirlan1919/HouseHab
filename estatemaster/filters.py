@@ -155,6 +155,23 @@ class SaleResidentialFilter(django_filters.FilterSet):
             return queryset.filter(separateBathroom=True)
         return queryset
 
+    ordering = filters.OrderingFilter(
+        fields=[
+            ('price', 'price'),
+            ('totalArea', 'totalArea'),
+            ('minutesBusStop', 'minutesBusStop'),
+            ('address', 'address'),
+            ('id', 'id')
+        ],
+        field_labels={
+            'price': 'Цена',
+            'totalArea': 'Общая площадь',
+            'minutesBusStop': 'Время до метро',
+            'address': 'Адрес',
+            'id': 'ID объявления'
+        }
+    )
+
     class Meta:
         model = SaleResidential
         fields = [
@@ -305,6 +322,25 @@ class SaleCommercialFilter(django_filters.FilterSet):
                 Q(total_price__lte=value) | Q(price_per_m2__lte=value)
             )
         return queryset
+
+    ordering = filters.OrderingFilter(
+        fields=[
+            ('total_price', 'total_price'),
+            ('price_per_m2', 'price_per_m2'),
+            ('totalArea', 'totalArea'),
+            ('minutesBusStop', 'minutesBusStop'),
+            ('address', 'address'),
+            ('id', 'id')
+        ],
+        field_labels={
+            'total_price': 'Цена за все',
+            'price_per_m2': 'Цена за м2',
+            'totalArea': 'Общая площадь',
+            'minutesBusStop': 'Время до метро',
+            'address': 'Адрес',
+            'id': 'ID объявления'
+        }
+    )
 
     class Meta:
         model = SaleCommercialAdvertisement
@@ -476,6 +512,23 @@ class RentLongFilter(django_filters.FilterSet):
             return queryset.filter(Q(deposit=0) | Q(deposit__isnull=True))
         return queryset
 
+    ordering = filters.OrderingFilter(
+        fields=[
+            ('rent_per_month', 'rent_per_month'),
+            ('totalArea', 'totalArea'),
+            ('minutesBusStop', 'minutesBusStop'),
+            ('address', 'address'),
+            ('id', 'id')
+        ],
+        field_labels={
+            'price': 'Аренда в месяц',
+            'totalArea': 'Общая площадь',
+            'minutesBusStop': 'Время до метро',
+            'address': 'Адрес',
+            'id': 'ID объявления'
+        }
+    )
+
     class Meta:
         model = RentLongAdvertisement
         fields = [
@@ -595,6 +648,23 @@ class RentDailyFilter(django_filters.FilterSet):
                 query |= Q(apartment__contains=item) | Q(connection__contains=item) | Q(furniture__contains=item)
             return queryset.filter(query)
         return queryset
+
+    ordering = filters.OrderingFilter(
+        fields=[
+            ('daily_price', 'daily_price'),
+            ('totalArea', 'totalArea'),
+            ('minutesBusStop', 'minutesBusStop'),
+            ('address', 'address'),
+            ('id', 'id')
+        ],
+        field_labels={
+            'daily_price': 'Аренда за день',
+            'totalArea': 'Общая площадь',
+            'minutesBusStop': 'Время до метро',
+            'address': 'Адрес',
+            'id': 'ID объявления'
+        }
+    )
 
     class Meta:
         model = RentDayAdvertisement
@@ -764,6 +834,25 @@ class RentCommercialFilter(django_filters.FilterSet):
         if value:  # If True, filter for no agent commission
             return queryset.filter(agentBonus='Нет')
         return queryset
+
+    ordering = filters.OrderingFilter(
+        fields=[
+            ('rent_per_month_per_m2', 'rent_per_month_per_m2'),
+            ('rent_per_year_per_m2', 'rent_per_year_per_m2'),
+            ('totalArea', 'totalArea'),
+            ('minutesBusStop', 'minutesBusStop'),
+            ('address', 'address'),
+            ('id', 'id')
+        ],
+        field_labels={
+            'rent_per_month_per_m2': 'Аренда в месяц за м2',
+            'rent_per_year_per_m2': 'Аренда в год за м2',
+            'totalArea': 'Общая площадь',
+            'minutesBusStop': 'Время до метро',
+            'address': 'Адрес',
+            'id': 'ID объявления'
+        }
+    )
 
     class Meta:
         model = RentCommercialAdvertisement
